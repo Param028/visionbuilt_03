@@ -1,0 +1,317 @@
+import React, { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { api } from '../services/api';
+import { User } from '../types';
+import { SUPPORTED_COUNTRIES } from '../constants';
+import { Button, Card, Input } from '../components/ui/Components';
+import { Stepper, ScrollFloat } from '../components/ui/ReactBits';
+import { ArrowLeft, Mail, KeyRound, Lock, Globe } from 'lucide-react';
+import { useToast } from '../components/ui/Toast';
+
+type AuthMode = 'login' | 'signup' | 'forgot_email' | 'forgot_otp' | 'reset_password';
+
+const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
+  const [searchParams] = useSearchParams();
+  const [authMode, setAuthMode] = useState<AuthMode>(
+    searchParams.get('mode') === 'signup' ? 'signup' : 'login'
+  );
+  const toast = useToast();
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [country, setCountry] = useState('India');
+  
+  // Reset Password States
+  const [otp, setOtp] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  
+  const [loading, setLoading] = useState(false);
+  const [loadingStep, setLoadingStep] = useState(0);
+
+  const simulateLoading = async (steps = [1, 2, 3, 4]) => {
+      for (const step of steps) {
+          setLoadingStep(step);
+          await new Promise(r => setTimeout(r, 600));
+      }
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
+      e.preventDefault();
+      setLoading(true);
+      try {
+          await simulateLoading();
+          const user = await api.signInWithPassword(email, password);
+          setUser(user);
+          toast.success("Successfully logged in!");
+      } catch (err: any) {
+          toast.error(err.message || "Login failed");
+      } finally {
+          setLoading(false);
+      }
+  };
+
+  const handleSignup = async (e: React.FormEvent) => {
+      e.preventDefault();
+      setLoading(true);
+      try {
+          await simulateLoading();
+          await api.signUp(email, password, fullName, country);
+          toast.success("Account created! Please verify your email.");
+      } catch (err: any) {
+          toast.error(err.message || "Signup failed");
+      } finally {
+          setLoading(false);
+      }
+  };
+
+  const handleForgotEmail = async (e: React.FormEvent) => {
+      e.preventDefault();
+      setLoading(true);
+      try {
+          await api.sendPasswordResetOtp(email);
+          setAuthMode('forgot_otp');
+          toast.success("Reset code sent to your email.");
+      } catch (err: any) {
+          toast.error(err.message);
+      } finally {
+          setLoading(false);
+      }
+  };
+
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+      e.preventDefault();
+      setLoading(true);
+      try {
+          await api.verifyRecoveryOtp(email, otp);
+          setAuthMode('reset_password');
+          toast.success("Code verified. Please set a new password.");
+      } catch (err: any) {
+          toast.error("Invalid code. Please try again.");
+      } finally {
+          setLoading(false);
+      }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+      e.preventDefault();
+      setLoading(true);
+      try {
+          await api.updateUserPassword(newPassword);
+          // Get fresh user to trigger login
+          const user = await api.getCurrentUser();
+          if (user) {
+              setUser(user);
+              toast.success("Password updated successfully!");
+          }
+      } catch (err: any) {
+          toast.error(err.message);
+      } finally {
+          setLoading(false);
+      }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center px-4">
+        <Card className="w-full max-w-lg p-6 sm:p-12 flex flex-col items-center justify-center min-h-[400px]">
+          <h2 className="text-2xl font-display font-bold text-white mb-8 animate-pulse text-center">
+             <ScrollFloat>Processing...</ScrollFloat>
+          </h2>
+          <div className="w-full px-2 sm:px-4 mb-8">
+            <Stepper 
+              currentStep={loadingStep}
+              steps={[
+                { id: 1, label: "Verifying" },
+                { id: 2, label: "Encrypting" },
+                { id: 3, label: "Connecting" },
+                { id: 4, label: "Success" }
+              ]}
+            />
+          </div>
+          <p className="text-gray-400 text-sm mt-8 animate-pulse">Establishing secure handshake protocol...</p>
+        </Card>
+      </div>
+    );
+  }
+
+  // Common Header Logic
+  const renderHeader = () => {
+      switch(authMode) {
+          case 'signup': return { title: 'Create Account', sub: 'Join Vision Built to start your project.' };
+          case 'forgot_email': return { title: 'Reset Password', sub: 'Enter your email to receive a secure code.' };
+          case 'forgot_otp': return { title: 'Verify Code', sub: `Enter the code sent to ${email}` };
+          case 'reset_password': return { title: 'New Password', sub: 'Set a secure password for your account.' };
+          default: return { title: 'Welcome Back', sub: 'Sign in to manage your orders.' };
+      }
+  };
+
+  const { title, sub } = renderHeader();
+
+  return (
+    <div className="min-h-[80vh] flex items-center justify-center px-4">
+      <Card className="w-full max-w-md p-8 relative">
+        {authMode !== 'login' && authMode !== 'signup' && (
+            <button onClick={() => setAuthMode('login')} className="absolute top-8 left-8 text-gray-400 hover:text-white transition-colors">
+                <ArrowLeft size={20} />
+            </button>
+        )}
+
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-display font-bold text-white mb-2">
+              <ScrollFloat>{title}</ScrollFloat>
+          </h2>
+          <div className="text-gray-400 text-sm">
+            <ScrollFloat className="justify-center" animationDuration={0.4}>{sub}</ScrollFloat>
+          </div>
+        </div>
+
+        {authMode === 'login' && (
+            <form onSubmit={handleLogin} className="space-y-5">
+                <Input 
+                    type="email" 
+                    placeholder="Email Address" 
+                    value={email} 
+                    onChange={(e) => setEmail(e.target.value)} 
+                    required 
+                />
+                <div className="relative">
+                    <Input 
+                        type="password" 
+                        placeholder="Password" 
+                        value={password} 
+                        onChange={(e) => setPassword(e.target.value)} 
+                        required 
+                    />
+                    <button 
+                        type="button"
+                        onClick={() => setAuthMode('forgot_email')}
+                        className="absolute right-0 -bottom-6 text-xs text-gray-500 hover:text-vision-primary transition-colors"
+                    >
+                        Forgot Password?
+                    </button>
+                </div>
+                <div className="pt-2"></div>
+                <Button type="submit" className="w-full">Log In</Button>
+            </form>
+        )}
+
+        {authMode === 'signup' && (
+            <form onSubmit={handleSignup} className="space-y-5">
+                <Input 
+                    placeholder="Full Name" 
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    required 
+                />
+                <Input 
+                    type="email" 
+                    placeholder="Email Address" 
+                    value={email} 
+                    onChange={(e) => setEmail(e.target.value)} 
+                    required 
+                />
+                <Input 
+                    type="password" 
+                    placeholder="Password" 
+                    value={password} 
+                    onChange={(e) => setPassword(e.target.value)} 
+                    required 
+                />
+                
+                <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-gray-400 uppercase tracking-wider flex items-center gap-1">
+                        <Globe size={12} /> Country / Currency
+                    </label>
+                    <select
+                        className="flex h-10 w-full rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-vision-primary/50"
+                        value={country}
+                        onChange={(e) => setCountry(e.target.value)}
+                        required
+                    >
+                        {SUPPORTED_COUNTRIES.map((c) => (
+                            <option key={c} value={c} className="bg-vision-900 text-white">
+                                {c}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                <Button type="submit" className="w-full">Sign Up</Button>
+            </form>
+        )}
+
+        {authMode === 'forgot_email' && (
+            <form onSubmit={handleForgotEmail} className="space-y-5">
+                <div className="bg-white/5 p-4 rounded-lg flex items-center justify-center mb-4">
+                    <Mail size={48} className="text-vision-primary opacity-80" />
+                </div>
+                <Input 
+                    type="email" 
+                    placeholder="Enter your email" 
+                    value={email} 
+                    onChange={(e) => setEmail(e.target.value)} 
+                    required 
+                />
+                <Button type="submit" className="w-full">Send Reset Code</Button>
+            </form>
+        )}
+
+        {authMode === 'forgot_otp' && (
+            <form onSubmit={handleVerifyOtp} className="space-y-5">
+                <div className="bg-white/5 p-4 rounded-lg flex items-center justify-center mb-4">
+                    <KeyRound size={48} className="text-vision-primary opacity-80" />
+                </div>
+                <Input 
+                    type="text" 
+                    placeholder="Enter 6-digit Code" 
+                    value={otp} 
+                    onChange={(e) => setOtp(e.target.value)} 
+                    required 
+                    className="text-center tracking-widest text-lg"
+                />
+                <Button type="submit" className="w-full">Verify Code</Button>
+                <div className="text-center text-xs">
+                    <button type="button" onClick={handleForgotEmail} className="text-gray-500 hover:text-white">Resend Code</button>
+                </div>
+            </form>
+        )}
+
+        {authMode === 'reset_password' && (
+            <form onSubmit={handleResetPassword} className="space-y-5">
+                <div className="bg-white/5 p-4 rounded-lg flex items-center justify-center mb-4">
+                    <Lock size={48} className="text-vision-primary opacity-80" />
+                </div>
+                <Input 
+                    type="password" 
+                    placeholder="New Password" 
+                    value={newPassword} 
+                    onChange={(e) => setNewPassword(e.target.value)} 
+                    required 
+                    minLength={6}
+                />
+                <Button type="submit" className="w-full">Update Password</Button>
+            </form>
+        )}
+
+        {(authMode === 'login' || authMode === 'signup') && (
+            <div className="mt-6 text-center text-sm">
+                <span className="text-gray-500">
+                    {authMode === 'signup' ? 'Already have an account?' : "Don't have an account?"}
+                </span>
+                <button 
+                    onClick={() => {
+                        setAuthMode(authMode === 'signup' ? 'login' : 'signup');
+                    }} 
+                    className="ml-2 text-vision-primary hover:text-white transition-colors font-medium"
+                >
+                    {authMode === 'signup' ? 'Log In' : 'Sign Up'}
+                </button>
+            </div>
+        )}
+      </Card>
+    </div>
+  );
+};
+
+export default Auth;
