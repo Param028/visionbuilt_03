@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
@@ -5,7 +6,7 @@ import { Service, User, Offer } from '../types';
 import { formatPrice, SUPPORTED_COUNTRIES } from '../constants';
 import { Button, Card, Input, Textarea } from '../components/ui/Components';
 import { Stepper, ScrollFloat } from '../components/ui/ReactBits';
-import { TicketPercent, X, Loader2, Globe } from 'lucide-react';
+import { TicketPercent, X, Loader2, Globe, Mail, Phone, User as UserIcon, Tag, DollarSign, MessageCircle } from 'lucide-react';
 import { useToast } from '../components/ui/Toast';
 
 const NewOrder: React.FC<{ user: User }> = ({ user }) => {
@@ -17,8 +18,14 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
   const [service, setService] = useState<Service | null>(null);
   const [step, setStep] = useState(1);
   const [country, setCountry] = useState(user.country || 'India');
+  const [isCustom, setIsCustom] = useState(!serviceId);
 
   const [formData, setFormData] = useState({
+    project_title: '',
+    client_name: user.name || '',
+    client_email: user.email || '',
+    client_phone: '',
+    client_budget: '',
     business_name: '',
     business_category: '',
     address_or_online: '',
@@ -41,9 +48,16 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
     if (serviceId) {
       api.getServices().then(services => {
         const s = services.find(x => x.id === serviceId);
-        if (s) setService(s);
+        if (s) {
+            setService(s);
+            setIsCustom(false);
+        }
       });
+    } else {
+        setIsCustom(true);
     }
+    // Scroll to top on mount
+    window.scrollTo(0, 0);
   }, [serviceId]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -65,7 +79,7 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
       const offer = await api.validateOffer(couponCode.toUpperCase());
       if (offer) {
           setAppliedOffer(offer);
-          toast.success("Coupon applied successfully!");
+          toast.success("Coupon applied!");
       } else {
           setOfferError('Invalid or expired coupon code.');
       }
@@ -78,137 +92,109 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
       setOfferError(null);
   };
 
-  const calculateTotal = () => {
-      if (!service) return { total: 0, discount: 0, final: 0 };
+  // Only calculate estimated total for display, not for charging
+  const calculateEstimatedTotal = () => {
+      if (!isCustom && !service) return 0;
+      let base = isCustom ? 0 : (service?.base_price || 0);
+      const dPrice = service?.domain_price ?? 15;
+      const ePrice = service?.business_email_price ?? 50;
+      if (formData.domain_requested) base += dPrice;
+      if (formData.business_email_requested) base += ePrice;
       
-      let base = service.base_price;
-      if (formData.domain_requested) base += 15;
-      if (formData.business_email_requested) base += 50;
-      
-      let discount = 0;
       if (appliedOffer) {
-          discount = base * (appliedOffer.discountPercentage / 100);
+          base = base - (base * (appliedOffer.discountPercentage / 100));
       }
-
-      return {
-          total: base,
-          discount: discount,
-          final: base - discount
-      };
+      return base;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (step === 1) {
+       if (!formData.client_phone.trim()) {
+           toast.error("Phone number is required for developer contact.");
+           return;
+       }
        setStep(2);
+       window.scrollTo(0, 0);
        return;
     }
     
-    if (service) {
-        setIsProcessing(true);
-        setProcessingStep(1); // Payment Gateway
+    setIsProcessing(true);
+    setProcessingStep(1); 
 
-        try {
-            const { final, discount } = calculateTotal();
-            
-            // Initiate order
-            await api.createOrder({
-                user_id: user.id,
-                type: 'service',
-                service_id: service.id,
-                service_title: service.title,
-                domain_requested: formData.domain_requested,
-                business_email_requested: formData.business_email_requested,
-                total_amount: final,
-                discount_amount: discount,
-                applied_offer_code: appliedOffer?.code,
-                requirements: {
-                    business_name: formData.business_name,
-                    business_category: formData.business_category,
-                    address_or_online: formData.address_or_online,
-                    requirements_text: formData.requirements_text,
-                    reference_links: formData.reference_links
-                }
-            });
-            
-            setProcessingStep(4); // Complete
-            toast.success("Order placed successfully!");
-            setTimeout(() => navigate('/dashboard'), 500);
-        } catch (error: any) {
-            console.error(error);
-            setIsProcessing(false);
-            if (error.message && error.message.includes("VITE_RAZORPAY_KEY_ID")) {
-                toast.error("Deployment Error: Razorpay Key missing in environment variables.");
-            } else {
-                toast.error(error.message || "Payment failed or cancelled. Please try again.");
+    try {
+        const estimated = calculateEstimatedTotal();
+        
+        await api.createOrder({
+            user_id: user.id,
+            type: 'service',
+            service_id: service?.id,
+            service_title: isCustom ? formData.project_title : (service?.title || 'Custom Project'),
+            is_custom: isCustom,
+            domain_requested: formData.domain_requested,
+            business_email_requested: formData.business_email_requested,
+            // For service orders, we don't charge upfront anymore.
+            // We set total_amount to the estimated (or 0 for custom) to be confirmed by dev later
+            total_amount: isCustom ? 0 : estimated,
+            discount_amount: 0, // Calculated later when dev sets price
+            applied_offer_code: appliedOffer?.code,
+            requirements: {
+                business_name: formData.business_name,
+                business_category: formData.business_category,
+                address_or_online: formData.address_or_online,
+                requirements_text: formData.requirements_text,
+                reference_links: formData.reference_links,
+                client_name: formData.client_name,
+                client_email: formData.client_email,
+                client_phone: formData.client_phone,
+                client_budget: formData.client_budget
             }
-        }
+        });
+        
+        setProcessingStep(4);
+        toast.success("Request submitted! A developer will contact you shortly.");
+        setTimeout(() => navigate('/dashboard'), 2000);
+    } catch (error: any) {
+        setIsProcessing(false);
+        toast.error(error.message || "Failed to process order.");
     }
   };
 
   if (isProcessing) {
      return (
-        <div className="min-h-[80vh] flex items-center justify-center px-4">
-            <Card className="w-full max-w-2xl p-6 sm:p-12 text-center relative overflow-hidden">
+        <div className="min-h-[80vh] flex items-center justify-center px-4 py-10">
+            <Card className="w-full max-w-2xl p-8 sm:p-12 text-center relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-vision-primary via-vision-secondary to-vision-primary animate-gradient-x"></div>
-                
-                <h2 className="text-3xl font-display font-bold text-white mb-2">
-                    <ScrollFloat>Processing Payment</ScrollFloat>
+                <h2 className="text-2xl sm:text-3xl font-display font-bold text-white mb-2">
+                    <ScrollFloat>Submitting Request</ScrollFloat>
                 </h2>
-                <p className="text-gray-400 mb-12">Please do not close this window.</p>
-                
-                <div className="max-w-xl mx-auto px-2 sm:px-4">
-                     <Stepper 
-                        currentStep={processingStep}
-                        steps={[
-                            { id: 1, label: "Gateway" },
-                            { id: 2, label: "Verifying" },
-                            { id: 3, label: "Confirming" },
-                            { id: 4, label: "Finalizing" }
-                        ]}
-                    />
-                </div>
-
-                <div className="mt-16 bg-white/5 rounded-lg p-4 inline-block">
-                    <div className="flex items-center space-x-3 text-sm text-gray-300">
-                        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                        <span>Secure 256-bit Encryption Active</span>
-                    </div>
+                <p className="text-gray-400 mb-12">Sending details to our developer team...</p>
+                <div className="max-w-xl mx-auto px-4">
+                     <Stepper currentStep={processingStep} steps={[{ id: 1, label: "Saving" }, { id: 2, label: "Routing" }, { id: 3, label: "Notifying" }, { id: 4, label: "Done" }]} />
                 </div>
             </Card>
         </div>
      )
   }
 
-  if (!service) return <div className="p-20 text-center">Loading Service...</div>;
+  if (!service && !isCustom) return <div className="p-20 text-center">Loading Service...</div>;
 
-  const { total, discount, final } = calculateTotal();
+  const estimatedTotal = calculateEstimatedTotal();
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-10">
-      <Card>
-        <div className="mb-8 flex justify-between items-start">
+    <div className="w-full max-w-4xl mx-auto px-4 py-8 sm:py-16">
+      <Card className={`${isCustom ? "border-vision-secondary/30" : "border-vision-primary/30"} w-full`}>
+        <div className="mb-8 flex flex-col sm:flex-row justify-between items-start gap-4">
             <div>
-                <h1 className="text-2xl font-display font-bold text-white">
-                    New Order: <span className="text-vision-primary">{service.title}</span>
+                <h1 className="text-xl sm:text-2xl font-display font-bold text-white">
+                    {isCustom ? <span className="text-vision-secondary">Request Custom Build</span> : <>New Request: <span className="text-vision-primary">{service?.title}</span></>}
                 </h1>
-                <div className="flex items-center space-x-2 mt-2 max-w-[200px]">
-                    <div className={`h-1 flex-1 rounded-full ${step >= 1 ? 'bg-vision-primary' : 'bg-gray-700'}`}></div>
-                    <div className={`h-1 flex-1 rounded-full ${step >= 2 ? 'bg-vision-primary' : 'bg-gray-700'}`}></div>
-                </div>
+                <p className="text-xs text-gray-500 mt-1 uppercase tracking-widest font-mono">Phase {step} / 02</p>
             </div>
-            
-            {/* Country Selector for Order */}
-            <div className="flex items-center space-x-2">
-                <Globe size={16} className="text-gray-400" />
-                <select 
-                    value={country} 
-                    onChange={(e) => setCountry(e.target.value)}
-                    className="bg-black/30 text-white text-xs border border-white/10 rounded px-2 py-1 outline-none"
-                >
-                    {SUPPORTED_COUNTRIES.map(c => (
-                        <option key={c} value={c}>{c}</option>
-                    ))}
+            <div className="flex items-center space-x-2 bg-white/5 px-3 py-1.5 rounded-lg border border-white/10">
+                <Globe size={14} className="text-vision-primary" />
+                <select value={country} onChange={(e) => setCountry(e.target.value)} className="bg-transparent text-white text-[10px] font-bold uppercase outline-none cursor-pointer">
+                    {SUPPORTED_COUNTRIES.map(c => <option key={c} value={c} className="bg-vision-900">{c}</option>)}
                 </select>
             </div>
         </div>
@@ -216,157 +202,97 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
         <form onSubmit={handleSubmit} className="space-y-6">
           {step === 1 ? (
              <>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Input 
-                        label="Business Name" 
-                        name="business_name" 
-                        value={formData.business_name} 
-                        onChange={handleChange} 
-                        required 
-                    />
-                    <Input 
-                        label="Category" 
-                        name="business_category" 
-                        value={formData.business_category} 
-                        onChange={handleChange} 
-                        placeholder="e.g. E-commerce, SaaS" 
-                        required 
-                    />
-                </div>
-                <Input 
-                    label="Address / Online Handle" 
-                    name="address_or_online" 
-                    value={formData.address_or_online} 
-                    onChange={handleChange} 
-                    required 
-                />
-                <Textarea 
-                    label="Project Requirements" 
-                    name="requirements_text" 
-                    value={formData.requirements_text} 
-                    onChange={handleChange} 
-                    rows={4}
-                    placeholder="Describe what you need in detail..."
-                    required 
-                />
-                <Input 
-                    label="Reference Links (Optional)" 
-                    name="reference_links" 
-                    value={formData.reference_links} 
-                    onChange={handleChange} 
-                    placeholder="example.com"
-                />
-                
-                <div className="pt-4 border-t border-white/5 space-y-4">
-                    <h4 className="text-sm font-semibold text-white">Additional Services</h4>
-                    <label className="flex items-center space-x-3 cursor-pointer p-3 rounded-lg border border-white/10 hover:bg-white/5 transition-colors">
-                        <input type="checkbox" name="domain_requested" checked={formData.domain_requested} onChange={handleCheckbox} className="form-checkbox h-5 w-5 text-vision-primary rounded bg-transparent border-gray-600 focus:ring-offset-0 focus:ring-0" />
-                        <div className="flex-grow">
-                            <span className="text-gray-200 block text-sm font-medium">Domain Registration</span>
-                            <span className="text-gray-500 text-xs">We will secure your perfect domain name (+ {formatPrice(15, country)})</span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 sm:p-6 bg-white/5 rounded-xl border border-white/10 shadow-inner">
+                    <div className="col-span-full mb-2">
+                        <h4 className="text-[10px] font-bold text-vision-secondary uppercase tracking-widest flex items-center gap-2">
+                            <UserIcon size={12} /> Contact & Identity
+                        </h4>
+                    </div>
+                    <Input label="Your Name" name="client_name" value={formData.client_name} onChange={handleChange} required className="h-12" />
+                    {isCustom && <Input label="Project Title" name="project_title" value={formData.project_title} onChange={handleChange} placeholder="e.g. Portfolio v2" required className="h-12" />}
+                    <Input label="Email Address" type="email" name="client_email" value={formData.client_email} onChange={handleChange} required className="h-12" />
+                    <Input label="Phone / WhatsApp (Required)" type="tel" name="client_phone" value={formData.client_phone} onChange={handleChange} placeholder="+1..." required className="h-12" />
+                    {isCustom && (
+                        <div className="col-span-full">
+                            <Input label="Estimated Budget ($)" name="client_budget" value={formData.client_budget} onChange={handleChange} placeholder="e.g. 1000 - 1500" required className="h-12" />
                         </div>
-                    </label>
-                    <label className="flex items-center space-x-3 cursor-pointer p-3 rounded-lg border border-white/10 hover:bg-white/5 transition-colors">
-                        <input type="checkbox" name="business_email_requested" checked={formData.business_email_requested} onChange={handleCheckbox} className="form-checkbox h-5 w-5 text-vision-primary rounded bg-transparent border-gray-600 focus:ring-offset-0 focus:ring-0" />
-                        <div className="flex-grow">
-                            <span className="text-gray-200 block text-sm font-medium">Professional Business Email</span>
-                            <span className="text-gray-500 text-xs">Google Workspace or Outlook setup (+ {formatPrice(50, country)})</span>
-                        </div>
-                    </label>
+                    )}
+                    <div className="col-span-full mt-2 flex items-start gap-3 p-3 bg-vision-secondary/5 border border-vision-secondary/20 rounded-lg">
+                        <MessageCircle size={16} className="text-vision-secondary shrink-0 mt-0.5" />
+                        <p className="text-[10px] text-gray-400 leading-relaxed uppercase">
+                            <span className="text-vision-secondary font-bold">Protocol:</span> Payment is NOT required now. A developer will review your request and send a detailed quote broken into 2 milestones (Deposit + Final).
+                        </p>
+                    </div>
                 </div>
 
-                <div className="flex justify-end pt-4">
-                    <Button type="submit">
-                        Continue to Payment
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <Input label="Business Name" name="business_name" value={formData.business_name} onChange={handleChange} required className="h-12" />
+                    <Input label="Industry Category" name="business_category" value={formData.business_category} onChange={handleChange} placeholder="e.g. Retail" required className="h-12" />
+                </div>
+                <Input label="Address or Online Handle" name="address_or_online" value={formData.address_or_online} onChange={handleChange} required className="h-12" />
+                <Textarea label="Core Requirements" name="requirements_text" value={formData.requirements_text} onChange={handleChange} rows={6} placeholder="Describe the functionality, tech stack, or specific features you need..." required />
+                <Input label="Reference URLs (Links)" name="reference_links" value={formData.reference_links} onChange={handleChange} placeholder="competitor.com, design.com" className="h-12" />
+                
+                <div className="pt-6 border-t border-white/5 space-y-4">
+                    <h4 className="text-xs font-bold text-white uppercase tracking-widest">Asset Provisions</h4>
+                    {(isCustom || service?.allow_domain) && (
+                        <label className="flex items-center space-x-3 cursor-pointer p-4 rounded-xl border border-white/10 hover:bg-white/5 transition-all">
+                            <input type="checkbox" name="domain_requested" checked={formData.domain_requested} onChange={handleCheckbox} className="form-checkbox h-5 w-5 text-vision-primary rounded bg-transparent border-gray-600 focus:ring-0" />
+                            <div className="flex-grow">
+                                <span className="text-gray-200 block text-sm font-medium">Provision Custom Domain</span>
+                                <span className="text-[10px] text-gray-500 uppercase tracking-tighter tracking-wider">+ {formatPrice(service?.domain_price ?? 15, country)}</span>
+                            </div>
+                        </label>
+                    )}
+                    {(isCustom || service?.allow_business_email) && (
+                        <label className="flex items-center space-x-3 cursor-pointer p-4 rounded-xl border border-white/10 hover:bg-white/5 transition-all">
+                            <input type="checkbox" name="business_email_requested" checked={formData.business_email_requested} onChange={handleCheckbox} className="form-checkbox h-5 w-5 text-vision-primary rounded bg-transparent border-gray-600 focus:ring-0" />
+                            <div className="flex-grow">
+                                <span className="text-gray-200 block text-sm font-medium">Business Workspace Email</span>
+                                <span className="text-[10px] text-gray-500 uppercase tracking-tighter tracking-wider">+ {formatPrice(service?.business_email_price ?? 50, country)}</span>
+                            </div>
+                        </label>
+                    )}
+                </div>
+
+                <div className="flex justify-end pt-6">
+                    <Button type="submit" size="lg" variant={isCustom ? 'secondary' : 'primary'} className="w-full sm:w-auto min-w-[200px] h-12">
+                        Review & Submit
                     </Button>
                 </div>
              </>
           ) : (
              <div className="text-center py-6">
-                 <h2 className="text-xl font-bold text-white mb-6">
-                     <ScrollFloat>Order Summary</ScrollFloat>
-                 </h2>
-                 <div className="bg-white/5 rounded-lg p-6 mb-8 text-left max-w-md mx-auto space-y-3">
-                     <div className="flex justify-between text-gray-300">
-                         <span>{service.title}</span>
-                         <span>{formatPrice(service.base_price, country)}</span>
-                     </div>
-                     {formData.domain_requested && (
-                         <div className="flex justify-between text-gray-300">
-                             <span>Domain Registration</span>
-                             <span>{formatPrice(15, country)}</span>
-                         </div>
-                     )}
-                     {formData.business_email_requested && (
-                         <div className="flex justify-between text-gray-300">
-                             <span>Business Email</span>
-                             <span>{formatPrice(50, country)}</span>
-                         </div>
-                     )}
-
-                     {/* Coupon Section */}
-                     <div className="border-t border-white/10 pt-4 mt-2">
-                        {appliedOffer ? (
-                            <div className="flex justify-between items-center bg-green-500/10 border border-green-500/20 p-2 rounded-lg">
-                                <div className="flex items-center gap-2">
-                                    <TicketPercent size={16} className="text-green-400" />
-                                    <span className="text-green-400 text-sm font-medium">{appliedOffer.code} ({appliedOffer.discountPercentage}% OFF)</span>
-                                </div>
-                                <button type="button" onClick={removeCoupon} className="text-gray-400 hover:text-white">
-                                    <X size={14} />
-                                </button>
-                            </div>
-                        ) : (
-                            <div className="flex gap-2">
-                                <Input 
-                                    placeholder="Discount Code" 
-                                    value={couponCode} 
-                                    onChange={(e) => setCouponCode(e.target.value)}
-                                    className="h-9 text-sm"
-                                />
-                                <Button 
-                                    type="button" 
-                                    onClick={handleApplyCoupon} 
-                                    disabled={isValidatingOffer || !couponCode}
-                                    variant="secondary"
-                                    size="sm"
-                                    className="h-auto"
-                                >
-                                    {isValidatingOffer ? <Loader2 size={14} className="animate-spin" /> : 'Apply'}
-                                </Button>
-                            </div>
-                        )}
-                        {offerError && <p className="text-xs text-red-400 mt-1">{offerError}</p>}
+                 <h2 className="text-xl font-bold text-white mb-8 uppercase tracking-tight">Request Summary</h2>
+                 <div className="bg-white/5 rounded-2xl p-6 sm:p-10 mb-8 text-left max-w-lg mx-auto space-y-4 border border-white/10 shadow-2xl overflow-hidden relative">
+                     <div className="absolute -top-4 -right-4 w-24 h-24 bg-vision-primary/5 rounded-full blur-2xl" />
+                     
+                     <div className="flex justify-between items-center text-gray-300">
+                         <span className="flex items-center gap-2 font-bold text-sm uppercase tracking-wider"><Tag size={14} className="text-vision-primary" /> {isCustom ? formData.project_title : service?.title}</span>
+                         <span className="font-mono text-vision-primary font-bold text-sm">{isCustom ? 'QUOTING' : 'Standard Rate'}</span>
                      </div>
                      
-                     {/* Discount Line */}
-                     {appliedOffer && (
-                         <div className="flex justify-between text-green-400 text-sm mt-3 font-medium animate-in fade-in slide-in-from-top-1">
-                             <span>Discount Applied</span>
-                             <span>-{formatPrice(discount, country)}</span>
-                         </div>
-                     )}
+                     <div className="space-y-2 border-l border-white/10 pl-4 py-2 mt-4 text-xs text-gray-400">
+                         <div><span className="text-gray-500 uppercase">Contact:</span> {formData.client_phone}</div>
+                         <div><span className="text-gray-500 uppercase">Email:</span> {formData.client_email}</div>
+                         {isCustom && <div><span className="text-gray-500 uppercase">Budget:</span> {formData.client_budget}</div>}
+                     </div>
 
-                     <div className="border-t border-white/10 pt-3 flex justify-between text-xl font-bold text-vision-primary items-center mt-2">
-                         <span>Total</span>
+                     <div className="border-t border-white/10 pt-6 flex justify-between text-xl font-bold text-vision-primary items-center mt-4">
+                         <span className="text-base uppercase tracking-widest">Estimated Total</span>
                          <div className="text-right">
-                             {appliedOffer && (
-                                 <span className="block text-xs text-gray-500 font-normal line-through mb-1">{formatPrice(total, country)}</span>
-                             )}
-                             <span>{formatPrice(final, country)}</span>
+                             <span>{isCustom ? 'TBD' : formatPrice(estimatedTotal, country)}</span>
                          </div>
                      </div>
                  </div>
                  
-                 <div className="flex gap-4 justify-center">
-                    <Button type="button" variant="ghost" onClick={() => setStep(1)} disabled={isProcessing}>
-                        Back
-                    </Button>
-                    <Button type="submit" isLoading={isProcessing} className="min-w-[200px]">
-                        Pay & Place Order
+                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <Button type="button" variant="ghost" onClick={() => { setStep(1); window.scrollTo(0,0); }} disabled={isProcessing} className="h-12 px-8">Edit Details</Button>
+                    <Button type="submit" isLoading={isProcessing} className="min-w-[240px] h-12" variant={isCustom ? 'secondary' : 'primary'}>
+                        Submit Request
                     </Button>
                  </div>
-                 <p className="mt-4 text-xs text-gray-500">Secured by Razorpay</p>
+                 <p className="mt-6 text-[9px] text-gray-600 uppercase tracking-[0.3em] font-mono">No Payment Required at this step</p>
              </div>
           )}
         </form>

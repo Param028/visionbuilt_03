@@ -1,5 +1,4 @@
 
-
 export type Role = 'client' | 'developer' | 'super_admin' | 'admin';
 
 export type OrderStatus = 'pending' | 'accepted' | 'in_progress' | 'mockup_ready' | 'completed' | 'cancelled';
@@ -11,8 +10,8 @@ export interface User {
   name: string;
   email: string;
   role: Role;
-  country?: string; // New field
-  currency?: string; // New field
+  country?: string; 
+  currency?: string; 
   email_verified: boolean;
   avatar_url?: string;
   performance_score?: number; // 0-100
@@ -26,6 +25,10 @@ export interface Service {
   is_enabled: boolean;
   features: string[];
   icon: string; // Lucide icon name
+  allow_domain: boolean;
+  domain_price: number;
+  allow_business_email: boolean;
+  business_email_price: number;
 }
 
 export interface MarketplaceItem {
@@ -37,9 +40,9 @@ export interface MarketplaceItem {
   tags: string[];
   features: string[];
   image_url?: string;
-  preview_images?: string[]; // New field for gallery
+  preview_images?: string[]; 
   demo_url?: string;
-  download_url?: string; // Only available after purchase
+  download_url?: string; 
   developer_id: string;
   developer_name: string;
   views: number;
@@ -47,7 +50,7 @@ export interface MarketplaceItem {
   rating: number;
   review_count: number;
   created_at: string;
-  free_until?: string | null; // ISO Date string for limited time free availability
+  free_until?: string | null; 
 }
 
 export interface ProjectSuggestion {
@@ -67,7 +70,7 @@ export interface Offer {
   description: string;
   code: string;
   discountPercentage: number;
-  validUntil?: string; // ISO date string YYYY-MM-DD
+  validUntil?: string; 
 }
 
 export interface OrderRequirements {
@@ -76,27 +79,39 @@ export interface OrderRequirements {
   address_or_online: string;
   requirements_text: string;
   reference_links: string;
+  // Custom project fields
+  client_name?: string;
+  client_email?: string;
+  client_phone?: string; // Now mandatory logic-wise
+  client_budget?: string;
 }
 
 export interface Order {
   id: string;
   user_id: string;
-  type: OrderType; // New field to distinguish
-  // For Services
+  type: OrderType; 
   service_id?: string;
-  service_title: string; // Used as display title for both services and projects
-  // For Projects
+  service_title: string; 
   project_id?: string;
+  is_custom?: boolean;
   
   status: OrderStatus;
   domain_requested: boolean;
   business_email_requested: boolean;
-  total_amount: number;
-  currency?: string; // New field
-  requirements: OrderRequirements; // Can be empty/partial for projects
+  
+  // Financials
+  total_amount: number; // The agreed total
+  deposit_amount: number; // The initial step 1 payment
+  amount_paid: number; // How much has been paid so far
+  currency?: string; 
+  
+  requirements: OrderRequirements; 
   created_at: string;
   
-  rating?: number; // 1-5
+  // Deliverables / Previews
+  deliverables?: string[]; // URLs to images/files uploaded by dev
+
+  rating?: number; 
   review?: string;
   applied_offer_code?: string;
   discount_amount?: number;
@@ -133,8 +148,8 @@ export interface AdminActivity {
   id: string;
   admin_id: string;
   admin_name: string;
-  action: string; // e.g., "Updated Order Status", "Disabled Service"
-  details?: string; // e.g., "Order #o1 to completed", "Service ID s2"
+  action: string; 
+  details?: string; 
   timestamp: string;
 }
 
@@ -142,9 +157,9 @@ export interface Task {
   id: string;
   title: string;
   description: string;
-  assigned_to_id: string; // Developer ID
+  assigned_to_id: string; 
   assigned_to_name: string;
-  created_by_id: string; // Super Admin ID
+  created_by_id: string; 
   status: 'todo' | 'in_progress' | 'review' | 'done';
   priority: 'low' | 'medium' | 'high';
   due_date: string;
@@ -155,6 +170,6 @@ export interface AnalyticsData {
   total_views: number;
   total_orders: number;
   active_projects: number;
-  sales_trend: number[]; // Simple array for graph
+  sales_trend: number[]; 
   top_developer: User | null;
 }

@@ -28,6 +28,11 @@ CREATE TABLE IF NOT EXISTS public.services (
     is_enabled BOOLEAN DEFAULT true,
     features TEXT[] DEFAULT '{}',
     icon TEXT,
+    -- New configuration fields
+    allow_domain BOOLEAN DEFAULT true,
+    domain_price NUMERIC DEFAULT 15,
+    allow_business_email BOOLEAN DEFAULT true,
+    business_email_price NUMERIC DEFAULT 50,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now())
 );
 

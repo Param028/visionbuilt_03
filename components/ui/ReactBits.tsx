@@ -10,6 +10,18 @@ function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+// Helper to check if we are on a mobile device for performance optimization
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+  return isMobile;
+};
+
 // --- 0. ScrollFloat ---
 export const ScrollFloat: React.FC<{
   children: React.ReactNode;
@@ -24,7 +36,24 @@ export const ScrollFloat: React.FC<{
   delay = 0, 
   stagger = 0.02 
 }) => {
+  const isMobile = useIsMobile();
   const text = typeof children === 'string' ? children : String(children || '');
+  
+  // If mobile, don't split by characters to save DOM nodes and CPU
+  if (isMobile) {
+    return (
+      <motion.h2
+        initial={{ opacity: 0, y: 10 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.4, delay }}
+        className={cn("inline-flex flex-wrap", className)}
+      >
+        {text}
+      </motion.h2>
+    );
+  }
+
   const chars = text.split('');
 
   const containerVariants: Variants = {
@@ -114,15 +143,13 @@ export const CountUp: React.FC<{
     stiffness: 100,
   });
 
-  const isInView = true; // Simplified for this implementation, typically useInView
-
   useEffect(() => {
-    if (startWhen && isInView) {
+    if (startWhen) {
       setTimeout(() => {
         motionValue.set(direction === "down" ? from : to);
       }, delay * 1000);
     }
-  }, [motionValue, isInView, startWhen, to, from, direction, delay]);
+  }, [motionValue, startWhen, to, from, direction, delay]);
 
   useEffect(() => {
     const unsubscribe = springValue.on("change", (latest) => {
@@ -262,8 +289,10 @@ export const LogoLoop: React.FC<{ items: LogoLoopItem[] }> = ({ items }) => {
           width: max-content;
           animation: logo-scroll 40s linear infinite;
         }
-        .logo-loop-track:hover {
-          animation-play-state: paused;
+        @media (hover: hover) {
+          .logo-loop-track:hover {
+            animation-play-state: paused;
+          }
         }
       `}</style>
 
@@ -292,9 +321,19 @@ export const LogoLoop: React.FC<{ items: LogoLoopItem[] }> = ({ items }) => {
 
 // --- 0.8 GlareCard ---
 export const GlareCard: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className }) => {
+  const isMobile = useIsMobile();
   const refElement = useRef<HTMLDivElement>(null);
   const [rotate, setRotate] = useState({ x: 0, y: 0 });
   const [glare, setGlare] = useState({ x: 50, y: 50, opacity: 0 });
+
+  // Disable expensive tilt on mobile
+  if (isMobile) {
+    return (
+      <div className={cn("rounded-xl border border-white/10 bg-black/40 shadow-xl overflow-hidden", className)}>
+        {children}
+      </div>
+    );
+  }
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!refElement.current) return;
@@ -379,7 +418,7 @@ export const Particles: React.FC<ParticlesProps> = ({
   const circles = useRef<any[]>([]);
   const mouse = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const canvasSize = useRef<{ w: number; h: number }>({ w: 0, h: 0 });
-  const dpr = typeof window !== "undefined" ? Math.min(window.devicePixelRatio, 2) : 1;
+  const dpr = typeof window !== "undefined" ? Math.min(window.devicePixelRatio, 1.5) : 1; // Limit DPR for performance
   const rafID = useRef<number | null>(null);
 
   useEffect(() => {
@@ -444,7 +483,7 @@ export const Particles: React.FC<ParticlesProps> = ({
     const translateY = 0;
     const size = Math.floor(Math.random() * 2) + 0.5;
     const alpha = 0;
-    const targetAlpha = parseFloat((Math.random() * 0.6 + 0.1).toFixed(1));
+    const targetAlpha = parseFloat((Math.random() * 0.4 + 0.1).toFixed(1)); // Lower opacity
     const dx = (Math.random() - 0.5) * vx;
     const dy = (Math.random() - 0.5) * vy;
     const magnetism = 0.1 + Math.random() * 4;
@@ -691,16 +730,17 @@ export const MagicBentoItem: React.FC<{
   icon?: React.ReactNode;
   colSpan?: number;
 }> = ({ children, className, title, description, icon, colSpan = 1 }) => {
+  const isMobile = useIsMobile();
   return (
     <motion.div
-      whileHover={{ scale: 1.02 }}
+      whileHover={isMobile ? {} : { scale: 1.02 }}
       className={cn(
         "group relative overflow-hidden rounded-xl border border-white/10 bg-black/40 p-6 shadow-2xl backdrop-blur-sm hover:border-vision-primary/30 hover:shadow-[0_0_20px_rgba(6,182,212,0.15)] transition-all duration-300",
         colSpan === 2 ? "md:col-span-2" : "md:col-span-1",
         className
       )}
     >
-      <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-gradient-to-br from-vision-primary/20 to-vision-secondary/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      {!isMobile && <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-gradient-to-br from-vision-primary/20 to-vision-secondary/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />}
       
       <div className="relative z-10 h-full flex flex-col justify-between">
         <div>
@@ -724,6 +764,7 @@ export const MagicBentoItem: React.FC<{
 
 // --- 6. CardNav ---
 export const TiltedCard: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className }) => {
+  const isMobile = useIsMobile();
   const x = useMotionValue(0);
   const y = useMotionValue(0);
 
@@ -732,6 +773,10 @@ export const TiltedCard: React.FC<{ children: React.ReactNode; className?: strin
 
   const rotateX = useTransform(mouseY, [-0.5, 0.5], ["12deg", "-12deg"]);
   const rotateY = useTransform(mouseX, [-0.5, 0.5], ["-12deg", "12deg"]);
+
+  if (isMobile) {
+    return <div className={className}>{children}</div>;
+  }
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();

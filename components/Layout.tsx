@@ -17,24 +17,18 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [particleCount, setParticleCount] = useState(60); // Default low for safety
+  const [particleCount, setParticleCount] = useState(40);
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Optimization: Reduce particles on mobile to prevent lag
   useEffect(() => {
     const handleResize = () => {
-      // < 768px (Mobile) = 40 particles
-      // > 768px (Desktop) = 150 particles
-      setParticleCount(window.innerWidth < 768 ? 40 : 150);
+      setParticleCount(window.innerWidth < 768 ? 20 : 100);
       if (window.innerWidth >= 768) {
         setIsMenuOpen(false);
       }
     };
-
-    // Set initial
     handleResize();
-
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -66,41 +60,28 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-vision-900 text-gray-100 font-sans selection:bg-vision-primary selection:text-white overflow-x-hidden relative">
-      {/* Global Particles Background - Optimized Quantity */}
-      <Particles className="absolute inset-0 z-0 pointer-events-none" quantity={particleCount} ease={80} vx={0.06} vy={0.06} refresh />
+    <div className="min-h-screen flex flex-col bg-vision-900 text-gray-100 font-sans selection:bg-vision-primary selection:text-white relative overflow-x-hidden">
+      <Particles className="fixed inset-0 z-0 pointer-events-none" quantity={particleCount} ease={80} vx={0.06} vy={0.06} refresh />
 
-      {/* Navbar */}
-      <nav className="fixed top-0 w-full z-50 bg-vision-900/80 backdrop-blur-xl border-b border-white/5 transition-all duration-300">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            {/* Logo */}
+      <nav className="fixed top-0 w-full z-50 bg-vision-900/80 backdrop-blur-xl border-b border-white/5 h-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
+          <div className="flex justify-between items-center h-full">
             <Link to="/" className="flex items-center gap-3 group relative z-20">
-              <div className="relative flex-shrink-0">
-                <div className="absolute inset-0 bg-vision-primary/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <Logo className="w-8 h-8 md:w-10 md:h-10 relative z-10 drop-shadow-[0_0_5px_rgba(6,182,212,0.5)] transition-all duration-500 ease-out group-hover:scale-110 group-hover:rotate-12 group-hover:drop-shadow-[0_0_20px_rgba(6,182,212,0.8)]" />
-              </div>
+              <Logo className="w-8 h-8 md:w-9 md:h-9 relative z-10 drop-shadow-[0_0_5px_rgba(6,182,212,0.5)]" />
               <span className="font-display font-bold text-lg md:text-xl tracking-tight text-white group-hover:text-vision-primary transition-colors whitespace-nowrap">
                 VISION BUILT
               </span>
             </Link>
 
-            {/* Desktop Links (PillNav) */}
             <div className="hidden md:flex items-center gap-6">
               <PillNav items={getNavItems()} />
-              
-              {/* Offers Button (Highlighted) */}
-               <Link 
-                  to="/offers" 
-                  className="flex items-center gap-2 px-4 py-1.5 bg-gradient-to-r from-vision-primary/20 to-vision-secondary/20 border border-vision-primary/30 text-vision-primary hover:text-white hover:border-vision-primary rounded-full font-medium transition-all shadow-[0_0_10px_rgba(6,182,212,0.1)] hover:shadow-[0_0_15px_rgba(6,182,212,0.3)] text-sm"
-               >
+               <Link to="/offers" className="flex items-center gap-2 px-4 py-1.5 bg-vision-primary/10 border border-vision-primary/30 text-vision-primary hover:text-white hover:border-vision-primary rounded-full font-medium transition-all text-sm">
                   <Tag size={14} />
                   <span>Offers</span>
                </Link>
 
               {user && (
                   <div className="flex items-center gap-4 pl-4 border-l border-white/10">
-                    <span className="text-xs text-gray-400 font-mono hidden lg:block truncate max-w-[150px]">{user.email}</span>
                     <Button onClick={handleLogout} variant="ghost" size="icon" className="rounded-full text-gray-400 hover:text-red-400">
                       <LogOut size={18} />
                     </Button>
@@ -108,65 +89,37 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
               )}
               {!user && (
                  <Link to="/auth?mode=signup" className="ml-2">
-                    <Button variant="primary" size="sm" className="bg-vision-primary text-vision-900 hover:bg-cyan-400 font-bold">
-                        Get Started
-                    </Button>
+                    <Button variant="primary" size="sm">Get Started</Button>
                  </Link>
               )}
             </div>
 
-            {/* Mobile Menu Button */}
             <div className="md:hidden flex items-center z-20">
-              <button 
-                onClick={() => setIsMenuOpen(!isMenuOpen)} 
-                className="p-2 -mr-2 text-gray-300 hover:text-white transition-colors focus:outline-none"
-                aria-label="Toggle menu"
-              >
+              <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="p-2 text-gray-300">
                 {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
               </button>
             </div>
           </div>
         </div>
 
-        {/* Mobile Menu Overlay */}
-        <div 
-          className={`md:hidden absolute top-16 left-0 w-full bg-vision-900/95 backdrop-blur-2xl border-b border-white/10 shadow-2xl transition-all duration-300 ease-in-out origin-top overflow-hidden ${isMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'}`}
-        >
-            <div className="px-4 py-6 space-y-2">
+        <div className={`md:hidden fixed top-16 left-0 w-full bg-vision-900/98 backdrop-blur-2xl border-b border-white/10 transition-all duration-300 overflow-hidden ${isMenuOpen ? 'max-h-[80vh] opacity-100 py-6' : 'max-h-0 opacity-0 py-0'}`}>
+            <div className="px-4 space-y-2">
               {getNavItems().map(item => (
-                <Link 
-                  key={item.name}
-                  to={item.path} 
-                  className={`flex items-center justify-between px-4 py-3 rounded-lg text-base font-medium transition-all ${location.pathname === item.path ? 'bg-white/10 text-white border border-white/10' : 'text-gray-400 hover:text-white hover:bg-white/5 border border-transparent'}`}
-                  onClick={() => setIsMenuOpen(false)}
-                >
+                <Link key={item.name} to={item.path} className={`flex items-center justify-between px-4 py-4 rounded-lg text-base font-medium ${location.pathname === item.path ? 'bg-white/10 text-white' : 'text-gray-400'}`} onClick={() => setIsMenuOpen(false)}>
                   <span>{item.name}</span>
-                  {location.pathname === item.path && <ChevronRight size={16} className="text-vision-primary" />}
+                  <ChevronRight size={16} />
                 </Link>
               ))}
-              
-              <div className="pt-4 mt-4 border-t border-white/10 space-y-3">
+              <div className="pt-4 mt-4 border-t border-white/10">
                  {user ? (
-                   <>
-                     <div className="px-4 text-xs text-gray-500 font-mono break-all">
-                       Signed in as <br/> <span className="text-gray-300">{user.email}</span>
-                     </div>
-                     <button 
-                        onClick={() => { handleLogout(); setIsMenuOpen(false); }} 
-                        className="w-full flex items-center justify-between px-4 py-3 rounded-lg text-base font-medium text-red-400 hover:bg-red-500/10 transition-colors border border-transparent hover:border-red-500/20"
-                     >
-                        <span>Log Out</span>
-                        <LogOut size={16} />
-                     </button>
-                   </>
+                   <button onClick={handleLogout} className="w-full flex items-center justify-between px-4 py-4 rounded-lg text-red-400">
+                      <span>Log Out</span>
+                      <LogOut size={16} />
+                   </button>
                  ) : (
                    <div className="grid grid-cols-2 gap-3 px-1">
-                      <Link to="/auth?mode=login" onClick={() => setIsMenuOpen(false)}>
-                          <Button variant="ghost" className="w-full justify-center">Log In</Button>
-                      </Link>
-                      <Link to="/auth?mode=signup" onClick={() => setIsMenuOpen(false)}>
-                          <Button variant="primary" className="w-full justify-center">Get Started</Button>
-                      </Link>
+                      <Link to="/auth?mode=login" onClick={() => setIsMenuOpen(false)} className="w-full"><Button variant="ghost" className="w-full">Log In</Button></Link>
+                      <Link to="/auth?mode=signup" onClick={() => setIsMenuOpen(false)} className="w-full"><Button variant="primary" className="w-full">Sign Up</Button></Link>
                    </div>
                  )}
               </div>
@@ -174,71 +127,49 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
         </div>
       </nav>
 
-      {/* Main Content */}
-      <main className="flex-grow pt-16 relative z-10 flex flex-col">
-        <div className="relative flex-grow flex flex-col">
+      <main className="flex-grow pt-16 relative z-10 flex flex-col min-h-[calc(100vh-64px)]">
           {children}
-        </div>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-white/5 bg-vision-900/50 backdrop-blur-md relative z-10">
-        <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
-            <div className="col-span-1 sm:col-span-2 md:col-span-1">
+      <footer className="border-t border-white/5 bg-vision-900 relative z-10">
+        <div className="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div className="col-span-1 md:col-span-1">
                <div className="flex items-center space-x-2 mb-4">
-                  <Logo className="w-8 h-8 opacity-90 grayscale hover:grayscale-0 transition-all duration-300" />
+                  <Logo className="w-7 h-7" />
                   <span className="font-display font-bold text-lg text-white">VISION BUILT</span>
                </div>
-               <div className="text-gray-400 text-sm mb-6 leading-relaxed">
-                 <ScrollFloat animationDuration={0.4} stagger={0.01}>
-                    Building the digital future with precision, aesthetics, and advanced technology.
-                 </ScrollFloat>
-               </div>
+               <p className="text-gray-400 text-sm mb-6 leading-relaxed">Precision digital engineering for modern enterprises.</p>
                <div className="flex space-x-4">
-                    <a href={`https://instagram.com/${INITIAL_CONTACT_INFO.instagram}`} target="_blank" rel="noreferrer" className="p-2 rounded-full bg-white/5 text-gray-400 hover:text-pink-500 hover:bg-white/10 transition-all">
-                        <Instagram size={20} />
-                    </a>
-                    <a href={`mailto:${INITIAL_CONTACT_INFO.email}`} className="p-2 rounded-full bg-white/5 text-gray-400 hover:text-vision-primary hover:bg-white/10 transition-all">
-                        <Mail size={20} />
-                    </a>
+                    <a href={`https://instagram.com/${INITIAL_CONTACT_INFO.instagram}`} target="_blank" rel="noreferrer" className="text-gray-400 hover:text-pink-500 transition-colors"><Instagram size={20} /></a>
+                    <a href={`mailto:${INITIAL_CONTACT_INFO.email}`} className="text-gray-400 hover:text-vision-primary transition-colors"><Mail size={20} /></a>
                </div>
             </div>
-            
-            <div className="space-y-4">
+            <div className="space-y-3">
               <h3 className="text-xs font-bold text-white uppercase tracking-widest">Platform</h3>
-              <ul className="space-y-3">
-                <li><Link to="/services" className="text-gray-400 hover:text-vision-primary transition-colors text-sm block py-1">Services</Link></li>
-                <li><Link to="/marketplace" className="text-gray-400 hover:text-vision-primary transition-colors text-sm block py-1">Marketplace</Link></li>
-                <li><Link to="/auth" className="text-gray-400 hover:text-vision-primary transition-colors text-sm block py-1">Client Portal</Link></li>
-                <li><Link to="/offers" className="text-gray-400 hover:text-vision-primary transition-colors text-sm block py-1">Special Offers</Link></li>
+              <ul className="space-y-2 text-sm">
+                <li><Link to="/services" className="text-gray-400 hover:text-vision-primary">Services</Link></li>
+                <li><Link to="/marketplace" className="text-gray-400 hover:text-vision-primary">Marketplace</Link></li>
+                <li><Link to="/offers" className="text-gray-400 hover:text-vision-primary">Offers</Link></li>
               </ul>
             </div>
-
-            <div className="space-y-4">
+            <div className="space-y-3">
                <h3 className="text-xs font-bold text-white uppercase tracking-widest">Support</h3>
-               <ul className="space-y-3">
-                 <li><Link to="/refund-policy" className="text-gray-400 hover:text-vision-primary transition-colors text-sm block py-1">Refund Policy</Link></li>
-                 <li><a href={`mailto:${INITIAL_CONTACT_INFO.email}`} className="text-gray-400 hover:text-vision-primary transition-colors text-sm block py-1">Contact Support</a></li>
+               <ul className="space-y-2 text-sm">
+                 <li><Link to="/refund-policy" className="text-gray-400 hover:text-vision-primary">Refund Policy</Link></li>
+                 <li><a href={`mailto:${INITIAL_CONTACT_INFO.email}`} className="text-gray-400 hover:text-vision-primary">Email Support</a></li>
                </ul>
             </div>
-
-            <div className="space-y-4">
+            <div className="space-y-3">
                <h3 className="text-xs font-bold text-white uppercase tracking-widest">Legal</h3>
-               <ul className="space-y-3">
-                 <li><Link to="/privacy-policy" className="text-gray-400 hover:text-vision-primary transition-colors text-sm block py-1">Privacy Policy</Link></li>
-                 <li><Link to="/terms-of-service" className="text-gray-400 hover:text-vision-primary transition-colors text-sm block py-1">Terms of Service</Link></li>
+               <ul className="space-y-2 text-sm">
+                 <li><Link to="/privacy-policy" className="text-gray-400 hover:text-vision-primary">Privacy Policy</Link></li>
+                 <li><Link to="/terms-of-service" className="text-gray-400 hover:text-vision-primary">Terms of Service</Link></li>
                </ul>
             </div>
           </div>
-          
-          <div className="mt-12 border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-500">
-            <p className="text-center md:text-left">&copy; {new Date().getFullYear()} Vision Built. All rights reserved.</p>
-            <div className="flex flex-col sm:flex-row gap-4 items-center font-mono bg-black/20 px-4 py-2 rounded-full border border-white/5">
-                <span className="flex items-center gap-2"><Mail size={12}/> {INITIAL_CONTACT_INFO.email}</span>
-                <span className="hidden sm:inline text-gray-700">|</span>
-                <span className="flex items-center gap-2"><Instagram size={12}/> @{INITIAL_CONTACT_INFO.instagram}</span>
-            </div>
+          <div className="mt-10 border-t border-white/5 pt-8 text-xs text-gray-500 text-center md:text-left">
+            <p>&copy; {new Date().getFullYear()} Vision Built. Precision Digital Craft.</p>
           </div>
         </div>
       </footer>

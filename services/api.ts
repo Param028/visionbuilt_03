@@ -1,3 +1,4 @@
+
 import { supabase } from '../lib/supabase';
 import { User, Service, Order, Message, ContactInfo, Offer, MarketplaceItem, AdminActivity, Task, AnalyticsData, Role, ProjectSuggestion } from '../types';
 import { INITIAL_CONTACT_INFO, CURRENCY_CONFIG } from '../constants';
@@ -86,6 +87,26 @@ export class ApiService {
       throw new Error("Login failed");
   }
 
+  async signInWithGithub(): Promise<void> {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'github',
+      options: {
+        redirectTo: window.location.origin + '/auth'
+      }
+    });
+    if (error) throw error;
+  }
+
+  async signInWithGoogle(): Promise<void> {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: window.location.origin + '/auth'
+      }
+    });
+    if (error) throw error;
+  }
+
   async signUp(email: string, password: string, fullName: string, country: string): Promise<void> {
       const { error } = await supabase.auth.signUp({
           email,
@@ -107,7 +128,9 @@ export class ApiService {
   }
 
   async sendPasswordResetOtp(email: string): Promise<void> {
-      const { error } = await supabase.auth.resetPasswordForEmail(email);
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + '/auth?mode=reset_password'
+      });
       if (error) throw error;
   }
 
@@ -125,12 +148,15 @@ export class ApiService {
       if (error) throw error;
   }
 
-  async createOrder(orderData: Omit<Order, 'id' | 'created_at' | 'status'>): Promise<Order> {
+  async createOrder(orderData: Omit<Order, 'id' | 'created_at' | 'status' | 'amount_paid' | 'deposit_amount' | 'deliverables'>): Promise<Order> {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("Unauthorized: Please log in again.");
 
-    // 1. PAYMENT PROCESS
-    if (orderData.total_amount > 0) {
+    // MODIFIED: Only process payment immediately if it's a 'project' (Marketplace Instant Buy)
+    // Services now go through a Request -> Quote -> Deposit flow.
+    let paidAmount = 0;
+    
+    if (orderData.type === 'project' && orderData.total_amount > 0) {
         const receiptId = `rcpt_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
         try {
             await this.handleRazorpayPayment(
@@ -138,6 +164,7 @@ export class ApiService {
                 orderData.service_title, 
                 receiptId
             );
+            paidAmount = orderData.total_amount;
         } catch (paymentError: any) {
             console.error("Payment failed", paymentError);
             throw paymentError;
@@ -145,29 +172,33 @@ export class ApiService {
     }
 
     // 2. INSERT ORDER INTO DB
-    let initialStatus: Order['status'] = 'completed';
-    if (orderData.total_amount > 0 && orderData.type === 'service') {
-        initialStatus = 'accepted';
+    let initialStatus: Order['status'] = 'pending';
+    
+    // Instant buy projects are completed immediately
+    if (orderData.type === 'project' && paidAmount >= orderData.total_amount) {
+        initialStatus = 'completed';
     }
 
     const { data: newOrder, error: orderError } = await supabase
         .from('orders')
         .insert({
             ...orderData,
-            status: initialStatus
+            status: initialStatus,
+            amount_paid: paidAmount,
+            deposit_amount: 0, // Default 0 for services until dev sets it
+            deliverables: []
         })
         .select()
         .single();
     
     if (orderError) {
-        console.error("CRITICAL: Payment succeeded but DB insert failed", orderError);
-        throw new Error("Order creation failed after payment. Please contact support with your payment receipt.");
+        console.error("CRITICAL: DB insert failed", orderError);
+        throw new Error("Order creation failed. Please contact support.");
     }
         
     // 3. SEND NOTIFICATIONS (Non-blocking)
     const userEmail = user.email || 'Customer';
     
-    // Explicitly NO Authorization header here
     supabase.functions.invoke('send-order-confirmation', { 
         body: { 
             orderId: newOrder.id, 
@@ -181,6 +212,57 @@ export class ApiService {
 
     return newOrder;
   }
+
+  // --- Financial & Deliverable Management ---
+
+  async processOrderPayment(orderId: string, amount: number, description: string): Promise<void> {
+      const receiptId = `rcpt_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+      await this.handleRazorpayPayment(amount, description, receiptId);
+      
+      // Update amount_paid in DB
+      const { data: currentOrder } = await supabase.from('orders').select('amount_paid, total_amount').eq('id', orderId).single();
+      const newPaid = (currentOrder?.amount_paid || 0) + amount;
+      
+      const updates: any = { amount_paid: newPaid };
+      
+      // Auto-update status based on payment
+      if (newPaid >= (currentOrder?.total_amount || 0) && (currentOrder?.total_amount || 0) > 0) {
+          // If fully paid, usually moves to completion or next stage depending on workflow
+          // Keeping status manual for dev, but tracking money here.
+      } else {
+          updates.status = 'in_progress'; // Deposit paid = in progress
+      }
+
+      await supabase.from('orders').update(updates).eq('id', orderId);
+  }
+
+  async updateOrderFinancials(orderId: string, total: number, deposit: number): Promise<Order> {
+      const { data, error } = await supabase
+          .from('orders')
+          .update({ total_amount: total, deposit_amount: deposit, status: 'accepted' }) // Move to accepted so user sees the quote
+          .eq('id', orderId)
+          .select()
+          .single();
+      if(error) throw error;
+      return data;
+  }
+
+  async addDeliverable(orderId: string, fileUrl: string): Promise<Order> {
+      const { data: current } = await supabase.from('orders').select('deliverables').eq('id', orderId).single();
+      const currentList = current?.deliverables || [];
+      const newList = [...currentList, fileUrl];
+      
+      const { data, error } = await supabase
+          .from('orders')
+          .update({ deliverables: newList })
+          .eq('id', orderId)
+          .select()
+          .single();
+      if(error) throw error;
+      return data;
+  }
+
+  // ------------------------------------------
 
   async getOrders(userId?: string): Promise<Order[]> {
     let query = supabase.from('orders').select('*').order('created_at', { ascending: false });
@@ -341,7 +423,7 @@ export class ApiService {
       }
 
       const redirectTo = window.location.origin + '/auth';
-      // Explicitly NO Authorization header here
+      
       const { data, error } = await supabase.functions.invoke('invite-developer', {
           body: { email, name, invited_by: adminId, role, redirectTo }
       });
@@ -392,9 +474,28 @@ export class ApiService {
       return this.getTasks();
   }
 
-  async getMarketplaceItems(): Promise<MarketplaceItem[]> {
-    const { data } = await supabase.from('marketplace_items').select('*');
+  async getMarketplaceItems(developerId?: string): Promise<MarketplaceItem[]> {
+    let query = supabase.from('marketplace_items').select('*');
+    if (developerId) query = query.eq('developer_id', developerId);
+    const { data } = await query;
     return data || [];
+  }
+
+  async getMarketplaceSales(developerId: string): Promise<Order[]> {
+      // Get orders where project_id exists and that project is owned by developerId
+      const { data: items } = await supabase.from('marketplace_items').select('id').eq('developer_id', developerId);
+      const itemIds = items?.map(i => i.id) || [];
+      
+      if (itemIds.length === 0) return [];
+
+      const { data: orders } = await supabase
+        .from('orders')
+        .select('*')
+        .in('project_id', itemIds)
+        .eq('type', 'project')
+        .order('created_at', { ascending: false });
+      
+      return orders || [];
   }
 
   async getMarketplaceItemById(id: string): Promise<MarketplaceItem | undefined> {
@@ -431,7 +532,6 @@ export class ApiService {
       return this.getMarketplaceItems();
   }
 
-  // --- Suggestion API ---
   async getProjectSuggestions(): Promise<ProjectSuggestion[]> {
       const { data } = await supabase.from('project_suggestions').select('*').order('votes', { ascending: false });
       return data as ProjectSuggestion[] || [];
@@ -448,8 +548,6 @@ export class ApiService {
   }
 
   async voteProjectSuggestion(id: string): Promise<ProjectSuggestion[]> {
-      // Optimistic simple vote increment
-      // In prod, use RPC or check for existing vote
       const { data: current } = await supabase.from('project_suggestions').select('votes').eq('id', id).single();
       if(current) {
           await supabase.from('project_suggestions').update({ votes: (current.votes || 0) + 1 }).eq('id', id);
@@ -462,7 +560,6 @@ export class ApiService {
       if(error) throw error;
       return this.getProjectSuggestions();
   }
-  // -----------------------
 
   async getOffers(): Promise<Offer[]> {
     const { data } = await supabase.from('offers').select('*');
@@ -525,29 +622,25 @@ export class ApiService {
   }
 
   private async handleRazorpayPayment(amount: number, description: string, receiptId: string): Promise<void> {
-      // 0. Security Check
       if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
-          throw new Error("Payment Security Error: Transactions require a secure HTTPS connection. Please use a secure URL.");
+          throw new Error("Payment Security Error: Transactions require a secure HTTPS connection.");
       }
 
-      // 1. Verify Configuration
       const key = getEnvVar('VITE_RAZORPAY_KEY_ID') || getEnvVar('REACT_APP_RAZORPAY_KEY_ID');
       if (!key) {
-          throw new Error("Payment Configuration Missing. Please set 'VITE_RAZORPAY_KEY_ID' in environment variables.");
+          throw new Error("Payment Configuration Missing.");
       }
 
-      // 2. Load SDK
       const res = await loadRazorpay('https://checkout.razorpay.com/v1/checkout.js');
-      if (!res) throw new Error('Razorpay SDK failed to load. Please check your internet connection or disable ad-blockers.');
+      if (!res) throw new Error('Razorpay SDK failed to load.');
 
-      // 3. Get/Refresh Session
       let { data: { session } } = await supabase.auth.getSession();
       const now = Math.floor(Date.now() / 1000);
       
       if (!session?.access_token || (session.expires_at && session.expires_at < (now + 60))) {
            const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
            if (refreshError || !refreshData.session) {
-               throw new Error("Authentication failed. Please log in again to continue payment.");
+               throw new Error("Authentication failed.");
            }
            session = refreshData.session;
       }
@@ -560,25 +653,11 @@ export class ApiService {
       const amountInINR = Math.round(amount * rate);
 
       try {
-        // 4. Create Order via Edge Function
-        // IMPORTANT: supabase.functions.invoke automatically attaches Authorization header if user is logged in
-        // We DO NOT send `headers: { Authorization: ... }` here.
         const { data: edgeData, error: edgeError } = await supabase.functions.invoke('create-razorpay-order', {
             body: { amount: amountInINR, currency: 'INR', receipt: receiptId }
         });
         
         if (edgeError) {
-          console.error("Payment Edge Function Error:", edgeError);
-          // Only show user-friendly message
-          if (edgeError.message?.includes('404')) {
-              throw new Error("Payment Service Not Found. Please ensure the 'create-razorpay-order' Edge Function is deployed.");
-          }
-          if (edgeError.message?.includes('500')) {
-              throw new Error("Payment Service Error. Please try again later.");
-          }
-          if (edgeError.message?.includes('Failed to fetch')) {
-              throw new Error("Connection Error. Please check your internet or firewall.");
-          }
           throw new Error("Unable to initiate payment connection.");
         }
         
@@ -597,8 +676,6 @@ export class ApiService {
                 description: description,
                 order_id: orderIdToUse, 
                 handler: function (response: any) {
-                    // Payment Success - In a real prod app, you verify signature here.
-                    // For MVP, we trust the callback and let backend verify or create order.
                     resolve();
                 },
                 prefill: {
@@ -621,9 +698,6 @@ export class ApiService {
             rzp.open();
         });
       } catch (err: any) {
-        if (err.message && (err.message.includes('FunctionsFetchError') || err.message.includes('Failed to fetch'))) {
-           throw new Error("Unable to connect to payment server. Please check your network connection.");
-        }
         throw err;
       }
   }
