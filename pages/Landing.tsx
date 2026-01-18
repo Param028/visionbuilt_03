@@ -4,14 +4,21 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Code, Layout, Shield, Cpu, Globe, Rocket, Star, CheckCircle } from 'lucide-react';
 import { Button } from '../components/ui/Components';
-import { Particles, GradientText, ShinyText, MagicBento, MagicBentoItem, ScrollFloat, LogoLoop, CountUp } from '../components/ui/ReactBits';
+import { Particles, GradientText, ShinyText, MagicBento, MagicBentoItem, ScrollFloat, LogoLoop, CountUp, ProjectLoop } from '../components/ui/ReactBits';
 import { api } from '../services/api';
+import { MarketplaceItem } from '../types';
 
 const Landing: React.FC = () => {
   const [stats, setStats] = useState<{ totalDelivered: number, averageRating: number }>({ totalDelivered: 0, averageRating: 0 });
+  const [featuredProjects, setFeaturedProjects] = useState<MarketplaceItem[]>([]);
 
   useEffect(() => {
       api.getPlatformStats().then(setStats);
+      api.getMarketplaceItems().then(items => {
+          // Filter for items with images to ensure good quality previews
+          const withImages = items.filter(i => i.image_url);
+          setFeaturedProjects(withImages.length > 0 ? withImages : []); 
+      });
   }, []);
 
   const techLogos = [
@@ -116,10 +123,38 @@ const Landing: React.FC = () => {
         </div>
       </section>
 
+      {/* Project Preview Loop Section */}
+      <section className="py-20 bg-black/40 border-y border-white/5 relative overflow-hidden z-20">
+         <div className="max-w-7xl mx-auto px-4 mb-8 text-center relative z-10">
+              <span className="text-xs font-semibold text-vision-primary uppercase tracking-widest mb-2 block">Our Work</span>
+              <h2 className="text-2xl font-display font-bold text-white mb-2"><ScrollFloat>Featured Deployments</ScrollFloat></h2>
+              <p className="text-gray-400 text-sm max-w-lg mx-auto">
+                 Real-world applications built with our scalable architecture and modern design systems.
+              </p>
+         </div>
+         
+         {featuredProjects.length > 0 ? (
+            <ProjectLoop items={featuredProjects.map(p => ({
+                id: p.id,
+                image: p.image_url!,
+                title: p.title,
+                url: `/marketplace/buy/${p.id}` 
+            }))} />
+         ) : (
+             <ProjectLoop items={[
+                 { id: '1', image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800', title: 'Enterprise Dashboard', url: '/services' },
+                 { id: '2', image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=800', title: 'Fintech Analytics', url: '/services' },
+                 { id: '3', image: 'https://images.unsplash.com/photo-1555421689-491a97ff2040?auto=format&fit=crop&q=80&w=800', title: 'E-Commerce Core', url: '/services' },
+                 { id: '4', image: 'https://images.unsplash.com/photo-1614741118887-7a4ee193a5fa?auto=format&fit=crop&q=80&w=800', title: 'AI Neural Net', url: '/services' },
+                 { id: '5', image: 'https://images.unsplash.com/photo-1642132652075-2d434374c43c?auto=format&fit=crop&q=80&w=800', title: 'Crypto Exchange', url: '/services' }
+             ]} />
+         )}
+      </section>
+
       {/* Trusted Tech Stack Logo Loop */}
-      <section className="py-10 border-y border-white/5 bg-black/20 backdrop-blur-sm relative z-20">
+      <section className="py-10 border-b border-white/5 bg-black/20 backdrop-blur-sm relative z-20">
           <div className="max-w-7xl mx-auto px-4 mb-6 text-center">
-              <span className="text-sm font-semibold text-gray-500 uppercase tracking-widest">Powered By Modern Technology</span>
+              <span className="text-xs font-semibold text-gray-500 uppercase tracking-widest">Powered By Modern Technology</span>
           </div>
           <LogoLoop items={techLogos} />
       </section>

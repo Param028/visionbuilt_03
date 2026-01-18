@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { api } from '../services/api';
@@ -22,9 +23,15 @@ const GoogleIcon = () => (
 
 const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
   const [searchParams] = useSearchParams();
-  const [authMode, setAuthMode] = useState<AuthMode>(
-    searchParams.get('mode') === 'signup' ? 'signup' : 'login'
-  );
+  // Initialize authMode based on URL 'mode' parameter to support deep linking (e.g., reset_password)
+  const [authMode, setAuthMode] = useState<AuthMode>(() => {
+    const mode = searchParams.get('mode');
+    if (mode === 'signup' || mode === 'forgot_email' || mode === 'forgot_otp' || mode === 'reset_password') {
+      return mode as AuthMode;
+    }
+    return 'login';
+  });
+
   const toast = useToast();
 
   const [email, setEmail] = useState('');
@@ -61,11 +68,34 @@ const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
       }
   };
 
+  const handleAuthError = (err: any, provider: string) => {
+    console.error(`${provider} Login Error:`, err);
+    let msg = err.message || `${provider} login failed`;
+
+    // Try to parse JSON error if Supabase returns raw JSON string
+    // Example: {"code":400,"error_code":"validation_failed","msg":"Unsupported provider: provider is not enabled"}
+    if (typeof msg === 'string' && msg.trim().startsWith('{')) {
+      try {
+        const parsed = JSON.parse(msg);
+        if (parsed.msg) msg = parsed.msg;
+        else if (parsed.error_description) msg = parsed.error_description;
+      } catch (e) {
+        // failed to parse, use original
+      }
+    }
+
+    if (msg.includes("provider is not enabled") || msg.includes("Unsupported provider")) {
+      msg = `${provider} Login is currently disabled. Please enable it in your Supabase Dashboard under Authentication > Providers.`;
+    }
+
+    toast.error(msg);
+  };
+
   const handleGithubLogin = async () => {
     try {
       await api.signInWithGithub();
     } catch (err: any) {
-      toast.error(err.message || "GitHub login failed");
+      handleAuthError(err, 'GitHub');
     }
   };
 
@@ -73,7 +103,7 @@ const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
     try {
       await api.signInWithGoogle();
     } catch (err: any) {
-      toast.error(err.message || "Google login failed");
+      handleAuthError(err, 'Google');
     }
   };
 

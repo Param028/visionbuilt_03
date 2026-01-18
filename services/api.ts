@@ -179,10 +179,13 @@ export class ApiService {
         initialStatus = 'completed';
     }
 
+    // Sanitize payload: is_custom exists in Order type but not in DB schema
+    const { is_custom, ...dbPayload } = orderData;
+
     const { data: newOrder, error: orderError } = await supabase
         .from('orders')
         .insert({
-            ...orderData,
+            ...dbPayload,
             status: initialStatus,
             amount_paid: paidAmount,
             deposit_amount: 0, // Default 0 for services until dev sets it
@@ -210,7 +213,10 @@ export class ApiService {
         if (error) console.error("Edge Function Invocation Error:", error);
     });
 
-    return newOrder;
+    return {
+        ...newOrder,
+        is_custom: newOrder.type === 'service' && !newOrder.service_id
+    };
   }
 
   // --- Financial & Deliverable Management ---
@@ -244,7 +250,7 @@ export class ApiService {
           .select()
           .single();
       if(error) throw error;
-      return data;
+      return { ...data, is_custom: data.type === 'service' && !data.service_id };
   }
 
   async addDeliverable(orderId: string, fileUrl: string): Promise<Order> {
@@ -259,7 +265,7 @@ export class ApiService {
           .select()
           .single();
       if(error) throw error;
-      return data;
+      return { ...data, is_custom: data.type === 'service' && !data.service_id };
   }
 
   // ------------------------------------------
@@ -268,12 +274,19 @@ export class ApiService {
     let query = supabase.from('orders').select('*').order('created_at', { ascending: false });
     if (userId) query = query.eq('user_id', userId);
     const { data } = await query;
-    return data as Order[] || [];
+    return (data || []).map((o: any) => ({
+        ...o,
+        is_custom: o.type === 'service' && !o.service_id
+    })) as Order[];
   }
 
   async getOrderById(orderId: string): Promise<Order | undefined> {
      const { data } = await supabase.from('orders').select('*').eq('id', orderId).single();
-     return data;
+     if (!data) return undefined;
+     return {
+         ...data,
+         is_custom: data.type === 'service' && !data.service_id
+     } as Order;
   }
 
   async updateOrderStatus(orderId: string, status: Order['status'], adminId?: string): Promise<Order> {
@@ -285,7 +298,7 @@ export class ApiService {
         .single();
     if(error) throw error;
     if (adminId) this.logActivity(adminId, 'Updated Order Status', `Order #${orderId} -> ${status}`);
-    return data;
+    return { ...data, is_custom: data.type === 'service' && !data.service_id };
   }
 
   async updateOrderPrice(orderId: string, newPrice: number, adminId?: string): Promise<Order> {
@@ -297,7 +310,7 @@ export class ApiService {
           .single();
       if(error) throw error;
       if (adminId) this.logActivity(adminId, 'Updated Order Price', `Order #${orderId} -> $${newPrice}`);
-      return data;
+      return { ...data, is_custom: data.type === 'service' && !data.service_id };
   }
 
   async rateOrder(orderId: string, rating: number, review?: string): Promise<Order> {
@@ -308,7 +321,7 @@ export class ApiService {
           .select()
           .single();
       if(error) throw error;
-      return data;
+      return { ...data, is_custom: data.type === 'service' && !data.service_id };
   }
 
   async getMessages(orderId: string): Promise<Message[]> {
@@ -439,8 +452,21 @@ export class ApiService {
   }
 
   async removeTeamMember(id: string, adminId: string): Promise<User[]> {
-      const { error } = await supabase.from('profiles').delete().eq('id', id);
-      if (error) throw error;
+      // Direct delete fails due to RLS and Auth table restrictions.
+      // We invoke a secure edge function to handle the deletion from auth.users (cascades to profile)
+      const { data, error } = await supabase.functions.invoke('delete-team-member', {
+          body: { userId: id }
+      });
+
+      if (error) {
+          console.error("Delete function error:", error);
+          throw new Error("Failed to communicate with removal service.");
+      }
+      
+      if (data && data.error) {
+          throw new Error(data.error);
+      }
+
       this.logActivity(adminId, 'Removed Team Member', `ID: ${id}`);
       return this.getTeamMembers();
   }
@@ -495,7 +521,10 @@ export class ApiService {
         .eq('type', 'project')
         .order('created_at', { ascending: false });
       
-      return orders || [];
+      return (orders || []).map((o: any) => ({
+          ...o,
+          is_custom: o.type === 'service' && !o.service_id
+      })) as Order[];
   }
 
   async getMarketplaceItemById(id: string): Promise<MarketplaceItem | undefined> {

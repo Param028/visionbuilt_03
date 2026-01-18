@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef, Suspense } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import { Preloader } from './components/ui/Preloader';
@@ -7,7 +7,7 @@ import { ToastProvider, useToast } from './components/ui/Toast';
 import { Card, Button } from './components/ui/Components';
 import { api } from './services/api';
 import { User } from './types';
-import { isConfigured } from './lib/supabase';
+import { isConfigured, supabase } from './lib/supabase';
 import { AnimatePresence } from 'framer-motion';
 import { WifiOff, RefreshCw, Settings, Database, Key } from 'lucide-react';
 
@@ -39,7 +39,6 @@ const App: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [showSplash, setShowSplash] = useState(true);
   const [connectionError, setConnectionError] = useState(false);
-  const initAttempted = useRef(false);
 
   useEffect(() => {
     if (window.location.protocol === 'http:' && window.location.hostname !== 'localhost') {
@@ -55,34 +54,41 @@ const App: React.FC = () => {
     }
 
     const initSession = async () => {
-      if (initAttempted.current) return;
-      initAttempted.current = true;
-
-      const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000));
-      
       try {
-        const userPromise = api.getCurrentUser();
-        const currentUser = await Promise.race([userPromise, timeoutPromise]) as User | null;
+        const currentUser = await api.getCurrentUser();
         setUser(currentUser);
         setConnectionError(false);
       } catch (error: any) {
-        if (error.message !== 'timeout') {
-            console.error("Session check failed", error);
-            if (isConfigured && error.message && (
-                error.message.includes('Failed to fetch') || 
-                error.message.includes('NetworkError') ||
-                error.message.includes('error connecting')
-            )) {
-                setConnectionError(true);
-            }
-        } else {
-            console.warn("Session check timed out, proceeding as guest");
+        console.error("Session check failed", error);
+        if (isConfigured && error.message && (
+            error.message.includes('Failed to fetch') || 
+            error.message.includes('NetworkError') ||
+            error.message.includes('error connecting')
+        )) {
+            setConnectionError(true);
         }
       } finally {
         setLoading(false);
       }
     };
+
+    // 1. Initial Fetch
     initSession();
+
+    // 2. Listen for Auth Changes (Sign in, Sign out, Token Refresh)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+            // Re-fetch user to ensure we have the latest profile data
+            const currentUser = await api.getCurrentUser();
+            setUser(currentUser);
+        } else if (event === 'SIGNED_OUT') {
+            setUser(null);
+        }
+    });
+
+    return () => {
+        subscription.unsubscribe();
+    };
   }, []);
 
   // --- 1. Setup Required Screen (Missing Env Vars) ---
