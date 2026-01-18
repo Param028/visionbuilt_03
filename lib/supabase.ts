@@ -21,12 +21,12 @@ const getEnvVar = (key: string) => {
   return '';
 };
 
-// Initialize Supabase client with hardcoded values (temporary fix)
-const supabaseUrl = 'https://yseofammdgqyrlqnanvu.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlzZW9mYW1tZGdxeXJscW5hbnZ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg0NTEyNzQsImV4cCI6MjA4NDAyNzI3NH0.yAwb-8Ud7I3x1OzXbm_BdUBAMJabNS7MVQeHe7XU1vg';
+// Initialize Supabase client with your correct project URL and key
+const supabaseUrl = 'https://mnjtumdncnfrixfhmfwe.supabase.co';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1uanR1bWRuY25mcml4ZmhtZndlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg3MjY0MDcsImV4cCI6MjA4NDMwMjQwN30.nf5brFimakPhZsY5VS548_mDK9FGei_W8PU6QScgBiA';
 
 // Check if configured (for setup screen)
-export const isConfigured = !!supabaseUrl && !!supabaseAnonKey && supabaseUrl !== 'https://placeholder.supabase.co';
+export const isConfigured = !!supabaseUrl && !!supabaseAnonKey;
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
