@@ -21,9 +21,9 @@ const getEnvVar = (key: string) => {
   return '';
 };
 
-// Initialize Supabase client with fallback values
-const supabaseUrl = getEnvVar('VITE_SUPABASE_URL') || 'https://yseofammdgqyrlqnanvu.supabase.co';
-const supabaseAnonKey = getEnvVar('VITE_SUPABASE_ANON_KEY') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlzZW9mYW1tZGdxeXJscW5hbnZ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg0NTEyNzQsImV4cCI6MjA4NDAyNzI3NH0.yAwb-8Ud7I3x1OzXbm_BdUBAMJabNS7MVQeHe7XU1vg';
+// Initialize Supabase client with hardcoded values (temporary fix)
+const supabaseUrl = 'https://yseofammdgqyrlqnanvu.supabase.co';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlzZW9mYW1tZGdxeXJscW5hbnZ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg0NTEyNzQsImV4cCI6MjA4NDAyNzI3NH0.yAwb-8Ud7I3x1OzXbm_BdUBAMJabNS7MVQeHe7XU1vg';
 
 // Check if configured (for setup screen)
 export const isConfigured = !!supabaseUrl && !!supabaseAnonKey && supabaseUrl !== 'https://placeholder.supabase.co';
