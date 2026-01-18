@@ -112,6 +112,7 @@ export class ApiService {
           email,
           password,
           options: {
+              emailRedirectTo: `${window.location.origin}/auth?mode=login`,
               data: {
                   full_name: fullName,
                   country: country,
