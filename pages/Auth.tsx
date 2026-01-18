@@ -73,7 +73,6 @@ const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
     let msg = err.message || `${provider} login failed`;
 
     // Try to parse JSON error if Supabase returns raw JSON string
-    // Example: {"code":400,"error_code":"validation_failed","msg":"Unsupported provider: provider is not enabled"}
     if (typeof msg === 'string' && msg.trim().startsWith('{')) {
       try {
         const parsed = JSON.parse(msg);
@@ -85,7 +84,7 @@ const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
     }
 
     if (msg.includes("provider is not enabled") || msg.includes("Unsupported provider")) {
-      msg = `${provider} Login is currently disabled. Please enable it in your Supabase Dashboard under Authentication > Providers.`;
+      msg = `Config Error: ${provider} login is disabled in Supabase. Check SETUP_GUIDE.md`;
     }
 
     toast.error(msg);
