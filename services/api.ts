@@ -209,7 +209,7 @@ export class ApiService {
             type: orderData.type,
             amount: orderData.total_amount
         } 
-    }).then(({ data, error }) => {
+    }).then(({ error }) => {
         if (error) console.error("Edge Function Invocation Error:", error);
     });
 

@@ -3,13 +3,13 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import { Preloader } from './components/ui/Preloader';
-import { ToastProvider, useToast } from './components/ui/Toast';
+import { ToastProvider } from './components/ui/Toast';
 import { Card, Button } from './components/ui/Components';
 import { api } from './services/api';
 import { User } from './types';
 import { isConfigured, supabase } from './lib/supabase';
 import { AnimatePresence } from 'framer-motion';
-import { WifiOff, RefreshCw, Settings, Database, Key } from 'lucide-react';
+import { WifiOff, RefreshCw, Settings, Key } from 'lucide-react';
 
 // --- Lazy Load Pages ---
 const Landing = React.lazy(() => import('./pages/Landing'));
@@ -76,7 +76,7 @@ const App: React.FC = () => {
     initSession();
 
     // 2. Listen for Auth Changes (Sign in, Sign out, Token Refresh)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event) => {
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
             // Re-fetch user to ensure we have the latest profile data
             const currentUser = await api.getCurrentUser();

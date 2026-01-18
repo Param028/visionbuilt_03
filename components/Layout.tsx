@@ -1,10 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, LogOut, User as UserIcon, Shield, LayoutDashboard, Tag, Instagram, Mail, ChevronRight } from 'lucide-react';
-import { User, Offer } from '../types';
+import { Menu, X, LogOut, Tag, Instagram, Mail, ChevronRight } from 'lucide-react';
+import { User } from '../types';
 import { api } from '../services/api';
-import { PillNav, ScrollFloat, Particles } from './ui/ReactBits';
+import { PillNav, Particles } from './ui/ReactBits';
 import { Button } from './ui/Components';
 import { Logo } from './ui/Logo';
 import { INITIAL_CONTACT_INFO } from '../constants';
