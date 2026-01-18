@@ -47,7 +47,11 @@ const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    console.log('App useEffect running');
+    console.log('isConfigured:', isConfigured);
+    
     if (!isConfigured) {
+        console.log('Not configured, showing setup screen');
         setLoading(false);
         setShowSplash(false);
         return;
@@ -55,7 +59,9 @@ const App: React.FC = () => {
 
     const initSession = async () => {
       try {
+        console.log('Initializing session...');
         const currentUser = await api.getCurrentUser();
+        console.log('Current user:', currentUser);
         setUser(currentUser);
         setConnectionError(false);
       } catch (error: any) {
@@ -68,9 +74,16 @@ const App: React.FC = () => {
             setConnectionError(true);
         }
       } finally {
+        console.log('Setting loading to false');
         setLoading(false);
       }
     };
+
+    // Add timeout to prevent infinite loading
+    const timeoutId = setTimeout(() => {
+      console.log('Timeout reached, forcing loading to false');
+      setLoading(false);
+    }, 10000); // 10 second timeout
 
     // 1. Initial Fetch
     initSession();
@@ -87,6 +100,7 @@ const App: React.FC = () => {
     });
 
     return () => {
+        clearTimeout(timeoutId);
         subscription.unsubscribe();
     };
   }, []);

@@ -20,8 +20,14 @@ const getEnv = (key: string) => {
 const supabaseUrl = getEnv('VITE_SUPABASE_URL') || getEnv('REACT_APP_SUPABASE_URL');
 const supabaseAnonKey = getEnv('VITE_SUPABASE_ANON_KEY') || getEnv('REACT_APP_SUPABASE_ANON_KEY');
 
+console.log('Supabase config check:');
+console.log('supabaseUrl:', supabaseUrl ? 'Found' : 'Missing');
+console.log('supabaseAnonKey:', supabaseAnonKey ? 'Found' : 'Missing');
+
 // Check if configured
 export const isConfigured = !!supabaseUrl && !!supabaseAnonKey;
+
+console.log('isConfigured:', isConfigured);
 
 // Initialize Supabase Client
 // We use placeholders if config is missing to prevent runtime crash "supabaseUrl is required"
