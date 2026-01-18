@@ -1,38 +1,41 @@
-
 import { createClient } from '@supabase/supabase-js';
 
-// Safe environment variable retrieval
-const getEnv = (key: string) => {
-  // @ts-ignore
-  if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env[key]) {
+// Helper to safely get environment variables
+const getEnvVar = (key: string) => {
+  try {
+    // Check for Vite/ESM environment
     // @ts-ignore
-    return import.meta.env[key];
-  }
-  // @ts-ignore
-  if (typeof process !== 'undefined' && process.env && process.env[key]) {
+    if (typeof import.meta !== 'undefined' && import.meta.env) {
+      // @ts-ignore
+      return import.meta.env[key];
+    }
+    // Check for Node/Webpack environment
     // @ts-ignore
-    return process.env[key];
+    if (typeof process !== 'undefined' && process.env) {
+      // @ts-ignore
+      return process.env[key];
+    }
+  } catch (e) {
+    console.warn(`Error accessing env var ${key}`, e);
   }
   return '';
 };
 
-// Retrieve URL and Key
-const supabaseUrl = getEnv('VITE_SUPABASE_URL') || getEnv('REACT_APP_SUPABASE_URL');
-const supabaseAnonKey = getEnv('VITE_SUPABASE_ANON_KEY') || getEnv('REACT_APP_SUPABASE_ANON_KEY');
+// Initialize Supabase client with fallback values
+const supabaseUrl = getEnvVar('VITE_SUPABASE_URL') || 'https://yseofammdgqyrlqnanvu.supabase.co';
+const supabaseAnonKey = getEnvVar('VITE_SUPABASE_ANON_KEY') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlzZW9mYW1tZGdxeXJscW5hbnZ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg0NTEyNzQsImV4cCI6MjA4NDAyNzI3NH0.yAwb-8Ud7I3x1OzXbm_BdUBAMJabNS7MVQeHe7XU1vg';
 
-console.log('Supabase config check:');
-console.log('supabaseUrl:', supabaseUrl ? 'Found' : 'Missing');
-console.log('supabaseAnonKey:', supabaseAnonKey ? 'Found' : 'Missing');
+// Check if configured (for setup screen)
+export const isConfigured = !!supabaseUrl && !!supabaseAnonKey && supabaseUrl !== 'https://placeholder.supabase.co';
 
-// Check if configured
-export const isConfigured = !!supabaseUrl && !!supabaseAnonKey;
-
-console.log('isConfigured:', isConfigured);
-
-// Initialize Supabase Client
-// We use placeholders if config is missing to prevent runtime crash "supabaseUrl is required"
-// The App component will handle the !isConfigured state by showing a setup screen.
-const validUrl = isConfigured ? supabaseUrl : 'https://placeholder.supabase.co';
-const validKey = isConfigured ? supabaseAnonKey : 'placeholder';
-
-export const supabase = createClient(validUrl, validKey);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+  },
+  global: {
+    headers: {
+      'x-client-info': 'supabase-js-web'
+    }
+  }
+});
