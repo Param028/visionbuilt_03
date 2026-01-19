@@ -17,6 +17,7 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
           clearInterval(timer);
           return 100;
         }
+        // Random increment for organic feel
         return prev + Math.random() * 5;
       });
     }, 50);
@@ -32,7 +33,7 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
 
   return (
     <motion.div
-      className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#020617] text-white overflow-hidden"
+      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#020617] text-white overflow-hidden h-[100dvh] w-full"
       initial={{ opacity: 1 }}
       exit={{ opacity: 0, scale: 1.1, filter: "blur(20px)" }}
       transition={{ duration: 0.8, ease: "easeInOut" }}
@@ -44,7 +45,7 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
       <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20" />
       <div className="absolute inset-0" style={{ backgroundImage: 'linear-gradient(rgba(6, 182, 212, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(6, 182, 212, 0.1) 1px, transparent 1px)', backgroundSize: '50px 50px', maskImage: 'radial-gradient(circle, black 30%, transparent 70%)' }}></div>
 
-      <div className="relative z-10 flex flex-col items-center">
+      <div className="relative z-10 flex flex-col items-center p-4">
         {/* Animated Logo Container */}
         <motion.div
           initial={{ scale: 0.5, opacity: 0 }}

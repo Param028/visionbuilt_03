@@ -72,13 +72,20 @@ const App: React.FC = () => {
       }
     };
 
-    // 1. Initial Fetch
-    initSession();
+    // 1. Initial Fetch with Failsafe Timeout
+    // Prevents mobile freeze if network hangs
+    const timeoutId = setTimeout(() => {
+        if (loading) {
+            console.warn("Session check timed out - forcing load");
+            setLoading(false);
+        }
+    }, 5000);
+
+    initSession().then(() => clearTimeout(timeoutId));
 
     // 2. Listen for Auth Changes (Sign in, Sign out, Token Refresh)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event) => {
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-            // Re-fetch user to ensure we have the latest profile data
             const currentUser = await api.getCurrentUser();
             setUser(currentUser);
         } else if (event === 'SIGNED_OUT') {
@@ -88,6 +95,7 @@ const App: React.FC = () => {
 
     return () => {
         subscription.unsubscribe();
+        clearTimeout(timeoutId);
     };
   }, []);
 

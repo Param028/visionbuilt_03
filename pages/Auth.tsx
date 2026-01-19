@@ -6,10 +6,10 @@ import { User } from '../types';
 import { SUPPORTED_COUNTRIES } from '../constants';
 import { Button, Card, Input } from '../components/ui/Components';
 import { Stepper, ScrollFloat } from '../components/ui/ReactBits';
-import { ArrowLeft, Mail, KeyRound, Lock, Globe } from 'lucide-react';
+import { ArrowLeft, Mail, KeyRound, Lock, Globe, CheckCircle2 } from 'lucide-react';
 import { useToast } from '../components/ui/Toast';
 
-type AuthMode = 'login' | 'signup' | 'forgot_email' | 'forgot_otp' | 'reset_password';
+type AuthMode = 'login' | 'signup' | 'forgot_email' | 'forgot_otp' | 'reset_password' | 'verification_sent';
 
 const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
   const [searchParams] = useSearchParams();
@@ -63,8 +63,20 @@ const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
       setLoading(true);
       try {
           await simulateLoading();
-          await api.signUp(email, password, fullName, country);
-          toast.success("Account created! Please verify your email.");
+          const { session, user } = await api.signUp(email, password, fullName, country);
+          
+          if (!session && user) {
+              // Email verification required
+              setAuthMode('verification_sent');
+              toast.success("Confirmation email sent!");
+          } else if (session) {
+              // Auto-login (if verification was disabled)
+              const fullUser = await api.getCurrentUser();
+              if (fullUser) {
+                  setUser(fullUser);
+                  toast.success("Account created!");
+              }
+          }
       } catch (err: any) {
           toast.error(err.message || "Signup failed");
       } finally {
@@ -149,6 +161,7 @@ const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
           case 'forgot_email': return { title: 'Reset Password', sub: 'Enter your email to receive a secure code.' };
           case 'forgot_otp': return { title: 'Verify Code', sub: `Enter the code sent to ${email}` };
           case 'reset_password': return { title: 'New Password', sub: 'Set a secure password for your account.' };
+          case 'verification_sent': return { title: 'Check Your Inbox', sub: 'Verification required to continue.' };
           default: return { title: 'Welcome Back', sub: 'Sign in to manage your orders.' };
       }
   };
@@ -248,6 +261,27 @@ const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
             </form>
         )}
 
+        {authMode === 'verification_sent' && (
+            <div className="text-center space-y-6">
+                <div className="w-20 h-20 bg-vision-primary/10 rounded-full flex items-center justify-center mx-auto text-vision-primary animate-pulse">
+                    <CheckCircle2 size={40} />
+                </div>
+                <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+                    <p className="text-sm text-gray-300">
+                        We have sent a secure verification link to:
+                        <br/>
+                        <span className="text-white font-bold">{email}</span>
+                    </p>
+                </div>
+                <p className="text-xs text-gray-500">
+                    Please check your inbox (and spam folder) and click the link to activate your dashboard.
+                </p>
+                <Button onClick={() => setAuthMode('login')} variant="outline" className="w-full">
+                    Return to Login
+                </Button>
+            </div>
+        )}
+
         {authMode === 'forgot_email' && (
             <form onSubmit={handleForgotEmail} className="space-y-5">
                 <div className="bg-white/5 p-4 rounded-lg flex items-center justify-center mb-4">
@@ -301,38 +335,40 @@ const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
             </form>
         )}
 
-        <div className="mt-8 pt-6 border-t border-white/10 text-center">
-          {authMode === 'login' && (
-            <p className="text-sm text-gray-400">
-              Don't have an account?{' '}
-              <button 
-                onClick={() => setAuthMode('signup')}
-                className="text-vision-primary hover:underline font-bold"
-              >
-                Sign Up
-              </button>
-            </p>
-          )}
-          {authMode === 'signup' && (
-            <p className="text-sm text-gray-400">
-              Already have an account?{' '}
-              <button 
+        {authMode !== 'verification_sent' && (
+            <div className="mt-8 pt-6 border-t border-white/10 text-center">
+            {authMode === 'login' && (
+                <p className="text-sm text-gray-400">
+                Don't have an account?{' '}
+                <button 
+                    onClick={() => setAuthMode('signup')}
+                    className="text-vision-primary hover:underline font-bold"
+                >
+                    Sign Up
+                </button>
+                </p>
+            )}
+            {authMode === 'signup' && (
+                <p className="text-sm text-gray-400">
+                Already have an account?{' '}
+                <button 
+                    onClick={() => setAuthMode('login')}
+                    className="text-vision-primary hover:underline font-bold"
+                >
+                    Log In
+                </button>
+                </p>
+            )}
+            {(authMode === 'forgot_email' || authMode === 'forgot_otp' || authMode === 'reset_password') && (
+                <button 
                 onClick={() => setAuthMode('login')}
-                className="text-vision-primary hover:underline font-bold"
-              >
-                Log In
-              </button>
-            </p>
-          )}
-          {(authMode === 'forgot_email' || authMode === 'forgot_otp' || authMode === 'reset_password') && (
-            <button 
-              onClick={() => setAuthMode('login')}
-              className="text-sm text-vision-primary hover:underline font-bold"
-            >
-              Back to Login
-            </button>
-          )}
-        </div>
+                className="text-sm text-vision-primary hover:underline font-bold"
+                >
+                Back to Login
+                </button>
+            )}
+            </div>
+        )}
       </Card>
     </div>
   );

@@ -17,6 +17,11 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 .glass-panel {
   background: rgba(15, 23, 42, 0.6);
   backdrop-filter: blur(12px);

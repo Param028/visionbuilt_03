@@ -17,13 +17,14 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [particleCount, setParticleCount] = useState(40);
+  const [particleCount, setParticleCount] = useState(30);
   const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
     const handleResize = () => {
-      setParticleCount(window.innerWidth < 768 ? 20 : 100);
+      // Significantly reduced particle count for performance
+      setParticleCount(window.innerWidth < 768 ? 15 : 40);
       if (window.innerWidth >= 768) {
         setIsMenuOpen(false);
       }
@@ -61,9 +62,18 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
 
   return (
     <div className="min-h-screen flex flex-col bg-vision-900 text-gray-100 font-sans selection:bg-vision-primary selection:text-white relative overflow-x-hidden">
-      <Particles className="fixed inset-0 z-0 pointer-events-none" quantity={particleCount} ease={80} vx={0.06} vy={0.06} refresh />
+      {/* Optimized Particles: Staticity increased to reduce movement noise, lower quantity */}
+      <Particles 
+        className="fixed inset-0 z-0 pointer-events-none" 
+        quantity={particleCount} 
+        staticity={80} // Increased staticity = less mouse interaction = higher perf
+        ease={80} 
+        vx={0.05} // Slower movement
+        vy={0.05} 
+        refresh 
+      />
 
-      <nav className="fixed top-0 w-full z-50 bg-vision-900/80 backdrop-blur-xl border-b border-white/5 h-16">
+      <nav className="fixed top-0 w-full z-50 bg-vision-900/90 backdrop-blur-md border-b border-white/5 h-16 transition-all duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
           <div className="flex justify-between items-center h-full">
             <Link to="/" className="flex items-center gap-3 group relative z-20">
@@ -75,7 +85,6 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
 
             <div className="hidden md:flex items-center gap-6">
               <PillNav items={getNavItems()} />
-               {/* Offers link removed from PillNav as it is now a separate button, but kept here for fallback */}
                
               {user && (
                   <div className="flex items-center gap-4 pl-4 border-l border-white/10">
@@ -99,7 +108,7 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
           </div>
         </div>
 
-        <div className={`md:hidden fixed top-16 left-0 w-full bg-vision-900/98 backdrop-blur-2xl border-b border-white/10 transition-all duration-300 overflow-hidden ${isMenuOpen ? 'max-h-[80vh] opacity-100 py-6' : 'max-h-0 opacity-0 py-0'}`}>
+        <div className={`md:hidden fixed top-16 left-0 w-full bg-vision-900 border-b border-white/10 transition-all duration-300 overflow-hidden ${isMenuOpen ? 'max-h-[80vh] opacity-100 py-6' : 'max-h-0 opacity-0 py-0'}`}>
             <div className="px-4 space-y-2">
               {getNavItems().map(item => (
                 <Link key={item.name} to={item.path} className={`flex items-center justify-between px-4 py-4 rounded-lg text-base font-medium ${location.pathname === item.path ? 'bg-white/10 text-white' : 'text-gray-400'}`} onClick={() => setIsMenuOpen(false)}>

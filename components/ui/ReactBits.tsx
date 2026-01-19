@@ -288,6 +288,7 @@ export const LogoLoop: React.FC<{ items: LogoLoopItem[] }> = ({ items }) => {
           display: flex;
           width: max-content;
           animation: logo-scroll 40s linear infinite;
+          will-change: transform;
         }
         @media (hover: hover) {
           .logo-loop-track:hover {
@@ -342,6 +343,7 @@ export const ProjectLoop: React.FC<{ items: ProjectLoopItem[] }> = ({ items }) =
           display: flex;
           width: max-content;
           animation: project-scroll 60s linear infinite;
+          will-change: transform;
         }
         @media (hover: hover) {
           .project-loop-track:hover {
@@ -361,6 +363,7 @@ export const ProjectLoop: React.FC<{ items: ProjectLoopItem[] }> = ({ items }) =
                 <img 
                   src={item.image} 
                   alt={item.title} 
+                  loading="lazy"
                   className="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500 filter grayscale group-hover:grayscale-0" 
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
@@ -473,7 +476,8 @@ export const Particles: React.FC<ParticlesProps> = ({
   const circles = useRef<any[]>([]);
   const mouse = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const canvasSize = useRef<{ w: number; h: number }>({ w: 0, h: 0 });
-  const dpr = typeof window !== "undefined" ? Math.min(window.devicePixelRatio, 1.5) : 1; // Limit DPR for performance
+  // FORCE DPR to 1.0 for performance. High DPR draws 4x-9x more pixels.
+  const dpr = 1; 
   const rafID = useRef<number | null>(null);
 
   useEffect(() => {

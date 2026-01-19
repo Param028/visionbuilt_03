@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS public.marketplace_items (
     preview_images TEXT[] DEFAULT '{}',
     demo_url TEXT,
     download_url TEXT,
-    developer_id UUID REFERENCES public.profiles(id),
+    developer_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
     developer_name TEXT,
     views INTEGER DEFAULT 0,
     purchases INTEGER DEFAULT 0,
@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS public.offers (
 -- ORDERS
 CREATE TABLE IF NOT EXISTS public.orders (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-    user_id UUID REFERENCES public.profiles(id) NOT NULL,
+    user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
     type TEXT CHECK (type IN ('service', 'project')) NOT NULL,
     service_id UUID REFERENCES public.services(id),
     project_id UUID REFERENCES public.marketplace_items(id),
@@ -97,7 +97,7 @@ CREATE TABLE IF NOT EXISTS public.orders (
 CREATE TABLE IF NOT EXISTS public.messages (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     order_id UUID REFERENCES public.orders(id) ON DELETE CASCADE NOT NULL,
-    sender_id UUID REFERENCES public.profiles(id) NOT NULL,
+    sender_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
     sender_name TEXT,
     sender_role TEXT,
     content TEXT NOT NULL,
@@ -110,9 +110,9 @@ CREATE TABLE IF NOT EXISTS public.tasks (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     title TEXT NOT NULL,
     description TEXT,
-    assigned_to_id UUID REFERENCES public.profiles(id),
+    assigned_to_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
     assigned_to_name TEXT,
-    created_by_id UUID REFERENCES public.profiles(id),
+    created_by_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
     status TEXT DEFAULT 'todo' CHECK (status IN ('todo', 'in_progress', 'review', 'done')),
     priority TEXT DEFAULT 'medium',
     due_date TIMESTAMP WITH TIME ZONE,
@@ -122,7 +122,7 @@ CREATE TABLE IF NOT EXISTS public.tasks (
 -- PROJECT SUGGESTIONS (Public Wishlist)
 CREATE TABLE IF NOT EXISTS public.project_suggestions (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-    user_id UUID REFERENCES public.profiles(id),
+    user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
     user_name TEXT,
     title TEXT NOT NULL,
     description TEXT,
@@ -134,7 +134,7 @@ CREATE TABLE IF NOT EXISTS public.project_suggestions (
 -- ADMIN ACTIVITY LOG
 CREATE TABLE IF NOT EXISTS public.admin_activity (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-    admin_id UUID REFERENCES public.profiles(id),
+    admin_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
     action TEXT NOT NULL,
     details TEXT,
     timestamp TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now())
@@ -369,4 +369,20 @@ BEGIN
   )
   ON CONFLICT (id) DO UPDATE SET role = 'super_admin';
   
+END $$;
+
+-- Fix foreign key constraints for existing tables (Migration)
+DO $$
+BEGIN
+    -- Orders -> User: Add ON DELETE CASCADE
+    IF EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'orders_user_id_fkey') THEN
+        ALTER TABLE public.orders DROP CONSTRAINT orders_user_id_fkey;
+        ALTER TABLE public.orders ADD CONSTRAINT orders_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id) ON DELETE CASCADE;
+    END IF;
+    
+    -- Messages -> Sender: Add ON DELETE CASCADE
+    IF EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'messages_sender_id_fkey') THEN
+        ALTER TABLE public.messages DROP CONSTRAINT messages_sender_id_fkey;
+        ALTER TABLE public.messages ADD CONSTRAINT messages_sender_id_fkey FOREIGN KEY (sender_id) REFERENCES public.profiles(id) ON DELETE CASCADE;
+    END IF;
 END $$;

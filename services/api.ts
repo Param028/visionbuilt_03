@@ -48,7 +48,6 @@ export class ApiService {
 
       // If profile is missing (Trigger failed?), create it manually
       if (!profile) {
-          console.warn("Profile not found for user, creating fallback...");
           const newProfile = {
               id: session.user.id,
               email: session.user.email,
@@ -62,7 +61,6 @@ export class ApiService {
           if (!insertError) {
               profile = newProfile;
           } else {
-              console.error("Failed to create fallback profile:", insertError);
               // Final retry fetch
               const { data: retryProfile } = await supabase.from('profiles').select('*').eq('id', session.user.id).maybeSingle();
               profile = retryProfile;
@@ -86,7 +84,18 @@ export class ApiService {
 
   async signInWithPassword(email: string, password: string): Promise<User> {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) throw error;
+      
+      if (error) {
+          console.error("Sign In Error:", error.message);
+          if (error.message.includes("Email not confirmed")) {
+              throw new Error("Please check your email inbox and click the confirmation link to verify your account.");
+          }
+          if (error.message.includes("Invalid login credentials")) {
+              throw new Error("Incorrect email or password.");
+          }
+          throw error;
+      }
+
       if (data.user) {
          return this.getCurrentUser() as Promise<User>;
       }
@@ -113,8 +122,8 @@ export class ApiService {
     if (error) throw error;
   }
 
-  async signUp(email: string, password: string, fullName: string, country: string): Promise<void> {
-      const { error } = await supabase.auth.signUp({
+  async signUp(email: string, password: string, fullName: string, country: string): Promise<{ user: any, session: any }> {
+      const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -122,19 +131,15 @@ export class ApiService {
                   full_name: fullName,
                   country: country,
                   role: 'client' 
-              }
+              },
+              // Critical: This ensures when they click the email link, they come back to the app
+              emailRedirectTo: window.location.origin
           }
       });
+      
       if (error) throw error;
 
-      // Trigger Welcome Email manually
-      supabase.functions.invoke('send-email', {
-        body: { type: 'welcome', email: email }
-      }).then(({ error }) => {
-        if (error) {
-            console.warn("Welcome email failed. This usually means 'RESEND_API_KEY' is missing in Supabase Secrets.", error);
-        }
-      });
+      return { user: data.user, session: data.session };
   }
 
   async logout(): Promise<void> {
@@ -209,7 +214,7 @@ export class ApiService {
         throw new Error("Order creation failed. Please contact support.");
     }
         
-    // 3. SEND EMAILS VIA NEW GENERIC FUNCTION
+    // 3. SEND EMAILS
     const userEmail = user.email || 'Customer';
     
     // Client Confirmation
@@ -231,7 +236,7 @@ export class ApiService {
     supabase.functions.invoke('send-email', { 
         body: { 
             type: 'admin_alert',
-            email: 'admin_override', // Handled in edge function
+            email: 'admin_override',
             data: { 
                 amount: orderData.total_amount,
                 userEmail: userEmail,
@@ -332,7 +337,6 @@ export class ApiService {
   }
 
   async updateOrderStatus(orderId: string, status: Order['status'], adminId?: string): Promise<Order> {
-    // 1. Update Status
     const { data, error } = await supabase
         .from('orders')
         .update({ status })
@@ -345,10 +349,8 @@ export class ApiService {
     if (adminId) {
         this.logActivity(adminId, 'Updated Order Status', `Order #${orderId} -> ${status}`);
         
-        // 2. Fetch User Email to send notification
         const { data: userData } = await supabase.from('profiles').select('email').eq('id', data.user_id).single();
         if (userData?.email) {
-            // 3. Send Notification Email
             supabase.functions.invoke('send-email', {
                 body: { 
                     type: 'order_update',
