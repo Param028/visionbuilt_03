@@ -19,14 +19,16 @@ Deno.serve(async (req: Request) => {
 
     if (!userId) throw new Error("User ID is required");
 
-    const supabaseAdmin = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    )
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+
+    if (!supabaseUrl || !supabaseServiceKey) {
+        throw new Error("Server Misconfiguration: Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY in Secrets.");
+    }
+
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
     // Optional: Nullify references in marketplace_items and tasks to prevent Foreign Key Violation errors.
-    // This assumes that if a dev is deleted, their items/tasks should persist but be unassigned.
-    // If you prefer to delete them, you'd delete here.
     await supabaseAdmin.from('marketplace_items').update({ developer_id: null }).eq('developer_id', userId);
     await supabaseAdmin.from('tasks').update({ assigned_to_id: null }).eq('assigned_to_id', userId);
     await supabaseAdmin.from('tasks').update({ created_by_id: null }).eq('created_by_id', userId);

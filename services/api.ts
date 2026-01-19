@@ -39,13 +39,16 @@ export class ApiService {
   async getCurrentUser(): Promise<User | null> {
     const { data: { session } } = await supabase.auth.getSession();
     if (session?.user) {
-      let { data: profile } = await supabase
+      // Use maybeSingle() to avoid throwing error if row is missing
+      let { data: profile, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', session.user.id)
-        .single();
+        .maybeSingle();
 
+      // If profile is missing (Trigger failed?), create it manually
       if (!profile) {
+          console.warn("Profile not found for user, creating fallback...");
           const newProfile = {
               id: session.user.id,
               email: session.user.email,
@@ -53,12 +56,16 @@ export class ApiService {
               role: 'client',
               country: session.user.user_metadata?.country || 'India'
           };
-          const { error } = await supabase.from('profiles').insert(newProfile);
-          if (!error) {
+          
+          const { error: insertError } = await supabase.from('profiles').insert(newProfile);
+          
+          if (!insertError) {
               profile = newProfile;
           } else {
-              const { data: retryProfile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
-              profile = retryProfile || newProfile;
+              console.error("Failed to create fallback profile:", insertError);
+              // Final retry fetch
+              const { data: retryProfile } = await supabase.from('profiles').select('*').eq('id', session.user.id).maybeSingle();
+              profile = retryProfile;
           }
       }
 
@@ -120,11 +127,13 @@ export class ApiService {
       });
       if (error) throw error;
 
-      // Trigger Welcome Email manually to ensure it sends even if triggers are delayed
+      // Trigger Welcome Email manually
       supabase.functions.invoke('send-email', {
         body: { type: 'welcome', email: email }
-      }).then(({ error }) => {
-        if(error) console.error("Welcome email failed", error);
+      }).then(({ data, error }) => {
+        if (error) {
+            console.warn("Welcome email failed. This usually means 'RESEND_API_KEY' is missing in Supabase Secrets.", error);
+        }
       });
   }
 
@@ -214,6 +223,8 @@ export class ApiService {
                 serviceTitle: orderData.service_title
             }
         } 
+    }).then(({error}) => {
+        if(error) console.warn("Confirmation email failed. Check Edge Function logs.");
     });
 
     // Admin Alert
@@ -227,7 +238,7 @@ export class ApiService {
                 serviceTitle: orderData.service_title
             }
         } 
-    });
+    }).catch(err => console.warn("Admin alert email failed", err));
 
     return {
         ...newOrder,

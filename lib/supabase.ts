@@ -3,17 +3,18 @@ import { createClient } from '@supabase/supabase-js';
 
 // Safe environment variable retrieval
 const getEnv = (key: string) => {
+  let val = '';
   // @ts-ignore
   if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env[key]) {
     // @ts-ignore
-    return import.meta.env[key];
+    val = import.meta.env[key];
   }
   // @ts-ignore
-  if (typeof process !== 'undefined' && process.env && process.env[key]) {
+  else if (typeof process !== 'undefined' && process.env && process.env[key]) {
     // @ts-ignore
-    return process.env[key];
+    val = process.env[key];
   }
-  return '';
+  return val ? val.trim() : '';
 };
 
 // Retrieve URL and Key
@@ -29,4 +30,10 @@ export const isConfigured = !!supabaseUrl && !!supabaseAnonKey;
 const validUrl = isConfigured ? supabaseUrl : 'https://placeholder.supabase.co';
 const validKey = isConfigured ? supabaseAnonKey : 'placeholder';
 
-export const supabase = createClient(validUrl, validKey);
+export const supabase = createClient(validUrl, validKey, {
+    auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true
+    }
+});

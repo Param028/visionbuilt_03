@@ -1,12 +1,11 @@
 
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-
 declare const Deno: any;
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+}
 
 interface EmailPayload {
   type: 'welcome' | 'order_confirmation' | 'admin_alert' | 'order_update';
@@ -14,9 +13,10 @@ interface EmailPayload {
   data?: any;
 }
 
-serve(async (req) => {
+Deno.serve(async (req: Request) => {
+  // Handle CORS preflight
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+    return new Response('ok', { headers: corsHeaders })
   }
 
   try {
@@ -24,10 +24,18 @@ serve(async (req) => {
     const SENDER_EMAIL = Deno.env.get('SENDER_EMAIL') || 'onboarding@resend.dev'; 
     const ADMIN_EMAIL = Deno.env.get('ADMIN_EMAIL');
 
-    if (!RESEND_API_KEY) throw new Error('Missing RESEND_API_KEY');
+    // validate configuration
+    if (!RESEND_API_KEY) {
+      console.error("CRITICAL: RESEND_API_KEY is missing in Edge Function Secrets.");
+      throw new Error('Server configuration error: Missing Email API Key');
+    }
 
     const payload: EmailPayload = await req.json();
     const { type, email, data } = payload;
+
+    if (!email) {
+      throw new Error('Recipient email is required');
+    }
 
     let subject = '';
     let html = '';
@@ -63,7 +71,12 @@ serve(async (req) => {
         break;
 
       case 'admin_alert':
-        to = [ADMIN_EMAIL!]; 
+        if (ADMIN_EMAIL) {
+            to = [ADMIN_EMAIL];
+        } else {
+            console.warn("ADMIN_EMAIL not set, skipping admin alert.");
+            return new Response(JSON.stringify({ message: "Admin email skipped" }), { headers: corsHeaders });
+        }
         subject = `[NEW ORDER] ${data.amount > 0 ? 'PAID' : 'REQUEST'} - $${data.amount}`;
         html = `
           <h1>New Transaction</h1>
@@ -89,7 +102,7 @@ serve(async (req) => {
         break;
 
       default:
-        throw new Error('Invalid email type');
+        throw new Error('Invalid email type: ' + type);
     }
 
     // --- SEND VIA RESEND ---
@@ -110,8 +123,8 @@ serve(async (req) => {
     const result = await res.json();
 
     if (!res.ok) {
-      console.error('Resend Error:', result);
-      throw new Error(JSON.stringify(result));
+      console.error('Resend API Error:', result);
+      throw new Error(result.message || result.name || 'Failed to send email via Resend');
     }
 
     return new Response(JSON.stringify(result), {
@@ -120,10 +133,12 @@ serve(async (req) => {
     });
 
   } catch (error: any) {
-    console.error('Email Function Error:', error);
+    console.error('Email Function Error:', error.message);
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 500,
     });
   }
 });
+
+export {};
