@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Lock, Shield, Terminal, ArrowRight, Fingerprint, ChevronRight } from 'lucide-react';
@@ -25,7 +26,7 @@ const DevLogin: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
         
         // Check if user actually has permissions
         if (user.role !== 'admin' && user.role !== 'super_admin' && user.role !== 'developer') {
-             throw new Error("Unauthorized Access Level");
+             throw new Error("Unauthorized Access Level: [Role mismatch: " + user.role + "]");
         }
 
         setUser(user);
@@ -113,9 +114,17 @@ const DevLogin: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
                      </div>
 
                      {error && (
-                         <div className="border border-red-500/50 bg-red-900/10 text-red-500 p-2 text-xs flex items-center">
-                             <Shield size={12} className="mr-2" />
-                             {error}
+                         <div className="border border-red-500/50 bg-red-900/10 text-red-500 p-3 text-xs flex flex-col gap-2">
+                             <div className="flex items-center font-bold">
+                                <Shield size={14} className="mr-2" />
+                                ACCESS DENIED
+                             </div>
+                             <p>{error}</p>
+                             {error.includes("Email not confirmed") && (
+                                <p className="text-[10px] text-red-400 opacity-80">
+                                    Hint: Run the SQL command to verify your email manually if this is a restored admin account.
+                                </p>
+                             )}
                          </div>
                      )}
 

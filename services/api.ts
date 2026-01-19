@@ -88,7 +88,7 @@ export class ApiService {
       if (error) {
           console.error("Sign In Error:", error.message);
           if (error.message.includes("Email not confirmed")) {
-              throw new Error("Please check your email inbox and click the confirmation link to verify your account.");
+              throw new Error("Email not confirmed. Please verify your account.");
           }
           if (error.message.includes("Invalid login credentials")) {
               throw new Error("Incorrect email or password.");
@@ -97,9 +97,22 @@ export class ApiService {
       }
 
       if (data.user) {
-         return this.getCurrentUser() as Promise<User>;
+         const user = await this.getCurrentUser();
+         console.log("Login Success. Detected Role:", user?.role);
+         return user as User;
       }
       throw new Error("Login failed");
+  }
+
+  async resendConfirmationEmail(email: string): Promise<void> {
+      const { error } = await supabase.auth.resend({
+          type: 'signup',
+          email: email,
+          options: {
+              emailRedirectTo: window.location.origin
+          }
+      });
+      if (error) throw error;
   }
 
   async signInWithGithub(): Promise<void> {
