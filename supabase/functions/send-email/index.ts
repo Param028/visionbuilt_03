@@ -21,7 +21,7 @@ Deno.serve(async (req: Request) => {
 
   try {
     const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
-    const SENDER_EMAIL = Deno.env.get('SENDER_EMAIL') || 'onboarding@resend.dev'; 
+    const SENDER_EMAIL = Deno.env.get('SENDER_EMAIL') || 'noreply@visionbuilt.in'; 
     const ADMIN_EMAIL = Deno.env.get('ADMIN_EMAIL');
 
     // validate configuration
@@ -40,19 +40,46 @@ Deno.serve(async (req: Request) => {
     let subject = '';
     let html = '';
     let to = [email];
+    
+    // --- Anti-Deduplication & Troubleshooting Info ---
+    const uniqueId = data?.uniqueId || Date.now();
+    const hiddenFooter = `
+      <div style="display:none; opacity:0; color:transparent; height:0; width:0; overflow:hidden;">
+        Message-ID: ${uniqueId}
+        Timestamp: ${new Date().toISOString()}
+      </div>
+    `;
 
     // --- TEMPLATE LOGIC ---
     switch (type) {
       case 'welcome':
         subject = 'Welcome to Vision Built';
         html = `
-          <div style="font-family: sans-serif; color: #333;">
-            <h1 style="color: #06b6d4;">Welcome to the Future.</h1>
-            <p>Hi there,</p>
-            <p>Thank you for joining Vision Built. Your account has been successfully created.</p>
-            <p>You can now browse our marketplace, request custom services, and track your orders in real-time.</p>
+          <div style="font-family: sans-serif; color: #333; max-width: 600px; margin: 0 auto;">
+            <h1 style="color: #06b6d4; border-bottom: 2px solid #06b6d4; padding-bottom: 10px;">Welcome to Vision Built</h1>
+            <p>Hi ${data?.name || 'there'},</p>
+            <p>Thank you for joining our platform. We are excited to help you build the future.</p>
+            
+            <div style="background-color: #f0fdf4; border-left: 4px solid #22c55e; padding: 15px; margin: 25px 0; border-radius: 4px;">
+                <p style="margin: 0; color: #166534; font-size: 14px;">
+                    <strong>✅ Verification Required:</strong><br/>
+                    We have sent a separate email containing a secure link to verify your account. Please click that link to activate your dashboard access.
+                </p>
+            </div>
+
+            <p>Once verified, you can:</p>
+            <ul>
+                <li>Request custom software development</li>
+                <li>Browse our marketplace of ready-made projects</li>
+                <li>Track orders in real-time</li>
+            </ul>
             <br/>
-            <a href="https://visionbuilt.in" style="background-color: #06b6d4; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Go to Dashboard</a>
+            <div style="text-align: center;">
+                <a href="https://visionbuilt.in/auth" style="background-color: #06b6d4; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">Go to Login</a>
+            </div>
+            <hr style="margin-top: 30px; border: none; border-top: 1px solid #eee;" />
+            <p style="font-size: 12px; color: #888; text-align: center;">Vision Built - Precision Digital Craft</p>
+            ${hiddenFooter}
           </div>
         `;
         break;
@@ -60,12 +87,17 @@ Deno.serve(async (req: Request) => {
       case 'order_confirmation':
         subject = `Order Confirmation #${data.orderId.slice(0, 8)}`;
         html = `
-          <div style="font-family: sans-serif; color: #333;">
+          <div style="font-family: sans-serif; color: #333; max-width: 600px; margin: 0 auto;">
             <h1 style="color: #06b6d4;">Order Received</h1>
             <p>We have received your request for <strong>${data.serviceTitle}</strong>.</p>
-            <p><strong>Order ID:</strong> ${data.orderId}</p>
-            <p><strong>Amount:</strong> $${data.amount}</p>
-            <p>A developer will review your requirements and update the status shortly.</p>
+            <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                <p style="margin: 5px 0;"><strong>Order ID:</strong> ${data.orderId}</p>
+                <p style="margin: 5px 0;"><strong>Amount:</strong> $${data.amount}</p>
+            </div>
+            <p>A developer will review your requirements and update the status shortly. You will receive an email notification when your quote is ready.</p>
+            <br/>
+            <a href="https://visionbuilt.in/dashboard/order/${data.orderId}" style="color: #06b6d4; text-decoration: none; font-weight: bold;">View Order Details →</a>
+            ${hiddenFooter}
           </div>
         `;
         break;
@@ -79,10 +111,16 @@ Deno.serve(async (req: Request) => {
         }
         subject = `[NEW ORDER] ${data.amount > 0 ? 'PAID' : 'REQUEST'} - $${data.amount}`;
         html = `
-          <h1>New Transaction</h1>
-          <p><strong>User:</strong> ${data.userEmail}</p>
-          <p><strong>Service:</strong> ${data.serviceTitle}</p>
-          <p><strong>Total:</strong> $${data.amount}</p>
+          <div style="font-family: sans-serif; color: #333;">
+            <h1 style="color: #06b6d4;">New Transaction Alert</h1>
+            <ul style="list-style: none; padding: 0;">
+                <li style="margin-bottom: 10px;"><strong>User:</strong> ${data.userEmail}</li>
+                <li style="margin-bottom: 10px;"><strong>Service:</strong> ${data.serviceTitle}</li>
+                <li style="margin-bottom: 10px;"><strong>Total:</strong> <span style="font-size: 1.2em; font-weight: bold;">$${data.amount}</span></li>
+            </ul>
+            <a href="https://visionbuilt.in/admin" style="background-color: #333; color: white; padding: 10px 15px; text-decoration: none; border-radius: 4px;">Open Admin Panel</a>
+            ${hiddenFooter}
+          </div>
         `;
         break;
 
@@ -90,13 +128,14 @@ Deno.serve(async (req: Request) => {
         const statusPretty = data.status.replace('_', ' ').toUpperCase();
         subject = `Update on Order #${data.orderId.slice(0, 6)}: ${statusPretty}`;
         html = `
-          <div style="font-family: sans-serif; color: #333;">
+          <div style="font-family: sans-serif; color: #333; max-width: 600px; margin: 0 auto;">
              <h2 style="color: #06b6d4;">Status Update</h2>
              <p>Your order for <strong>${data.serviceTitle}</strong> has been updated.</p>
-             <p><strong>New Status:</strong> <span style="background-color: #eee; padding: 2px 6px; border-radius: 4px;">${statusPretty}</span></p>
+             <p><strong>New Status:</strong> <span style="background-color: #eee; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 14px;">${statusPretty}</span></p>
              <p>Log in to your dashboard to view details or chat with the developer.</p>
              <br/>
-             <a href="https://visionbuilt.in/dashboard/order/${data.orderId}" style="background-color: #06b6d4; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">View Order</a>
+             <a href="https://visionbuilt.in/dashboard/order/${data.orderId}" style="background-color: #06b6d4; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">View Order</a>
+             ${hiddenFooter}
           </div>
         `;
         break;
@@ -106,6 +145,8 @@ Deno.serve(async (req: Request) => {
     }
 
     // --- SEND VIA RESEND ---
+    console.log(`Sending email [${type}] to [${to.join(', ')}] with ID: ${uniqueId}`);
+    
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {

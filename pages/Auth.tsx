@@ -6,7 +6,7 @@ import { User } from '../types';
 import { SUPPORTED_COUNTRIES } from '../constants';
 import { Button, Card, Input } from '../components/ui/Components';
 import { Stepper, ScrollFloat } from '../components/ui/ReactBits';
-import { ArrowLeft, Mail, KeyRound, Lock, Globe, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Mail, KeyRound, Lock, Globe, CheckCircle2, Github, Chrome } from 'lucide-react';
 import { useToast } from '../components/ui/Toast';
 
 type AuthMode = 'login' | 'signup' | 'forgot_email' | 'forgot_otp' | 'reset_password' | 'verification_sent';
@@ -81,6 +81,15 @@ const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
           toast.error(err.message || "Signup failed");
       } finally {
           setLoading(false);
+      }
+  };
+
+  const handleSocialLogin = async (provider: 'github' | 'google') => {
+      try {
+          if (provider === 'github') await api.signInWithGithub();
+          if (provider === 'google') await api.signInWithGoogle();
+      } catch (err: any) {
+          toast.error("Social login failed: " + err.message);
       }
   };
 
@@ -169,7 +178,7 @@ const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
   const { title, sub } = renderHeader();
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4">
+    <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
       <Card className="w-full max-w-md p-8 relative">
         {(authMode === 'forgot_email' || authMode === 'forgot_otp' || authMode === 'reset_password') && (
             <button onClick={() => setAuthMode('login')} className="absolute top-8 left-8 text-gray-400 hover:text-white transition-colors">
@@ -185,6 +194,37 @@ const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
             <ScrollFloat className="justify-center" animationDuration={0.4}>{sub}</ScrollFloat>
           </div>
         </div>
+
+        {/* Social Login Buttons (Only on Login/Signup) */}
+        {(authMode === 'login' || authMode === 'signup') && (
+          <div className="grid grid-cols-2 gap-3 mb-6">
+              <Button 
+                variant="secondary" 
+                onClick={() => handleSocialLogin('github')} 
+                className="w-full bg-white/5 border border-white/10 hover:bg-white/10"
+              >
+                  <Github className="w-4 h-4 mr-2" /> GitHub
+              </Button>
+              <Button 
+                variant="secondary" 
+                onClick={() => handleSocialLogin('google')} 
+                className="w-full bg-white/5 border border-white/10 hover:bg-white/10"
+              >
+                  <Chrome className="w-4 h-4 mr-2" /> Google
+              </Button>
+          </div>
+        )}
+        
+        {(authMode === 'login' || authMode === 'signup') && (
+            <div className="relative mb-6">
+                <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t border-white/10" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-[#0f172a] px-2 text-gray-500">Or continue with email</span>
+                </div>
+            </div>
+        )}
 
         {authMode === 'login' && (
             <form onSubmit={handleLogin} className="space-y-5">

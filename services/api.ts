@@ -139,6 +139,21 @@ export class ApiService {
       
       if (error) throw error;
 
+      // Restored: Send Welcome Email manually to ensure delivery
+      // Note: This runs in parallel to Supabase's verification email
+      console.log("Triggering Welcome Email...");
+      supabase.functions.invoke('send-email', {
+          body: {
+              type: 'welcome',
+              email: email,
+              data: { 
+                  name: fullName,
+                  uniqueId: Date.now() // Anti-deduplication
+              }
+          }
+      }).then(res => console.log("Welcome Email Result:", res))
+        .catch(err => console.warn("Welcome email trigger failed:", err));
+
       return { user: data.user, session: data.session };
   }
 
@@ -216,6 +231,7 @@ export class ApiService {
         
     // 3. SEND EMAILS
     const userEmail = user.email || 'Customer';
+    console.log("Triggering Order Emails...");
     
     // Client Confirmation
     supabase.functions.invoke('send-email', { 
@@ -225,7 +241,8 @@ export class ApiService {
             data: { 
                 orderId: newOrder.id, 
                 amount: orderData.total_amount,
-                serviceTitle: orderData.service_title
+                serviceTitle: orderData.service_title,
+                uniqueId: Date.now() // Anti-deduplication
             }
         } 
     }).then(({error}) => {
@@ -240,7 +257,8 @@ export class ApiService {
             data: { 
                 amount: orderData.total_amount,
                 userEmail: userEmail,
-                serviceTitle: orderData.service_title
+                serviceTitle: orderData.service_title,
+                uniqueId: Date.now() + 1 // Ensure distinct from above
             }
         } 
     }).catch(err => console.warn("Admin alert email failed", err));
@@ -358,7 +376,8 @@ export class ApiService {
                     data: {
                         orderId: orderId,
                         status: status,
-                        serviceTitle: data.service_title
+                        serviceTitle: data.service_title,
+                        uniqueId: Date.now() // Anti-deduplication
                     }
                 }
             }).catch(console.error);
