@@ -40,7 +40,8 @@ export class ApiService {
     const { data: { session } } = await supabase.auth.getSession();
     if (session?.user) {
       // Use maybeSingle() to avoid throwing error if row is missing
-      let { data: profile, error } = await supabase
+      // Removed unused 'error' variable
+      let { data: profile } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', session.user.id)
@@ -128,9 +129,10 @@ export class ApiService {
       if (error) throw error;
 
       // Trigger Welcome Email manually
+      // Removed unused 'data' variable from destructuring
       supabase.functions.invoke('send-email', {
         body: { type: 'welcome', email: email }
-      }).then(({ data, error }) => {
+      }).then(({ error }) => {
         if (error) {
             console.warn("Welcome email failed. This usually means 'RESEND_API_KEY' is missing in Supabase Secrets.", error);
         }
