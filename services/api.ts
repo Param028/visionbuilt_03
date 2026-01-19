@@ -40,7 +40,6 @@ export class ApiService {
     const { data: { session } } = await supabase.auth.getSession();
     if (session?.user) {
       // Use maybeSingle() to avoid throwing error if row is missing
-      // Removed unused 'error' variable
       let { data: profile } = await supabase
         .from('profiles')
         .select('*')
@@ -129,7 +128,6 @@ export class ApiService {
       if (error) throw error;
 
       // Trigger Welcome Email manually
-      // Removed unused 'data' variable from destructuring
       supabase.functions.invoke('send-email', {
         body: { type: 'welcome', email: email }
       }).then(({ error }) => {
