@@ -129,7 +129,7 @@ export const CountUp: React.FC<{
   from = 0,
   direction = "up",
   delay = 0,
-  duration = 2,
+  duration: _duration = 2,
   className = "",
   startWhen = true,
   separator = "",
@@ -667,7 +667,7 @@ export const GradientText: React.FC<{
   children,
   className,
   colors = ["#06b6d4", "#8b5cf6", "#3b82f6", "#06b6d4"],
-  animationSpeed = 8,
+  animationSpeed: _animationSpeed = 8,
 }) => {
   const gradientStyle = {
     backgroundImage: `linear-gradient(to right, ${colors.join(", ")})`,

@@ -6,7 +6,7 @@ import { Service, User, Offer } from '../types';
 import { formatPrice, SUPPORTED_COUNTRIES } from '../constants';
 import { Button, Card, Input, Textarea } from '../components/ui/Components';
 import { Stepper, ScrollFloat } from '../components/ui/ReactBits';
-import { TicketPercent, X, Loader2, Globe, Mail, Phone, User as UserIcon, Tag, DollarSign, MessageCircle } from 'lucide-react';
+import { Globe, User as UserIcon, Tag, ShieldCheck } from 'lucide-react';
 import { useToast } from '../components/ui/Toast';
 
 const NewOrder: React.FC<{ user: User }> = ({ user }) => {
@@ -36,10 +36,7 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
   });
   
   // Coupon State
-  const [couponCode, setCouponCode] = useState('');
-  const [appliedOffer, setAppliedOffer] = useState<Offer | null>(null);
-  const [isValidatingOffer, setIsValidatingOffer] = useState(false);
-  const [offerError, setOfferError] = useState<string | null>(null);
+  const [appliedOffer, _setAppliedOffer] = useState<Offer | null>(null);
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingStep, setProcessingStep] = useState(0);
@@ -68,28 +65,6 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
   const handleCheckbox = (e: React.ChangeEvent<HTMLInputElement>) => {
      const { name, checked } = e.target;
      setFormData(prev => ({ ...prev, [name]: checked }));
-  };
-
-  const handleApplyCoupon = async () => {
-      if (!couponCode.trim()) return;
-      setIsValidatingOffer(true);
-      setOfferError(null);
-      setAppliedOffer(null);
-
-      const offer = await api.validateOffer(couponCode.toUpperCase());
-      if (offer) {
-          setAppliedOffer(offer);
-          toast.success("Coupon applied!");
-      } else {
-          setOfferError('Invalid or expired coupon code.');
-      }
-      setIsValidatingOffer(false);
-  };
-
-  const removeCoupon = () => {
-      setAppliedOffer(null);
-      setCouponCode('');
-      setOfferError(null);
   };
 
   // Only calculate estimated total for display, not for charging
@@ -125,6 +100,8 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
     try {
         const estimated = calculateEstimatedTotal();
         
+        // We do NOT charge here. We create a request.
+        // Status defaults to 'pending' in API/DB.
         await api.createOrder({
             user_id: user.id,
             type: 'service',
@@ -133,10 +110,10 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
             is_custom: isCustom,
             domain_requested: formData.domain_requested,
             business_email_requested: formData.business_email_requested,
-            // For service orders, we don't charge upfront anymore.
-            // We set total_amount to the estimated (or 0 for custom) to be confirmed by dev later
+            // We pass the estimated amount, but the logic in API ensures no payment is triggered for 'service' type
+            // The status will be 'pending', so the user won't be asked to pay yet.
             total_amount: isCustom ? 0 : estimated,
-            discount_amount: 0, // Calculated later when dev sets price
+            discount_amount: 0, 
             applied_offer_code: appliedOffer?.code,
             requirements: {
                 business_name: formData.business_name,
@@ -151,9 +128,14 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
             }
         });
         
-        setProcessingStep(4);
-        toast.success("Request submitted! A developer will contact you shortly.");
-        setTimeout(() => navigate('/dashboard'), 2000);
+        setProcessingStep(3); // Visual feedback
+        
+        setTimeout(() => {
+            setProcessingStep(4);
+            toast.success("Request sent! A developer will review and send a quote.");
+            setTimeout(() => navigate('/dashboard'), 1500);
+        }, 1000);
+
     } catch (error: any) {
         setIsProcessing(false);
         toast.error(error.message || "Failed to process order.");
@@ -217,12 +199,6 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
                             <Input label="Estimated Budget ($)" name="client_budget" value={formData.client_budget} onChange={handleChange} placeholder="e.g. 1000 - 1500" required className="h-12" />
                         </div>
                     )}
-                    <div className="col-span-full mt-2 flex items-start gap-3 p-3 bg-vision-secondary/5 border border-vision-secondary/20 rounded-lg">
-                        <MessageCircle size={16} className="text-vision-secondary shrink-0 mt-0.5" />
-                        <p className="text-[10px] text-gray-400 leading-relaxed uppercase">
-                            <span className="text-vision-secondary font-bold">Protocol:</span> Payment is NOT required now. A developer will review your request and send a detailed quote broken into 2 milestones (Deposit + Final).
-                        </p>
-                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -269,7 +245,7 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
                      
                      <div className="flex justify-between items-center text-gray-300">
                          <span className="flex items-center gap-2 font-bold text-sm uppercase tracking-wider"><Tag size={14} className="text-vision-primary" /> {isCustom ? formData.project_title : service?.title}</span>
-                         <span className="font-mono text-vision-primary font-bold text-sm">{isCustom ? 'QUOTING' : 'Standard Rate'}</span>
+                         <span className="font-mono text-vision-primary font-bold text-sm bg-vision-primary/10 px-2 py-1 rounded">Requesting Quote</span>
                      </div>
                      
                      <div className="space-y-2 border-l border-white/10 pl-4 py-2 mt-4 text-xs text-gray-400">
@@ -278,12 +254,23 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
                          {isCustom && <div><span className="text-gray-500 uppercase">Budget:</span> {formData.client_budget}</div>}
                      </div>
 
-                     <div className="border-t border-white/10 pt-6 flex justify-between text-xl font-bold text-vision-primary items-center mt-4">
-                         <span className="text-base uppercase tracking-widest">Estimated Total</span>
+                     <div className="border-t border-white/10 pt-6 flex justify-between text-xl font-bold text-white items-center mt-4">
+                         <span className="text-base uppercase tracking-widest text-gray-400">Est. Total</span>
                          <div className="text-right">
                              <span>{isCustom ? 'TBD' : formatPrice(estimatedTotal, country)}</span>
                          </div>
                      </div>
+                     <p className="text-[10px] text-gray-500 text-right mt-1">Final quote to be confirmed by developer.</p>
+                 </div>
+
+                 <div className="flex items-start gap-3 max-w-lg mx-auto mb-8 p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl">
+                    <ShieldCheck className="text-blue-400 shrink-0 mt-0.5" size={20} />
+                    <div className="text-left">
+                        <h4 className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-1">No Payment Required Yet</h4>
+                        <p className="text-xs text-gray-400">
+                            Submitting this request does not charge your card. Our team will review your requirements and send a finalized quote with a deposit link to your dashboard.
+                        </p>
+                    </div>
                  </div>
                  
                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -292,7 +279,6 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
                         Submit Request
                     </Button>
                  </div>
-                 <p className="mt-6 text-[9px] text-gray-600 uppercase tracking-[0.3em] font-mono">No Payment Required at this step</p>
              </div>
           )}
         </form>

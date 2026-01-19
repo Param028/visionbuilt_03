@@ -1,41 +1,32 @@
+
 import { createClient } from '@supabase/supabase-js';
 
-// Helper to safely get environment variables
-const getEnvVar = (key: string) => {
-  try {
-    // Check for Vite/ESM environment
+// Safe environment variable retrieval
+const getEnv = (key: string) => {
+  // @ts-ignore
+  if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env[key]) {
     // @ts-ignore
-    if (typeof import.meta !== 'undefined' && import.meta.env) {
-      // @ts-ignore
-      return import.meta.env[key];
-    }
-    // Check for Node/Webpack environment
+    return import.meta.env[key];
+  }
+  // @ts-ignore
+  if (typeof process !== 'undefined' && process.env && process.env[key]) {
     // @ts-ignore
-    if (typeof process !== 'undefined' && process.env) {
-      // @ts-ignore
-      return process.env[key];
-    }
-  } catch (e) {
-    console.warn(`Error accessing env var ${key}`, e);
+    return process.env[key];
   }
   return '';
 };
 
-// Initialize Supabase client with your correct project URL and key
-const supabaseUrl = 'https://mnjtumdncnfrixfhmfwe.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1uanR1bWRuY25mcml4ZmhtZndlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg3MjY0MDcsImV4cCI6MjA4NDMwMjQwN30.nf5brFimakPhZsY5VS548_mDK9FGei_W8PU6QScgBiA';
+// Retrieve URL and Key
+const supabaseUrl = getEnv('VITE_SUPABASE_URL') || getEnv('REACT_APP_SUPABASE_URL');
+const supabaseAnonKey = getEnv('VITE_SUPABASE_ANON_KEY') || getEnv('REACT_APP_SUPABASE_ANON_KEY');
 
-// Check if configured (for setup screen)
+// Check if configured
 export const isConfigured = !!supabaseUrl && !!supabaseAnonKey;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-  },
-  global: {
-    headers: {
-      'x-client-info': 'supabase-js-web'
-    }
-  }
-});
+// Initialize Supabase Client
+// We use placeholders if config is missing to prevent runtime crash "supabaseUrl is required"
+// The App component will handle the !isConfigured state by showing a setup screen.
+const validUrl = isConfigured ? supabaseUrl : 'https://placeholder.supabase.co';
+const validKey = isConfigured ? supabaseAnonKey : 'placeholder';
+
+export const supabase = createClient(validUrl, validKey);

@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Tag, Sparkles, Copy, Check, Calendar, AlertCircle, Percent } from 'lucide-react';
+import { Sparkles, Copy, Check, Calendar, AlertCircle, Percent } from 'lucide-react';
 import { api } from '../services/api';
 import { Offer, User } from '../types';
 import { Button } from '../components/ui/Components';

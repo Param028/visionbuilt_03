@@ -2,9 +2,9 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Code, Layout, Shield, Cpu, Globe, Rocket, Star, CheckCircle } from 'lucide-react';
+import { ArrowRight, Code, Layout, Shield, Cpu, Globe, Star, CheckCircle } from 'lucide-react';
 import { Button } from '../components/ui/Components';
-import { Particles, GradientText, ShinyText, MagicBento, MagicBentoItem, ScrollFloat, LogoLoop, CountUp, ProjectLoop } from '../components/ui/ReactBits';
+import { GradientText, ShinyText, MagicBento, MagicBentoItem, ScrollFloat, LogoLoop, CountUp, ProjectLoop } from '../components/ui/ReactBits';
 import { api } from '../services/api';
 import { MarketplaceItem } from '../types';
 

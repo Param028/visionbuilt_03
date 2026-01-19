@@ -72,12 +72,6 @@ const App: React.FC = () => {
       }
     };
 
-    // Add timeout to prevent infinite loading
-    const timeoutId = setTimeout(() => {
-      console.log('Timeout reached, forcing loading to false');
-      setLoading(false);
-    }, 8000); // 8 second timeout
-
     // 1. Initial Fetch
     initSession();
 
@@ -93,7 +87,6 @@ const App: React.FC = () => {
     });
 
     return () => {
-        clearTimeout(timeoutId);
         subscription.unsubscribe();
     };
   }, []);

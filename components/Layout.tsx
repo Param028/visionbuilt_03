@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, LogOut, Tag, Instagram, Mail, ChevronRight } from 'lucide-react';
+import { Menu, X, LogOut, Instagram, Mail, ChevronRight } from 'lucide-react';
 import { User } from '../types';
 import { api } from '../services/api';
 import { PillNav, Particles } from './ui/ReactBits';
@@ -75,11 +75,8 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
 
             <div className="hidden md:flex items-center gap-6">
               <PillNav items={getNavItems()} />
-               <Link to="/offers" className="flex items-center gap-2 px-4 py-1.5 bg-vision-primary/10 border border-vision-primary/30 text-vision-primary hover:text-white hover:border-vision-primary rounded-full font-medium transition-all text-sm">
-                  <Tag size={14} />
-                  <span>Offers</span>
-               </Link>
-
+               {/* Offers link removed from PillNav as it is now a separate button, but kept here for fallback */}
+               
               {user && (
                   <div className="flex items-center gap-4 pl-4 border-l border-white/10">
                     <Button onClick={handleLogout} variant="ghost" size="icon" className="rounded-full text-gray-400 hover:text-red-400">

@@ -1,6 +1,6 @@
 
 import { supabase } from '../lib/supabase';
-import { User, Service, Order, Message, ContactInfo, Offer, MarketplaceItem, AdminActivity, Task, AnalyticsData, Role, ProjectSuggestion } from '../types';
+import { User, Service, Order, Message, ContactInfo, Offer, MarketplaceItem, AdminActivity, Task, AnalyticsData, Role, ProjectSuggestion, Payment } from '../types';
 import { INITIAL_CONTACT_INFO, CURRENCY_CONFIG } from '../constants';
 
 // Helper to open Razorpay
@@ -57,7 +57,6 @@ export class ApiService {
           if (!error) {
               profile = newProfile;
           } else {
-              // If insert fails (e.g. race condition), try select again
               const { data: retryProfile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
               profile = retryProfile || newProfile;
           }
@@ -112,7 +111,6 @@ export class ApiService {
           email,
           password,
           options: {
-              emailRedirectTo: `${window.location.origin}/auth?mode=login`,
               data: {
                   full_name: fullName,
                   country: country,
@@ -121,6 +119,13 @@ export class ApiService {
           }
       });
       if (error) throw error;
+
+      // Trigger Welcome Email manually to ensure it sends even if triggers are delayed
+      supabase.functions.invoke('send-email', {
+        body: { type: 'welcome', email: email }
+      }).then(({ error }) => {
+        if(error) console.error("Welcome email failed", error);
+      });
   }
 
   async logout(): Promise<void> {
@@ -153,8 +158,6 @@ export class ApiService {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("Unauthorized: Please log in again.");
 
-    // MODIFIED: Only process payment immediately if it's a 'project' (Marketplace Instant Buy)
-    // Services now go through a Request -> Quote -> Deposit flow.
     let paidAmount = 0;
     
     if (orderData.type === 'project' && orderData.total_amount > 0) {
@@ -172,15 +175,12 @@ export class ApiService {
         }
     }
 
-    // 2. INSERT ORDER INTO DB
     let initialStatus: Order['status'] = 'pending';
     
-    // Instant buy projects are completed immediately
     if (orderData.type === 'project' && paidAmount >= orderData.total_amount) {
         initialStatus = 'completed';
     }
 
-    // Sanitize payload: is_custom exists in Order type but not in DB schema
     const { is_custom, ...dbPayload } = orderData;
 
     const { data: newOrder, error: orderError } = await supabase
@@ -189,7 +189,7 @@ export class ApiService {
             ...dbPayload,
             status: initialStatus,
             amount_paid: paidAmount,
-            deposit_amount: 0, // Default 0 for services until dev sets it
+            deposit_amount: 0,
             deliverables: []
         })
         .select()
@@ -200,18 +200,33 @@ export class ApiService {
         throw new Error("Order creation failed. Please contact support.");
     }
         
-    // 3. SEND NOTIFICATIONS (Non-blocking)
+    // 3. SEND EMAILS VIA NEW GENERIC FUNCTION
     const userEmail = user.email || 'Customer';
     
-    supabase.functions.invoke('send-order-confirmation', { 
+    // Client Confirmation
+    supabase.functions.invoke('send-email', { 
         body: { 
-            orderId: newOrder.id, 
+            type: 'order_confirmation',
             email: userEmail,
-            type: orderData.type,
-            amount: orderData.total_amount
+            data: { 
+                orderId: newOrder.id, 
+                amount: orderData.total_amount,
+                serviceTitle: orderData.service_title
+            }
         } 
-    }).then(({ error }) => {
-        if (error) console.error("Edge Function Invocation Error:", error);
+    });
+
+    // Admin Alert
+    supabase.functions.invoke('send-email', { 
+        body: { 
+            type: 'admin_alert',
+            email: 'admin_override', // Handled in edge function
+            data: { 
+                amount: orderData.total_amount,
+                userEmail: userEmail,
+                serviceTitle: orderData.service_title
+            }
+        } 
     });
 
     return {
@@ -224,29 +239,46 @@ export class ApiService {
 
   async processOrderPayment(orderId: string, amount: number, description: string): Promise<void> {
       const receiptId = `rcpt_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
-      await this.handleRazorpayPayment(amount, description, receiptId);
+      const paymentResponse: any = await this.handleRazorpayPayment(amount, description, receiptId);
       
-      // Update amount_paid in DB
       const { data: currentOrder } = await supabase.from('orders').select('amount_paid, total_amount').eq('id', orderId).single();
       const newPaid = (currentOrder?.amount_paid || 0) + amount;
       
       const updates: any = { amount_paid: newPaid };
       
-      // Auto-update status based on payment
       if (newPaid >= (currentOrder?.total_amount || 0) && (currentOrder?.total_amount || 0) > 0) {
-          // If fully paid, usually moves to completion or next stage depending on workflow
-          // Keeping status manual for dev, but tracking money here.
+          // kept status manual for dev control
       } else {
-          updates.status = 'in_progress'; // Deposit paid = in progress
+          updates.status = 'in_progress'; 
       }
 
       await supabase.from('orders').update(updates).eq('id', orderId);
+
+      await supabase.from('payments').insert({
+          order_id: orderId,
+          amount: amount,
+          status: 'success',
+          razorpay_id: paymentResponse?.razorpay_payment_id || 'manual/test',
+          created_at: new Date().toISOString()
+      });
+  }
+
+  async getOrderPayments(orderId: string): Promise<Payment[]> {
+      const { data } = await supabase.from('payments').select('*').eq('order_id', orderId).order('created_at', { ascending: false });
+      return (data || []).map((p: any) => ({
+          id: p.id,
+          order_id: p.order_id,
+          amount: p.amount,
+          status: p.status,
+          date: p.created_at,
+          razorpay_id: p.razorpay_id
+      }));
   }
 
   async updateOrderFinancials(orderId: string, total: number, deposit: number): Promise<Order> {
       const { data, error } = await supabase
           .from('orders')
-          .update({ total_amount: total, deposit_amount: deposit, status: 'accepted' }) // Move to accepted so user sees the quote
+          .update({ total_amount: total, deposit_amount: deposit, status: 'accepted' })
           .eq('id', orderId)
           .select()
           .single();
@@ -269,8 +301,6 @@ export class ApiService {
       return { ...data, is_custom: data.type === 'service' && !data.service_id };
   }
 
-  // ------------------------------------------
-
   async getOrders(userId?: string): Promise<Order[]> {
     let query = supabase.from('orders').select('*').order('created_at', { ascending: false });
     if (userId) query = query.eq('user_id', userId);
@@ -291,14 +321,37 @@ export class ApiService {
   }
 
   async updateOrderStatus(orderId: string, status: Order['status'], adminId?: string): Promise<Order> {
+    // 1. Update Status
     const { data, error } = await supabase
         .from('orders')
         .update({ status })
         .eq('id', orderId)
         .select()
         .single();
+        
     if(error) throw error;
-    if (adminId) this.logActivity(adminId, 'Updated Order Status', `Order #${orderId} -> ${status}`);
+
+    if (adminId) {
+        this.logActivity(adminId, 'Updated Order Status', `Order #${orderId} -> ${status}`);
+        
+        // 2. Fetch User Email to send notification
+        const { data: userData } = await supabase.from('profiles').select('email').eq('id', data.user_id).single();
+        if (userData?.email) {
+            // 3. Send Notification Email
+            supabase.functions.invoke('send-email', {
+                body: { 
+                    type: 'order_update',
+                    email: userData.email,
+                    data: {
+                        orderId: orderId,
+                        status: status,
+                        serviceTitle: data.service_title
+                    }
+                }
+            }).catch(console.error);
+        }
+    }
+    
     return { ...data, is_custom: data.type === 'service' && !data.service_id };
   }
 
@@ -413,7 +466,7 @@ export class ApiService {
       const total = orders?.length || 0;
       const ratedOrders = orders?.filter(o => o.rating && o.rating > 0) || [];
       const sum = ratedOrders.reduce((acc, curr) => acc + (curr.rating || 0), 0);
-      const avg = ratedOrders.length > 0 ? (sum / ratedOrders.length) : 5.0; // Default to 5.0 if no ratings yet
+      const avg = ratedOrders.length > 0 ? (sum / ratedOrders.length) : 5.0; 
 
       return { totalDelivered: total, averageRating: avg };
   }
@@ -453,8 +506,6 @@ export class ApiService {
   }
 
   async removeTeamMember(id: string, adminId: string): Promise<User[]> {
-      // Direct delete fails due to RLS and Auth table restrictions.
-      // We invoke a secure edge function to handle the deletion from auth.users (cascades to profile)
       const { data, error } = await supabase.functions.invoke('delete-team-member', {
           body: { userId: id }
       });
@@ -495,7 +546,7 @@ export class ApiService {
       return this.getTasks();
   }
 
-  async updateTaskStatus(taskId: string, status: Task['status'], adminId: string): Promise<Task[]> {
+  async updateTaskStatus(taskId: string, status: Task['status'], _adminId: string): Promise<Task[]> {
       const { error } = await supabase.from('tasks').update({ status }).eq('id', taskId);
       if (error) throw error;
       return this.getTasks();
@@ -509,7 +560,6 @@ export class ApiService {
   }
 
   async getMarketplaceSales(developerId: string): Promise<Order[]> {
-      // Get orders where project_id exists and that project is owned by developerId
       const { data: items } = await supabase.from('marketplace_items').select('id').eq('developer_id', developerId);
       const itemIds = items?.map(i => i.id) || [];
       
@@ -551,7 +601,7 @@ export class ApiService {
       return this.getMarketplaceItems();
   }
 
-  async deleteMarketplaceItem(id: string, adminId?: string): Promise<MarketplaceItem[]> {
+  async deleteMarketplaceItem(id: string, _adminId?: string): Promise<MarketplaceItem[]> {
       const { error } = await supabase.from('marketplace_items').delete().eq('id', id);
       if (error) {
           if (error.code === '23503') {
@@ -651,7 +701,7 @@ export class ApiService {
       return INITIAL_CONTACT_INFO;
   }
 
-  private async handleRazorpayPayment(amount: number, description: string, receiptId: string): Promise<void> {
+  private async handleRazorpayPayment(amount: number, description: string, receiptId: string): Promise<any> {
       if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
           throw new Error("Payment Security Error: Transactions require a secure HTTPS connection.");
       }
@@ -706,7 +756,7 @@ export class ApiService {
                 description: description,
                 order_id: orderIdToUse, 
                 handler: function (response: any) {
-                    resolve();
+                    resolve(response);
                 },
                 prefill: {
                     name: userName,

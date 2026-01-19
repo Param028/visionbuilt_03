@@ -3,7 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Card } from '../components/ui/Components';
 import { ScrollFloat } from '../components/ui/ReactBits';
-import { FileText, Gavel, Copyright, AlertTriangle, CreditCard, Mail, Database } from 'lucide-react';
+import { FileText, Gavel, Copyright, CreditCard, Mail, Database } from 'lucide-react';
 import { INITIAL_CONTACT_INFO } from '../constants';
 
 const TermsOfService: React.FC = () => {

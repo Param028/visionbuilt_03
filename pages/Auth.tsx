@@ -6,20 +6,10 @@ import { User } from '../types';
 import { SUPPORTED_COUNTRIES } from '../constants';
 import { Button, Card, Input } from '../components/ui/Components';
 import { Stepper, ScrollFloat } from '../components/ui/ReactBits';
-import { ArrowLeft, Mail, KeyRound, Lock, Globe, Github } from 'lucide-react';
+import { ArrowLeft, Mail, KeyRound, Lock, Globe } from 'lucide-react';
 import { useToast } from '../components/ui/Toast';
 
 type AuthMode = 'login' | 'signup' | 'forgot_email' | 'forgot_otp' | 'reset_password';
-
-// Simple Google Icon SVG
-const GoogleIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-1 .67-2.28 1.07-3.71 1.07-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-    <path d="M5.84 14.11c-.22-.66-.35-1.36-.35-2.11s.13-1.45.35-2.11V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.83z" fill="#FBBC05"/>
-    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.83c.87-2.6 3.3-4.51 6.16-4.51z" fill="#EA4335"/>
-  </svg>
-);
 
 const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
   const [searchParams] = useSearchParams();
@@ -66,44 +56,6 @@ const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
       } finally {
           setLoading(false);
       }
-  };
-
-  const handleAuthError = (err: any, provider: string) => {
-    console.error(`${provider} Login Error:`, err);
-    let msg = err.message || `${provider} login failed`;
-
-    // Try to parse JSON error if Supabase returns raw JSON string
-    if (typeof msg === 'string' && msg.trim().startsWith('{')) {
-      try {
-        const parsed = JSON.parse(msg);
-        if (parsed.msg) msg = parsed.msg;
-        else if (parsed.error_description) msg = parsed.error_description;
-      } catch (e) {
-        // failed to parse, use original
-      }
-    }
-
-    if (msg.includes("provider is not enabled") || msg.includes("Unsupported provider")) {
-      msg = `Config Error: ${provider} login is disabled in Supabase. Check SETUP_GUIDE.md`;
-    }
-
-    toast.error(msg);
-  };
-
-  const handleGithubLogin = async () => {
-    try {
-      await api.signInWithGithub();
-    } catch (err: any) {
-      handleAuthError(err, 'GitHub');
-    }
-  };
-
-  const handleGoogleLogin = async () => {
-    try {
-      await api.signInWithGoogle();
-    } catch (err: any) {
-      handleAuthError(err, 'Google');
-    }
   };
 
   const handleSignup = async (e: React.FormEvent) => {
@@ -203,30 +155,6 @@ const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
 
   const { title, sub } = renderHeader();
 
-  const SocialAuth = () => (
-    <div className="space-y-6 mt-8">
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-white/10"></div>
-        </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-vision-900 px-2 text-gray-500 font-medium tracking-widest">Or continue with</span>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <Button variant="outline" className="gap-2 h-11 border-white/10 hover:border-vision-primary/50 group" onClick={handleGithubLogin}>
-          <Github size={18} className="group-hover:text-vision-primary transition-colors" />
-          <span className="text-xs font-bold uppercase tracking-wider">GitHub</span>
-        </Button>
-        <Button variant="outline" className="gap-2 h-11 border-white/10 hover:border-vision-primary/50 group" onClick={handleGoogleLogin}>
-          <GoogleIcon />
-          <span className="text-xs font-bold uppercase tracking-wider">Google</span>
-        </Button>
-      </div>
-    </div>
-  );
-
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4">
       <Card className="w-full max-w-md p-8 relative">
@@ -246,54 +174,15 @@ const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
         </div>
 
         {authMode === 'login' && (
-            <>
-                <form onSubmit={handleLogin} className="space-y-5">
-                    <Input 
-                        type="email" 
-                        placeholder="Email Address" 
-                        value={email} 
-                        onChange={(e) => setEmail(e.target.value)} 
-                        required 
-                    />
-                    <div className="relative">
-                        <Input 
-                            type="password" 
-                            placeholder="Password" 
-                            value={password} 
-                            onChange={(e) => setPassword(e.target.value)} 
-                            required 
-                        />
-                        <button 
-                            type="button"
-                            onClick={() => setAuthMode('forgot_email')}
-                            className="absolute right-0 -bottom-6 text-xs text-gray-500 hover:text-vision-primary transition-colors"
-                        >
-                            Forgot Password?
-                        </button>
-                    </div>
-                    <div className="pt-2"></div>
-                    <Button type="submit" className="w-full">Log In</Button>
-                </form>
-                <SocialAuth />
-            </>
-        )}
-
-        {authMode === 'signup' && (
-            <>
-                <form onSubmit={handleSignup} className="space-y-5">
-                    <Input 
-                        placeholder="Full Name" 
-                        value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
-                        required 
-                    />
-                    <Input 
-                        type="email" 
-                        placeholder="Email Address" 
-                        value={email} 
-                        onChange={(e) => setEmail(e.target.value)} 
-                        required 
-                    />
+            <form onSubmit={handleLogin} className="space-y-5">
+                <Input 
+                    type="email" 
+                    placeholder="Email Address" 
+                    value={email} 
+                    onChange={(e) => setEmail(e.target.value)} 
+                    required 
+                />
+                <div className="relative">
                     <Input 
                         type="password" 
                         placeholder="Password" 
@@ -301,29 +190,62 @@ const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
                         onChange={(e) => setPassword(e.target.value)} 
                         required 
                     />
-                    
-                    <div className="space-y-1.5">
-                        <label className="text-xs font-medium text-gray-400 uppercase tracking-wider flex items-center gap-1">
-                            <Globe size={12} /> Country / Currency
-                        </label>
-                        <select
-                            className="flex h-10 w-full rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-vision-primary/50"
-                            value={country}
-                            onChange={(e) => setCountry(e.target.value)}
-                            required
-                        >
-                            {SUPPORTED_COUNTRIES.map((c) => (
-                                <option key={c} value={c} className="bg-vision-900 text-white">
-                                    {c}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
+                    <button 
+                        type="button"
+                        onClick={() => setAuthMode('forgot_email')}
+                        className="absolute right-0 -bottom-6 text-xs text-gray-500 hover:text-vision-primary transition-colors"
+                    >
+                        Forgot Password?
+                    </button>
+                </div>
+                <div className="pt-2"></div>
+                <Button type="submit" className="w-full">Log In</Button>
+            </form>
+        )}
 
-                    <Button type="submit" className="w-full">Sign Up</Button>
-                </form>
-                <SocialAuth />
-            </>
+        {authMode === 'signup' && (
+            <form onSubmit={handleSignup} className="space-y-5">
+                <Input 
+                    placeholder="Full Name" 
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    required 
+                />
+                <Input 
+                    type="email" 
+                    placeholder="Email Address" 
+                    value={email} 
+                    onChange={(e) => setEmail(e.target.value)} 
+                    required 
+                />
+                <Input 
+                    type="password" 
+                    placeholder="Password" 
+                    value={password} 
+                    onChange={(e) => setPassword(e.target.value)} 
+                    required 
+                />
+                
+                <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-gray-400 uppercase tracking-wider flex items-center gap-1">
+                        <Globe size={12} /> Country / Currency
+                    </label>
+                    <select
+                        className="flex h-10 w-full rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-vision-primary/50"
+                        value={country}
+                        onChange={(e) => setCountry(e.target.value)}
+                        required
+                    >
+                        {SUPPORTED_COUNTRIES.map((c) => (
+                            <option key={c} value={c} className="bg-vision-900 text-white">
+                                {c}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                <Button type="submit" className="w-full">Sign Up</Button>
+            </form>
         )}
 
         {authMode === 'forgot_email' && (

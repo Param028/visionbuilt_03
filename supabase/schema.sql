@@ -1,11 +1,12 @@
 
--- Enable UUID extension for unique IDs
+-- 1. Enable Extensions
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
--- Enable pgcrypto for password hashing (Required for creating users via SQL)
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+CREATE EXTENSION IF NOT EXISTS "net"; -- Required for webhooks/edge functions
 
--- 1. Profiles (Extends Supabase Auth)
+-- 2. Create Tables
+
+-- PROFILES (Users)
 CREATE TABLE IF NOT EXISTS public.profiles (
     id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
     email TEXT UNIQUE NOT NULL,
@@ -19,7 +20,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now())
 );
 
--- 2. Services
+-- SERVICES (Catalog)
 CREATE TABLE IF NOT EXISTS public.services (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     title TEXT NOT NULL,
@@ -28,7 +29,6 @@ CREATE TABLE IF NOT EXISTS public.services (
     is_enabled BOOLEAN DEFAULT true,
     features TEXT[] DEFAULT '{}',
     icon TEXT,
-    -- New configuration fields
     allow_domain BOOLEAN DEFAULT true,
     domain_price NUMERIC DEFAULT 15,
     allow_business_email BOOLEAN DEFAULT true,
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS public.services (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now())
 );
 
--- 3. Marketplace Items
+-- MARKETPLACE ITEMS
 CREATE TABLE IF NOT EXISTS public.marketplace_items (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     title TEXT NOT NULL,
@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS public.marketplace_items (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now())
 );
 
--- 4. Offers/Coupons
+-- OFFERS (Coupons)
 CREATE TABLE IF NOT EXISTS public.offers (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     title TEXT NOT NULL,
@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS public.offers (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now())
 );
 
--- 5. Orders
+-- ORDERS
 CREATE TABLE IF NOT EXISTS public.orders (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     user_id UUID REFERENCES public.profiles(id) NOT NULL,
@@ -82,16 +82,19 @@ CREATE TABLE IF NOT EXISTS public.orders (
     domain_requested BOOLEAN DEFAULT false,
     business_email_requested BOOLEAN DEFAULT false,
     total_amount NUMERIC NOT NULL,
+    deposit_amount NUMERIC DEFAULT 0,
+    amount_paid NUMERIC DEFAULT 0,
     currency TEXT DEFAULT 'USD',
     requirements JSONB DEFAULT '{}',
     applied_offer_code TEXT,
     discount_amount NUMERIC DEFAULT 0,
     rating INTEGER,
     review TEXT,
+    deliverables TEXT[] DEFAULT '{}',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now())
 );
 
--- 6. Messages (Chat)
+-- MESSAGES (Chat)
 CREATE TABLE IF NOT EXISTS public.messages (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     order_id UUID REFERENCES public.orders(id) ON DELETE CASCADE NOT NULL,
@@ -103,7 +106,7 @@ CREATE TABLE IF NOT EXISTS public.messages (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now())
 );
 
--- 7. Tasks (Internal)
+-- TASKS (Admin/Dev)
 CREATE TABLE IF NOT EXISTS public.tasks (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     title TEXT NOT NULL,
@@ -117,7 +120,7 @@ CREATE TABLE IF NOT EXISTS public.tasks (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now())
 );
 
--- 8. Project Suggestions (Wishlist)
+-- PROJECT SUGGESTIONS (Public Wishlist)
 CREATE TABLE IF NOT EXISTS public.project_suggestions (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     user_id UUID REFERENCES public.profiles(id),
@@ -129,7 +132,7 @@ CREATE TABLE IF NOT EXISTS public.project_suggestions (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now())
 );
 
--- 9. Admin Activity Log
+-- ADMIN ACTIVITY LOG
 CREATE TABLE IF NOT EXISTS public.admin_activity (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     admin_id UUID REFERENCES public.profiles(id),
@@ -138,103 +141,95 @@ CREATE TABLE IF NOT EXISTS public.admin_activity (
     timestamp TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now())
 );
 
--- RLS POLICIES (BASIC SECURE DEFAULT)
+-- PAYMENTS
+CREATE TABLE IF NOT EXISTS public.payments (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    order_id UUID REFERENCES public.orders(id) ON DELETE CASCADE NOT NULL,
+    amount NUMERIC NOT NULL,
+    status TEXT DEFAULT 'success',
+    razorpay_id TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now())
+);
+
+-- 3. Row Level Security (RLS) Policies
+
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.services ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.marketplace_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.payments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.tasks ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.admin_activity ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.project_suggestions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.offers ENABLE ROW LEVEL SECURITY;
 
 -- Profiles: Public read, User update own
-CREATE POLICY "Public profiles are viewable by everyone" ON public.profiles FOR SELECT USING (true);
-CREATE POLICY "Users can update own profile" ON public.profiles FOR UPDATE USING (auth.uid() = id);
+CREATE POLICY "Public profiles" ON public.profiles FOR SELECT USING (true);
+CREATE POLICY "User update own" ON public.profiles FOR UPDATE USING (auth.uid() = id);
 
 -- Services: Public read, Admin write
 CREATE POLICY "Public services" ON public.services FOR SELECT USING (true);
-CREATE POLICY "Admins can insert services" ON public.services FOR INSERT WITH CHECK (auth.uid() IN (SELECT id FROM public.profiles WHERE role IN ('admin', 'super_admin')));
-CREATE POLICY "Admins can update services" ON public.services FOR UPDATE USING (auth.uid() IN (SELECT id FROM public.profiles WHERE role IN ('admin', 'super_admin')));
+CREATE POLICY "Admin manage services" ON public.services FOR ALL USING (
+  auth.uid() IN (SELECT id FROM public.profiles WHERE role IN ('admin', 'super_admin'))
+);
 
 -- Orders: Users see own, Admins see all
-CREATE POLICY "Users can see own orders" ON public.orders FOR SELECT USING (auth.uid() = user_id OR auth.uid() IN (SELECT id FROM public.profiles WHERE role IN ('admin', 'super_admin', 'developer')));
-CREATE POLICY "Users can create orders" ON public.orders FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Admins can update orders" ON public.orders FOR UPDATE USING (auth.uid() IN (SELECT id FROM public.profiles WHERE role IN ('admin', 'super_admin', 'developer')));
+CREATE POLICY "Users see own orders" ON public.orders FOR SELECT USING (
+  auth.uid() = user_id OR 
+  auth.uid() IN (SELECT id FROM public.profiles WHERE role IN ('admin', 'super_admin', 'developer'))
+);
+CREATE POLICY "Users create orders" ON public.orders FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Admin update orders" ON public.orders FOR UPDATE USING (
+  auth.uid() IN (SELECT id FROM public.profiles WHERE role IN ('admin', 'super_admin', 'developer'))
+);
 
--- Storage Buckets (Run manually in Dashboard if SQL fails)
+-- Messages: Participants see, Participants write
+CREATE POLICY "Order participants read messages" ON public.messages FOR SELECT USING (
+  auth.uid() IN (SELECT user_id FROM public.orders WHERE id = order_id) OR
+  auth.uid() IN (SELECT id FROM public.profiles WHERE role IN ('admin', 'super_admin', 'developer'))
+);
+CREATE POLICY "Order participants send messages" ON public.messages FOR INSERT WITH CHECK (
+  auth.uid() IN (SELECT user_id FROM public.orders WHERE id = order_id) OR
+  auth.uid() IN (SELECT id FROM public.profiles WHERE role IN ('admin', 'super_admin', 'developer'))
+);
+
+-- Other tables: General public read, Admin write
+CREATE POLICY "Public read offers" ON public.offers FOR SELECT USING (true);
+CREATE POLICY "Admin manage offers" ON public.offers FOR ALL USING (auth.uid() IN (SELECT id FROM public.profiles WHERE role IN ('admin', 'super_admin')));
+
+CREATE POLICY "Public read marketplace" ON public.marketplace_items FOR SELECT USING (true);
+CREATE POLICY "Admin manage marketplace" ON public.marketplace_items FOR ALL USING (auth.uid() IN (SELECT id FROM public.profiles WHERE role IN ('admin', 'super_admin', 'developer')));
+
+-- 4. Triggers
+
+-- Handle New User (Auto-create Profile)
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.profiles (id, email, name, role)
+  VALUES (new.id, new.email, COALESCE(new.raw_user_meta_data->>'full_name', 'User'), 'client');
+  RETURN new;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE OR REPLACE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
+
+-- 5. Storage Buckets
 INSERT INTO storage.buckets (id, name, public) VALUES ('public', 'public', true) ON CONFLICT DO NOTHING;
 
--- =================================================================
--- SUPER ADMIN CREATION SCRIPT
--- =================================================================
+-- 6. Super Admin Seed (Optional)
 DO $$
 DECLARE
   target_user_id UUID;
   existing_user_id UUID;
 BEGIN
-  -- Check if user already exists
+  -- Check if user exists
   SELECT id INTO existing_user_id FROM auth.users WHERE email = 'vbuilt20@gmail.com';
 
   IF existing_user_id IS NOT NULL THEN
-     -- If user exists, just update their profile to be super_admin
      UPDATE public.profiles SET role = 'super_admin' WHERE id = existing_user_id;
-     RAISE NOTICE 'User vbuilt20@gmail.com already exists. Updated role to super_admin.';
-  ELSE
-     -- If user does not exist, create them
-     target_user_id := uuid_generate_v4();
-     
-     INSERT INTO auth.users (
-       instance_id,
-       id,
-       aud,
-       role,
-       email,
-       encrypted_password,
-       email_confirmed_at,
-       recovery_sent_at,
-       last_sign_in_at,
-       raw_app_meta_data,
-       raw_user_meta_data,
-       created_at,
-       updated_at,
-       confirmation_token,
-       email_change,
-       email_change_token_new,
-       recovery_token
-     ) VALUES (
-       '00000000-0000-0000-0000-000000000000',
-       target_user_id,
-       'authenticated',
-       'authenticated',
-       'vbuilt20@gmail.com',
-       crypt('vision03', gen_salt('bf')), -- Password hashing
-       now(),
-       now(),
-       now(),
-       '{"provider":"email","providers":["email"]}',
-       '{"full_name":"Vision_03"}',
-       now(),
-       now(),
-       '',
-       '',
-       '',
-       ''
-     );
-
-     INSERT INTO public.profiles (
-       id,
-       email,
-       name,
-       role,
-       country,
-       currency
-     ) VALUES (
-       target_user_id,
-       'vbuilt20@gmail.com',
-       'Vision_03',
-       'super_admin',
-       'India',
-       'INR'
-     );
-     
-     RAISE NOTICE 'Created super_admin user: vbuilt20@gmail.com';
   END IF;
 END $$;

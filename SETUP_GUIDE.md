@@ -1,42 +1,89 @@
 
-# Vision Built - Setup Guide
+# Vision Built - Production Deployment Guide
 
-## 1. Environment Variables
-Ensure you have a `.env` file in the root directory with the following keys:
+## 1. API Keys & Secrets Checklist
 
-```env
-VITE_SUPABASE_URL=your_supabase_project_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-VITE_RAZORPAY_KEY_ID=your_razorpay_key_id
-# For Local Admin CLI Scripts (Optional)
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-```
+| Variable Name | Type | Location | Purpose |
+| :--- | :--- | :--- | :--- |
+| **VITE_SUPABASE_URL** | Public | `.env` (Frontend) | Connects React to Supabase instance. |
+| **VITE_SUPABASE_ANON_KEY** | Public | `.env` (Frontend) | Public key for client-side DB access (RLS protected). |
+| **VITE_RAZORPAY_KEY_ID** | Public | `.env` (Frontend) | Opens Razorpay Modal in browser. |
+| **SUPABASE_URL** | Secret | Supabase Edge Functions | Auto-set by Supabase. |
+| **SUPABASE_SERVICE_ROLE_KEY** | Secret | Supabase Edge Functions | Admin access for Edge Functions (Bypasses RLS). |
+| **RAZORPAY_KEY_ID** | Secret | Supabase Edge Functions | Validates orders on server side. |
+| **RAZORPAY_KEY_SECRET** | Secret | Supabase Edge Functions | Signs/captures payments securely. |
+| **RESEND_API_KEY** | Secret | Supabase Edge Functions | Sends transactional emails. Get from [Resend.com](https://resend.com). |
+| **SENDER_EMAIL** | Secret | Supabase Edge Functions | The "From" address (e.g., `noreply@visionbuilt.in`). |
+| **ADMIN_EMAIL** | Secret | Supabase Edge Functions | Your email to receive order alerts. |
 
-## 2. Authentication Setup (Fixing "Provider not enabled")
+---
 
-To make Google and GitHub login work, you must enable them in Supabase.
+## 2. Chronological Deployment Steps
 
-1.  Go to **Authentication > Providers** in your Supabase Dashboard.
-2.  **GitHub:**
-    *   Create an OAuth App here: [GitHub Developer Settings](https://github.com/settings/developers)
-    *   **Homepage URL:** `http://localhost:5173` (or your production URL)
-    *   **Callback URL:** Copy from Supabase (e.g., `https://xyz.supabase.co/auth/v1/callback`)
-    *   Enter Client ID & Secret in Supabase.
-3.  **Google:**
-    *   Create Credentials here: [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
-    *   **Authorized Javascript Origins:** `http://localhost:5173`
-    *   **Authorized Redirect URIs:** Copy from Supabase.
-    *   Enter Client ID & Secret in Supabase.
+### Step 1: Database Initialization
+1.  Log in to the **Supabase Dashboard**.
+2.  Go to the **SQL Editor**.
+3.  Copy the entire content of `supabase/schema.sql` from your project.
+4.  Paste it into the editor and click **Run**.
+    *   *This creates tables, policies, triggers, and the Super Admin user.*
 
-## 3. URL Configuration
-1.  Go to **Authentication > URL Configuration** in Supabase.
-2.  Set **Site URL** to `http://localhost:5173`.
-3.  Add `http://localhost:5173/*` and `https://<your-vercel-url>/*` to **Redirect URLs**.
+### Step 2: Edge Functions Deployment
+*Prerequisite:* Install Supabase CLI (`npm install -g supabase`).
 
-## 4. Database Setup
-Copy the content of `supabase/schema.sql` and run it in the **SQL Editor** of your Supabase dashboard to create all necessary tables and the Super Admin user.
+1.  **Login to CLI:**
+    ```bash
+    supabase login
+    ```
+2.  **Link Project:**
+    ```bash
+    supabase link --project-ref <your-project-id>
+    ```
+3.  **Set Secrets (Backend Keys):**
+    Run the following command to set production secrets:
+    ```bash
+    supabase secrets set RAZORPAY_KEY_ID=rzp_live_... RAZORPAY_KEY_SECRET=... RESEND_API_KEY=re_... SENDER_EMAIL=noreply@yourdomain.com ADMIN_EMAIL=you@gmail.com
+    ```
+4.  **Deploy Functions:**
+    ```bash
+    supabase functions deploy send-email
+    supabase functions deploy create-razorpay-order
+    supabase functions deploy invite-developer
+    supabase functions deploy delete-team-member
+    ```
 
-## 5. Admin CLI
-To manage users or delete developers without restrictions:
-1.  Ensure `SUPABASE_SERVICE_ROLE_KEY` is in your `.env`.
-2.  Run: `npm run admin`
+### Step 3: Auth Configuration
+Supabase handles Forgot Password / Magic Links automatically, but you need to configure the provider.
+
+1.  Go to **Authentication > Providers** in Supabase.
+2.  Enable **Email** provider.
+3.  *(Optional but Recommended)*: Go to **Settings > SMTP Settings**.
+    *   Enable **Custom SMTP**.
+    *   Host: `smtp.resend.com`
+    *   Port: `465`
+    *   User: `resend`
+    *   Pass: `YOUR_RESEND_API_KEY`
+    *   Sender Email: `noreply@yourdomain.com`
+    *   *Why?* This ensures your "Reset Password" emails don't go to spam.
+
+### Step 4: Storage Setup
+1.  Go to **Storage** in Supabase.
+2.  Verify a public bucket named `public` exists.
+3.  If not, create it and ensure it is set to **Public**.
+
+### Step 5: Frontend Deployment (Vercel)
+1.  Push your code to **GitHub**.
+2.  Import the repo into **Vercel**.
+3.  In Vercel **Project Settings > Environment Variables**, add:
+    *   `VITE_SUPABASE_URL`
+    *   `VITE_SUPABASE_ANON_KEY`
+    *   `VITE_RAZORPAY_KEY_ID`
+4.  Deploy.
+
+### Step 6: Final Verification
+1.  Visit your Vercel URL.
+2.  Sign up as a new user.
+    *   *Check:* Did you receive the "Welcome" email? (Triggered by DB webhook -> Edge Function).
+3.  Log in as Super Admin (`vbuilt20@gmail.com` / `vision03`).
+4.  Go to **Admin > Services** and add a test service.
+5.  Go to **Dashboard** and try to place an order.
+    *   *Check:* Does Razorpay modal open?

@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, Button } from '../components/ui/Components';
 import { ScrollFloat } from '../components/ui/ReactBits';
-import { RefreshCcw, CheckCircle, XCircle, Clock, Mail, ShieldAlert, FileText, Globe, HardDrive } from 'lucide-react';
+import { CheckCircle, XCircle, Clock, Mail, ShieldAlert, FileText, Globe, HardDrive } from 'lucide-react';
 import { INITIAL_CONTACT_INFO } from '../constants';
 
 const RefundPolicy: React.FC = () => {

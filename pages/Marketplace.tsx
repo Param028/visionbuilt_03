@@ -7,7 +7,7 @@ import { api } from '../services/api';
 import { MarketplaceItem, User } from '../types';
 import { formatPrice } from '../constants';
 import { Button } from '../components/ui/Components';
-import { ScrollFloat, GlareCard, PillNav } from '../components/ui/ReactBits';
+import { ScrollFloat, GlareCard } from '../components/ui/ReactBits';
 
 const Marketplace: React.FC = () => {
   const [items, setItems] = useState<MarketplaceItem[]>([]);
