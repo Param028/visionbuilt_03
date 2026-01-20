@@ -14,17 +14,32 @@ const Offers: React.FC<{ user: User | null }> = ({ user }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    let isMounted = true;
+    
+    // Failsafe timeout
+    const timeoutId = setTimeout(() => {
+        if (isMounted && loading) {
+            setLoading(false);
+        }
+    }, 5000);
+
     const fetchOffers = async () => {
       try {
         const data = await api.getOffers();
-        setOffers(data);
+        if (isMounted) setOffers(data);
       } catch (error) {
         console.error("Failed to fetch offers", error);
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
+    
     fetchOffers();
+
+    return () => {
+        isMounted = false;
+        clearTimeout(timeoutId);
+    };
   }, []);
 
   const handleCopy = (code: string, id: string) => {

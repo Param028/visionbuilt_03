@@ -17,17 +17,32 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    let isMounted = true;
+    
+    // Failsafe timeout
+    const timeoutId = setTimeout(() => {
+        if (isMounted && loading) {
+            setLoading(false);
+        }
+    }, 5000);
+
     const fetchData = async () => {
       try {
         const data = await api.getMarketplaceItems();
-        setItems(data);
+        if (isMounted) setItems(data);
       } catch (error) {
         console.error("Failed to load marketplace items", error);
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
+    
     fetchData();
+
+    return () => {
+        isMounted = false;
+        clearTimeout(timeoutId);
+    };
   }, []);
 
   const handleBuy = (id: string) => {

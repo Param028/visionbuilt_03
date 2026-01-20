@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Check, ShoppingCart, Code, Layout, GraduationCap, Bot, Sparkles, Server, Database, Globe } from 'lucide-react';
+import { Check, ShoppingCart, Code, Layout, GraduationCap, Bot, Sparkles, Server, Database, Globe, AlertCircle } from 'lucide-react';
 import { api } from '../services/api';
 import { Service, User } from '../types';
 import { formatPrice } from '../constants';
@@ -53,17 +53,35 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    let isMounted = true;
+
+    // Failsafe: Force stop loading after 5 seconds if DB hangs
+    const timeoutId = setTimeout(() => {
+        if (isMounted && loading) {
+            console.warn("Services fetch timed out - forcing UI render");
+            setLoading(false);
+        }
+    }, 5000);
+
     const fetchData = async () => {
       try {
         const data = await api.getServices();
-        setServices(data.filter(s => s.is_enabled));
+        if (isMounted) {
+            setServices(data.filter(s => s.is_enabled));
+        }
       } catch (error) {
         console.error("Failed to load services", error);
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
+    
     fetchData();
+
+    return () => {
+        isMounted = false;
+        clearTimeout(timeoutId);
+    };
   }, []);
 
   const handleOrder = (serviceId: string) => {
@@ -105,66 +123,79 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {services.map((service, index) => (
-          <motion.div
-            key={service.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-          >
-            <Card className="h-full flex flex-col hover:border-vision-primary/50 transition-all duration-300 group">
-              <div className="mb-6">
-                <div className="flex justify-between items-start mb-4">
-                  <div className="p-3 rounded-lg bg-white/5 text-vision-primary border border-white/10 group-hover:bg-vision-primary group-hover:text-black transition-colors duration-300 shadow-[0_0_15px_rgba(6,182,212,0.1)] group-hover:shadow-[0_0_20px_rgba(6,182,212,0.4)]">
-                    {getIcon(service.icon)}
-                  </div>
-                </div>
-                
-                <h3 className="text-xl font-bold font-display text-white mb-2 group-hover:text-vision-primary transition-colors">
-                    {service.title}
-                </h3>
-                
-                <p className="text-gray-400 text-sm h-12 mb-4 line-clamp-2">{service.description}</p>
-                
-                <div className="text-3xl font-bold text-white font-sora">
-                  {formatPrice(service.base_price, user?.country)} <span className="text-sm font-normal text-gray-500">/ starting</span>
-                </div>
-              </div>
-
-              <div className="flex-grow space-y-3 mb-8 border-t border-white/5 pt-6">
-                {service.features.map((feature, i) => {
-                  const description = getFeatureDescription(feature);
-                  return (
-                    <div key={i} className="flex items-center text-sm text-gray-300 group/feature w-fit">
-                      <Check className="w-4 h-4 text-vision-secondary mr-2 flex-shrink-0" />
-                      {description ? (
-                        <Tooltip content={description} className="cursor-help">
-                          <span className="border-b border-dashed border-gray-600 group-hover/feature:border-vision-primary transition-colors">
-                            {feature}
-                          </span>
-                        </Tooltip>
-                      ) : (
-                        <span>{feature}</span>
-                      )}
+      {services.length === 0 ? (
+          <div className="flex flex-col items-center justify-center p-12 border border-white/10 rounded-2xl bg-white/5">
+              <AlertCircle className="w-12 h-12 text-vision-primary mb-4 opacity-50" />
+              <h3 className="text-xl font-bold text-white mb-2">Service Catalog Unavailable</h3>
+              <p className="text-gray-400 text-center max-w-md">
+                  Unable to load services at this moment. Please check your connection or contact support for a custom quote.
+              </p>
+              <Button onClick={() => window.location.reload()} variant="outline" className="mt-6">
+                  Retry Connection
+              </Button>
+          </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {services.map((service, index) => (
+            <motion.div
+                key={service.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+            >
+                <Card className="h-full flex flex-col hover:border-vision-primary/50 transition-all duration-300 group">
+                <div className="mb-6">
+                    <div className="flex justify-between items-start mb-4">
+                    <div className="p-3 rounded-lg bg-white/5 text-vision-primary border border-white/10 group-hover:bg-vision-primary group-hover:text-black transition-colors duration-300 shadow-[0_0_15px_rgba(6,182,212,0.1)] group-hover:shadow-[0_0_20px_rgba(6,182,212,0.4)]">
+                        {getIcon(service.icon)}
                     </div>
-                  );
-                })}
-              </div>
+                    </div>
+                    
+                    <h3 className="text-xl font-bold font-display text-white mb-2 group-hover:text-vision-primary transition-colors">
+                        {service.title}
+                    </h3>
+                    
+                    <p className="text-gray-400 text-sm h-12 mb-4 line-clamp-2">{service.description}</p>
+                    
+                    <div className="text-3xl font-bold text-white font-sora">
+                    {formatPrice(service.base_price, user?.country)} <span className="text-sm font-normal text-gray-500">/ starting</span>
+                    </div>
+                </div>
 
-              {(!user || user.role === 'client') ? (
-                  <Button onClick={() => handleOrder(service.id)} className="w-full group/btn">
-                    Select Service <ShoppingCart className="ml-2 w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
-                  </Button>
-              ) : (
-                  <div className="w-full py-2 text-center text-xs text-gray-500 border border-white/5 rounded-lg bg-white/5 uppercase tracking-wider">
-                      Admin Mode: Purchasing Disabled
-                  </div>
-              )}
-            </Card>
-          </motion.div>
-        ))}
-      </div>
+                <div className="flex-grow space-y-3 mb-8 border-t border-white/5 pt-6">
+                    {service.features.map((feature, i) => {
+                    const description = getFeatureDescription(feature);
+                    return (
+                        <div key={i} className="flex items-center text-sm text-gray-300 group/feature w-fit">
+                        <Check className="w-4 h-4 text-vision-secondary mr-2 flex-shrink-0" />
+                        {description ? (
+                            <Tooltip content={description} className="cursor-help">
+                            <span className="border-b border-dashed border-gray-600 group-hover/feature:border-vision-primary transition-colors">
+                                {feature}
+                            </span>
+                            </Tooltip>
+                        ) : (
+                            <span>{feature}</span>
+                        )}
+                        </div>
+                    );
+                    })}
+                </div>
+
+                {(!user || user.role === 'client') ? (
+                    <Button onClick={() => handleOrder(service.id)} className="w-full group/btn">
+                        Select Service <ShoppingCart className="ml-2 w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                    </Button>
+                ) : (
+                    <div className="w-full py-2 text-center text-xs text-gray-500 border border-white/5 rounded-lg bg-white/5 uppercase tracking-wider">
+                        Admin Mode: Purchasing Disabled
+                    </div>
+                )}
+                </Card>
+            </motion.div>
+            ))}
+        </div>
+      )}
     </div>
   );
 };
