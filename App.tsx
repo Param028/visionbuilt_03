@@ -11,12 +11,14 @@ import { isConfigured, supabase } from './lib/supabase';
 import { AnimatePresence } from 'framer-motion';
 import { WifiOff, RefreshCw, Settings, Key } from 'lucide-react';
 
-// --- Lazy Load Pages ---
-const Landing = React.lazy(() => import('./pages/Landing'));
+// --- Static Imports for Core Pages (Fixes loading spinner freeze) ---
+import Landing from './pages/Landing';
+import Auth from './pages/Auth';
+import Dashboard from './pages/Dashboard';
+
+// --- Lazy Load Non-Critical Pages ---
 const Services = React.lazy(() => import('./pages/Services'));
-const Auth = React.lazy(() => import('./pages/Auth'));
 const DevLogin = React.lazy(() => import('./pages/DevLogin'));
-const Dashboard = React.lazy(() => import('./pages/Dashboard'));
 const OrderDetails = React.lazy(() => import('./pages/OrderDetails'));
 const NewOrder = React.lazy(() => import('./pages/NewOrder'));
 const Admin = React.lazy(() => import('./pages/Admin'));
@@ -73,19 +75,28 @@ const App: React.FC = () => {
     };
 
     // 1. Initial Fetch with Failsafe Timeout
-    // Prevents mobile freeze if network hangs
     const timeoutId = setTimeout(() => {
-        if (loading) {
-            console.warn("Session check timed out - forcing load");
-            setLoading(false);
-        }
+        // We only force loading to false if it's still true.
+        // This handler might run even if initSession finished successfully 
+        // (if it finished *just* before and state update hasn't reflected in this closure yet, 
+        // though that's unlikely with React's batching).
+        // However, checking the *ref* or just dispatching the update is safer.
+        // Since setLoading is stable, calling it again with false is harmless.
+        setLoading(prev => {
+            if (prev) {
+                console.warn("Session check timed out - forcing load");
+                return false;
+            }
+            return prev;
+        });
     }, 5000);
 
     initSession().then(() => clearTimeout(timeoutId));
 
-    // 2. Listen for Auth Changes (Sign in, Sign out, Token Refresh)
+    // 2. Listen for Auth Changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event) => {
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+            // Re-fetch user on explicit sign-in events
             const currentUser = await api.getCurrentUser();
             setUser(currentUser);
         } else if (event === 'SIGNED_OUT') {
@@ -179,32 +190,26 @@ const App: React.FC = () => {
       {!isInitializing && (
         <ToastProvider>
           <HashRouter>
-            <Suspense fallback={<PageLoader />}>
-              <Routes>
-                <Route path="/protocol/access" element={<DevLogin setUser={setUser} />} />
-                <Route path="*" element={
-                  <Layout user={user} setUser={setUser}>
-                    <Suspense fallback={<PageLoader />}>
-                      <Routes>
-                        <Route path="/" element={<Landing />} />
-                        <Route path="/services" element={<Services user={user} />} />
-                        <Route path="/marketplace" element={<Marketplace user={user} />} />
-                        <Route path="/offers" element={<Offers user={user} />} />
-                        <Route path="/auth" element={!user ? <Auth setUser={setUser} /> : <Navigate to={user.role === 'admin' || user.role === 'super_admin' ? '/admin' : '/dashboard'} />} />
-                        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-                        <Route path="/terms-of-service" element={<TermsOfService />} />
-                        <Route path="/refund-policy" element={<RefundPolicy />} />
-                        <Route path="/dashboard" element={user ? <Dashboard user={user} /> : <Navigate to="/auth" />} />
-                        <Route path="/order/new" element={user ? <NewOrder user={user} /> : <Navigate to="/auth" />} />
-                        <Route path="/marketplace/buy/:id" element={user ? <ProjectCheckout user={user} /> : <Navigate to="/auth" />} />
-                        <Route path="/dashboard/order/:id" element={user ? <OrderDetails user={user} /> : <Navigate to="/auth" />} />
-                        <Route path="/admin/*" element={user && (user.role === 'admin' || user.role === 'developer' || user.role === 'super_admin') ? <Admin user={user} /> : <Navigate to="/" />} />
-                      </Routes>
-                    </Suspense>
-                  </Layout>
-                } />
-              </Routes>
-            </Suspense>
+            <Layout user={user} setUser={setUser}>
+                <Routes>
+                    <Route path="/" element={<Landing />} />
+                    <Route path="/auth" element={!user ? <Auth setUser={setUser} /> : <Navigate to={user.role === 'admin' || user.role === 'super_admin' ? '/admin' : '/dashboard'} />} />
+                    <Route path="/dashboard" element={user ? <Dashboard user={user} /> : <Navigate to="/auth" />} />
+                    
+                    {/* Lazy Loaded Routes */}
+                    <Route path="/protocol/access" element={<Suspense fallback={<PageLoader />}><DevLogin setUser={setUser} /></Suspense>} />
+                    <Route path="/services" element={<Suspense fallback={<PageLoader />}><Services user={user} /></Suspense>} />
+                    <Route path="/marketplace" element={<Suspense fallback={<PageLoader />}><Marketplace user={user} /></Suspense>} />
+                    <Route path="/offers" element={<Suspense fallback={<PageLoader />}><Offers user={user} /></Suspense>} />
+                    <Route path="/privacy-policy" element={<Suspense fallback={<PageLoader />}><PrivacyPolicy /></Suspense>} />
+                    <Route path="/terms-of-service" element={<Suspense fallback={<PageLoader />}><TermsOfService /></Suspense>} />
+                    <Route path="/refund-policy" element={<Suspense fallback={<PageLoader />}><RefundPolicy /></Suspense>} />
+                    <Route path="/order/new" element={<Suspense fallback={<PageLoader />}>{user ? <NewOrder user={user} /> : <Navigate to="/auth" />}</Suspense>} />
+                    <Route path="/marketplace/buy/:id" element={<Suspense fallback={<PageLoader />}>{user ? <ProjectCheckout user={user} /> : <Navigate to="/auth" />}</Suspense>} />
+                    <Route path="/dashboard/order/:id" element={<Suspense fallback={<PageLoader />}>{user ? <OrderDetails user={user} /> : <Navigate to="/auth" />}</Suspense>} />
+                    <Route path="/admin/*" element={<Suspense fallback={<PageLoader />}>{user && (user.role === 'admin' || user.role === 'developer' || user.role === 'super_admin') ? <Admin user={user} /> : <Navigate to="/" />}</Suspense>} />
+                </Routes>
+            </Layout>
           </HashRouter>
         </ToastProvider>
       )}

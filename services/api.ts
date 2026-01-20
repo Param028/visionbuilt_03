@@ -1,4 +1,3 @@
-
 import { supabase } from '../lib/supabase';
 import { User, Service, Order, Message, ContactInfo, Offer, MarketplaceItem, AdminActivity, Task, AnalyticsData, Role, ProjectSuggestion, Payment } from '../types';
 import { INITIAL_CONTACT_INFO, CURRENCY_CONFIG } from '../constants';
@@ -33,53 +32,68 @@ const getEnvVar = (key: string) => {
   return '';
 };
 
+// Helper for DB timeouts
+const withTimeout = <T>(promise: Promise<T>, ms: number, fallback: T): Promise<T> => {
+    const timeout = new Promise<T>((resolve) => setTimeout(() => resolve(fallback), ms));
+    return Promise.race([promise, timeout]);
+};
+
 export class ApiService {
   private currentUser: User | null = null;
 
   async getCurrentUser(): Promise<User | null> {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session?.user) {
-      // Use maybeSingle() to avoid throwing error if row is missing
-      let { data: profile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', session.user.id)
-        .maybeSingle();
+    try {
+        // 1. Get Session with strict timeout
+        const sessionPromise = supabase.auth.getSession();
+        const { data: { session } } = await withTimeout(sessionPromise, 4000, { data: { session: null } } as any);
 
-      // If profile is missing (Trigger failed?), create it manually
-      if (!profile) {
-          const newProfile = {
-              id: session.user.id,
-              email: session.user.email,
-              name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'User',
-              role: 'client',
-              country: session.user.user_metadata?.country || 'India'
-          };
-          
-          const { error: insertError } = await supabase.from('profiles').insert(newProfile);
-          
-          if (!insertError) {
+        if (session?.user) {
+          // 2. Get Profile with strict timeout
+          // If profile fetch hangs/fails, we fall back to null and create a temporary profile object from metadata
+          const profilePromise = supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .maybeSingle();
+            
+          let { data: profile } = await withTimeout(profilePromise, 3000, { data: null } as any);
+
+          // If profile is missing (Trigger failed or timeout?), create it manually
+          if (!profile) {
+              const newProfile = {
+                  id: session.user.id,
+                  email: session.user.email,
+                  name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'User',
+                  role: 'client',
+                  country: session.user.user_metadata?.country || 'India'
+              };
+              
+              // Try to insert, but don't wait forever
+              supabase.from('profiles').insert(newProfile).then(({ error }) => {
+                  if (error) console.warn("Background profile creation failed", error);
+              });
+              
+              // Use the object we just created/attempted as the profile
               profile = newProfile;
-          } else {
-              // Final retry fetch
-              const { data: retryProfile } = await supabase.from('profiles').select('*').eq('id', session.user.id).maybeSingle();
-              profile = retryProfile;
           }
-      }
 
-      this.currentUser = {
-        id: session.user.id,
-        email: session.user.email!,
-        name: profile?.name || session.user.user_metadata?.full_name || 'User',
-        role: profile?.role || 'client',
-        country: profile?.country || 'India',
-        email_verified: session.user.aud === 'authenticated',
-        avatar_url: profile?.avatar_url,
-        performance_score: profile?.performance_score
-      };
-      return this.currentUser;
+          this.currentUser = {
+            id: session.user.id,
+            email: session.user.email!,
+            name: profile?.name || session.user.user_metadata?.full_name || 'User',
+            role: profile?.role || 'client',
+            country: profile?.country || 'India',
+            email_verified: session.user.aud === 'authenticated',
+            avatar_url: profile?.avatar_url,
+            performance_score: profile?.performance_score
+          };
+          return this.currentUser;
+        }
+        return null;
+    } catch (err) {
+        console.warn("getCurrentUser failed or timed out", err);
+        return null;
     }
-    return null;
   }
 
   async signInWithPassword(email: string, password: string): Promise<User> {
@@ -98,20 +112,31 @@ export class ApiService {
 
       if (data.user) {
          // Explicitly fetch profile using the ID from the login response
-         // This avoids race conditions with getSession()
-         let { data: profile } = await supabase
+         const profilePromise = supabase
             .from('profiles')
             .select('*')
             .eq('id', data.user.id)
             .maybeSingle();
+            
+         // Race profile fetch against a 3s timeout. If DB is slow, proceed with metadata.
+         let { data: profile } = await withTimeout(profilePromise, 3000, { data: null } as any);
 
-         // Fallback if profile doesn't exist yet
+         // Fallback if profile doesn't exist yet or timeout occurred
          if (!profile) {
              profile = {
                  role: 'client',
                  name: data.user.user_metadata?.full_name || 'User',
-                 country: 'India'
+                 country: 'India',
+                 avatar_url: null,
+                 performance_score: 0
              };
+             // Attempt background creation if missing
+             supabase.from('profiles').insert({
+                 id: data.user.id,
+                 email: data.user.email,
+                 name: profile.name,
+                 role: 'client'
+             }).then();
          }
 
          // Construct User object directly
@@ -174,7 +199,6 @@ export class ApiService {
                   country: country,
                   role: 'client' 
               },
-              // Critical: This ensures when they click the email link, they come back to the app
               emailRedirectTo: window.location.origin
           }
       });
@@ -182,7 +206,6 @@ export class ApiService {
       if (error) throw error;
 
       // Restored: Send Welcome Email manually to ensure delivery
-      // Note: This runs in parallel to Supabase's verification email
       console.log("Triggering Welcome Email...");
       supabase.functions.invoke('send-email', {
           body: {

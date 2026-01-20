@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { api } from '../services/api';
@@ -49,10 +48,16 @@ const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
       
       try {
           // Run UI animation and API call in parallel for better UX
-          const loginPromise = api.signInWithPassword(email, password);
-          await simulateLoading(); // Ensure visual feedback lasts at least ~2.4s
+          const loginCall = api.signInWithPassword(email, password);
+          const uiAnimation = simulateLoading(); 
           
-          const user = await loginPromise;
+          // CRITICAL FIX: Race the login call against a 15s timeout to ensure UI never hangs indefinitely
+          const user = await Promise.race([
+              loginCall,
+              new Promise<never>((_, reject) => setTimeout(() => reject(new Error("Login timed out. Check connection.")), 15000))
+          ]);
+          
+          await uiAnimation; // Ensure visual feedback finishes gracefully
           
           if (user) {
               setUser(user);
@@ -70,10 +75,15 @@ const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
       e.preventDefault();
       setLoading(true);
       try {
-          const signupPromise = api.signUp(email, password, fullName, country);
-          await simulateLoading();
+          const signupCall = api.signUp(email, password, fullName, country);
+          const uiAnimation = simulateLoading();
           
-          const { session, user } = await signupPromise;
+          const { session, user } = await Promise.race([
+              signupCall,
+              new Promise<any>((_, reject) => setTimeout(() => reject(new Error("Signup timed out. Check connection.")), 15000))
+          ]);
+
+          await uiAnimation;
           
           if (!session && user) {
               // Email verification required
