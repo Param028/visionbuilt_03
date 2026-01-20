@@ -61,7 +61,8 @@ const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
       } catch (err: any) {
           console.error("Login Handler Error:", err);
           toast.error(err.message || "Login failed");
-          setLoading(false); // Only unset loading on error, otherwise let component unmount/redirect
+      } finally {
+          setLoading(false);
       }
   };
 
