@@ -79,7 +79,6 @@ const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
               // Email verification required
               setAuthMode('verification_sent');
               toast.success("Confirmation email sent!");
-              setLoading(false);
           } else if (session) {
               // Auto-login (if verification was disabled)
               const fullUser = await api.getCurrentUser();
@@ -90,6 +89,7 @@ const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
           }
       } catch (err: any) {
           toast.error(err.message || "Signup failed");
+      } finally {
           setLoading(false);
       }
   };
