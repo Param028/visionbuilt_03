@@ -15,9 +15,13 @@ CREATE TABLE IF NOT EXISTS public.profiles (
     currency TEXT DEFAULT 'INR',
     avatar_url TEXT,
     performance_score INTEGER DEFAULT 0,
+    email_verified BOOLEAN DEFAULT false,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now()),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now())
 );
+
+-- Ensure column exists if table was already created
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS email_verified BOOLEAN DEFAULT false;
 
 -- SERVICES (Catalog)
 CREATE TABLE IF NOT EXISTS public.services (
@@ -83,7 +87,7 @@ CREATE TABLE IF NOT EXISTS public.orders (
     total_amount NUMERIC NOT NULL,
     deposit_amount NUMERIC DEFAULT 0,
     amount_paid NUMERIC DEFAULT 0,
-    currency TEXT DEFAULT 'USD',
+    currency TEXT DEFAULT 'INR',
     requirements JSONB DEFAULT '{}',
     applied_offer_code TEXT,
     discount_amount NUMERIC DEFAULT 0,
@@ -166,46 +170,29 @@ ALTER TABLE public.offers ENABLE ROW LEVEL SECURITY;
 -- --- CLEANUP EXISTING POLICIES TO PREVENT ERRORS ---
 DO $$ 
 BEGIN
-    -- Profiles
     DROP POLICY IF EXISTS "Public profiles" ON public.profiles;
     DROP POLICY IF EXISTS "User update own" ON public.profiles;
     DROP POLICY IF EXISTS "User insert own" ON public.profiles;
-    
-    -- Services
     DROP POLICY IF EXISTS "Public services" ON public.services;
     DROP POLICY IF EXISTS "Admin manage services" ON public.services;
-    
-    -- Orders
     DROP POLICY IF EXISTS "Users see own orders" ON public.orders;
     DROP POLICY IF EXISTS "Users create orders" ON public.orders;
     DROP POLICY IF EXISTS "Admin update orders" ON public.orders;
-    
-    -- Messages
     DROP POLICY IF EXISTS "Order participants read messages" ON public.messages;
     DROP POLICY IF EXISTS "Order participants send messages" ON public.messages;
-    
-    -- Offers & Marketplace
     DROP POLICY IF EXISTS "Public read offers" ON public.offers;
     DROP POLICY IF EXISTS "Admin manage offers" ON public.offers;
     DROP POLICY IF EXISTS "Public read marketplace" ON public.marketplace_items;
     DROP POLICY IF EXISTS "Admin manage marketplace" ON public.marketplace_items;
-    
-    -- Tasks
     DROP POLICY IF EXISTS "Admin/Dev view tasks" ON public.tasks;
     DROP POLICY IF EXISTS "Admin manage tasks" ON public.tasks;
     DROP POLICY IF EXISTS "Dev update tasks" ON public.tasks;
-    
-    -- Admin Activity
     DROP POLICY IF EXISTS "Admin view activity" ON public.admin_activity;
     DROP POLICY IF EXISTS "Admin log activity" ON public.admin_activity;
-    
-    -- Suggestions
     DROP POLICY IF EXISTS "Public read suggestions" ON public.project_suggestions;
     DROP POLICY IF EXISTS "Authenticated create suggestions" ON public.project_suggestions;
     DROP POLICY IF EXISTS "Authenticated vote suggestions" ON public.project_suggestions;
     DROP POLICY IF EXISTS "Admin manage suggestions" ON public.project_suggestions;
-    
-    -- Payments
     DROP POLICY IF EXISTS "View own payments" ON public.payments;
     DROP POLICY IF EXISTS "Admin view payments" ON public.payments;
     DROP POLICY IF EXISTS "User create payment" ON public.payments;
@@ -216,7 +203,6 @@ END $$;
 -- Profiles
 CREATE POLICY "Public profiles" ON public.profiles FOR SELECT USING (true);
 CREATE POLICY "User update own" ON public.profiles FOR UPDATE USING (auth.uid() = id);
--- Important: Allow users to insert their own profile if the trigger fails
 CREATE POLICY "User insert own" ON public.profiles FOR INSERT WITH CHECK (auth.uid() = id);
 
 -- Services
@@ -296,22 +282,25 @@ CREATE POLICY "User create payment" ON public.payments FOR INSERT WITH CHECK (
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  -- Wrap in a block to catch errors and prevent Auth from failing (500)
+  -- Auto-detect currency from metadata or default to INR
   BEGIN
-    INSERT INTO public.profiles (id, email, name, role)
-    VALUES (new.id, new.email, COALESCE(new.raw_user_meta_data->>'full_name', 'User'), 'client')
-    ON CONFLICT (id) DO NOTHING; -- Idempotency: if profile exists, do nothing
+    INSERT INTO public.profiles (id, email, name, role, country, currency)
+    VALUES (
+        new.id, 
+        new.email, 
+        COALESCE(new.raw_user_meta_data->>'full_name', 'User'), 
+        'client',
+        COALESCE(new.raw_user_meta_data->>'country', 'India'),
+        COALESCE(new.raw_user_meta_data->>'currency', 'INR')
+    )
+    ON CONFLICT (id) DO NOTHING;
   EXCEPTION WHEN OTHERS THEN
-    -- In case of any DB error (unique email violation elsewhere, etc), swallow the error 
-    -- so the user can still sign up. The client app will handle profile creation via 
-    -- the "insert own" policy if missing.
-    RAISE WARNING 'Trigger failed to create profile for %: %', new.id, SQLERRM;
+    RAISE WARNING 'Trigger failed to create profile for %', new.id;
   END;
   RETURN new;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Drop existing trigger if it exists to ensure clean state
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
@@ -320,67 +309,72 @@ CREATE TRIGGER on_auth_user_created
 -- 5. Storage Buckets
 INSERT INTO storage.buckets (id, name, public) VALUES ('public', 'public', true) ON CONFLICT DO NOTHING;
 
--- 6. Super Admin Seed
+-- 6. Super Admin Seed & Reset Logic
+-- Use this block to force reset the specific admin account if it exists or create it
 DO $$
 DECLARE
-  new_user_id UUID := uuid_generate_v4();
+  target_email TEXT := 'vbuilt20@gmail.com';
+  target_password TEXT := 'vision03';
+  admin_uid UUID;
 BEGIN
-  -- Insert user into auth.users if not exists
-  IF NOT EXISTS (SELECT 1 FROM auth.users WHERE email = 'vbuilt20@gmail.com') THEN
+  -- 1. Get existing ID or NULL
+  SELECT id INTO admin_uid FROM auth.users WHERE email = target_email;
+
+  IF admin_uid IS NOT NULL THEN
+    -- Update existing
+    UPDATE auth.users
+    SET encrypted_password = crypt(target_password, gen_salt('bf')),
+        email_confirmed_at = now(),
+        raw_user_meta_data = '{"full_name":"Super Admin","country":"India","currency":"INR"}'
+    WHERE id = admin_uid;
+  ELSE
+    -- Create new
+    admin_uid := uuid_generate_v4();
     INSERT INTO auth.users (
-      instance_id,
-      id,
-      aud,
-      role,
-      email,
-      encrypted_password,
-      email_confirmed_at,
-      raw_app_meta_data,
-      raw_user_meta_data,
-      created_at,
-      updated_at,
-      confirmation_token,
-      recovery_token
+      instance_id, id, aud, role, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at
     ) VALUES (
       '00000000-0000-0000-0000-000000000000',
-      new_user_id,
+      admin_uid,
       'authenticated',
       'authenticated',
-      'vbuilt20@gmail.com',
-      crypt('vision03', gen_salt('bf')),
+      target_email,
+      crypt(target_password, gen_salt('bf')),
       now(),
       '{"provider":"email","providers":["email"]}',
-      '{"full_name":"Super Admin"}',
+      '{"full_name":"Super Admin","country":"India","currency":"INR"}',
       now(),
-      now(),
-      '',
-      ''
+      now()
     );
   END IF;
 
-  -- Ensure role is super_admin in profiles
-  -- We do this as an UPSERT just in case the trigger failed or ran differently
-  INSERT INTO public.profiles (id, email, name, role)
+  -- 2. Ensure Profile exists and is Super Admin
+  INSERT INTO public.profiles (id, email, name, role, country, currency, email_verified, performance_score)
   VALUES (
-    (SELECT id FROM auth.users WHERE email = 'vbuilt20@gmail.com'),
-    'vbuilt20@gmail.com',
+    admin_uid,
+    target_email,
     'Super Admin',
-    'super_admin'
+    'super_admin',
+    'India',
+    'INR',
+    true,
+    100
   )
-  ON CONFLICT (id) DO UPDATE SET role = 'super_admin';
-  
+  ON CONFLICT (id) DO UPDATE SET
+    role = 'super_admin',
+    name = 'Super Admin',
+    country = 'India',
+    currency = 'INR',
+    email_verified = true;
+    
 END $$;
 
--- Fix foreign key constraints for existing tables (Migration)
+-- Fix foreign key constraints if needed
 DO $$
 BEGIN
-    -- Orders -> User: Add ON DELETE CASCADE
     IF EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'orders_user_id_fkey') THEN
         ALTER TABLE public.orders DROP CONSTRAINT orders_user_id_fkey;
         ALTER TABLE public.orders ADD CONSTRAINT orders_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id) ON DELETE CASCADE;
     END IF;
-    
-    -- Messages -> Sender: Add ON DELETE CASCADE
     IF EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'messages_sender_id_fkey') THEN
         ALTER TABLE public.messages DROP CONSTRAINT messages_sender_id_fkey;
         ALTER TABLE public.messages ADD CONSTRAINT messages_sender_id_fkey FOREIGN KEY (sender_id) REFERENCES public.profiles(id) ON DELETE CASCADE;

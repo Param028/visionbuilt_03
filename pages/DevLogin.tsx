@@ -21,8 +21,11 @@ const DevLogin: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
     setLoading(true);
 
     try {
-        // Use password login for devs
-        const user = await api.signInWithPassword(email, password);
+        // Use password login for devs with a timeout wrapper to prevent hanging
+        const user = await Promise.race([
+            api.signInWithPassword(email, password),
+            new Promise<never>((_, reject) => setTimeout(() => reject(new Error("Authentication timed out. Check connection.")), 10000))
+        ]);
         
         if (!user) {
             throw new Error("Critical Error: User profile could not be loaded.");

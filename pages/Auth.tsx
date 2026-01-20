@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { api } from '../services/api';
@@ -5,14 +6,13 @@ import { User } from '../types';
 import { SUPPORTED_COUNTRIES } from '../constants';
 import { Button, Card, Input } from '../components/ui/Components';
 import { Stepper, ScrollFloat } from '../components/ui/ReactBits';
-import { ArrowLeft, Mail, KeyRound, Lock, Globe, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Mail, KeyRound, Lock, Globe, CheckCircle2, XCircle } from 'lucide-react';
 import { useToast } from '../components/ui/Toast';
 
 type AuthMode = 'login' | 'signup' | 'forgot_email' | 'forgot_otp' | 'reset_password' | 'verification_sent';
 
 const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
   const [searchParams] = useSearchParams();
-  // Initialize authMode based on URL 'mode' parameter to support deep linking (e.g., reset_password)
   const [authMode, setAuthMode] = useState<AuthMode>(() => {
     const mode = searchParams.get('mode');
     if (mode === 'signup' || mode === 'forgot_email' || mode === 'forgot_otp' || mode === 'reset_password') {
@@ -28,45 +28,46 @@ const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
   const [fullName, setFullName] = useState('');
   const [country, setCountry] = useState('India');
   
-  // Reset Password States
   const [otp, setOtp] = useState('');
   const [newPassword, setNewPassword] = useState('');
   
   const [loading, setLoading] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
 
-  const simulateLoading = async (steps = [1, 2, 3, 4]) => {
-      for (const step of steps) {
-          setLoadingStep(step);
-          await new Promise(r => setTimeout(r, 600));
-      }
+  // Simplified: Only update visual steps, don't return a promise to await
+  const startLoadingAnimation = () => {
+      let step = 1;
+      setLoadingStep(1);
+      const interval = setInterval(() => {
+          step++;
+          if (step > 4) clearInterval(interval);
+          else setLoadingStep(step);
+      }, 400);
+      return interval; // Return interval ID to clear if needed
   };
 
   const handleLogin = async (e: React.FormEvent) => {
       e.preventDefault();
       setLoading(true);
+      const animInterval = startLoadingAnimation();
       
       try {
-          // Run UI animation and API call in parallel for better UX
-          const loginCall = api.signInWithPassword(email, password);
-          const uiAnimation = simulateLoading(); 
-          
-          // CRITICAL FIX: Race the login call against a 15s timeout to ensure UI never hangs indefinitely
-          const user = await Promise.race([
-              loginCall,
-              new Promise<never>((_, reject) => setTimeout(() => reject(new Error("Login timed out. Check connection.")), 15000))
-          ]);
-          
-          await uiAnimation; // Ensure visual feedback finishes gracefully
+          // Direct API call without wrapping in Promise.race locally (API handles timeout)
+          const user = await api.signInWithPassword(email, password);
           
           if (user) {
-              setUser(user);
-              toast.success("Successfully logged in!");
+              clearInterval(animInterval);
+              setLoadingStep(4); // Force complete visual
+              // Small delay to show success tick
+              setTimeout(() => {
+                  setUser(user);
+                  toast.success("Successfully logged in!");
+              }, 500);
           }
       } catch (err: any) {
+          clearInterval(animInterval);
           console.error("Login Handler Error:", err);
           toast.error(err.message || "Login failed");
-      } finally {
           setLoading(false);
       }
   };
@@ -74,32 +75,34 @@ const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
   const handleSignup = async (e: React.FormEvent) => {
       e.preventDefault();
       setLoading(true);
-      try {
-          const signupCall = api.signUp(email, password, fullName, country);
-          const uiAnimation = simulateLoading();
-          
-          const { session, user } = await Promise.race([
-              signupCall,
-              new Promise<any>((_, reject) => setTimeout(() => reject(new Error("Signup timed out. Check connection.")), 15000))
-          ]);
+      const animInterval = startLoadingAnimation();
 
-          await uiAnimation;
-          
-          if (!session && user) {
-              // Email verification required
-              setAuthMode('verification_sent');
-              toast.success("Confirmation email sent!");
-          } else if (session) {
-              // Auto-login (if verification was disabled)
-              const fullUser = await api.getCurrentUser();
-              if (fullUser) {
-                  setUser(fullUser);
-                  toast.success("Account created!");
+      try {
+          const { session, user } = await api.signUp(email, password, fullName, country);
+          clearInterval(animInterval);
+          setLoadingStep(4);
+
+          setTimeout(async () => {
+              if (!session && user) {
+                  setAuthMode('verification_sent');
+                  toast.success("Confirmation email sent!");
+                  setLoading(false);
+              } else if (session) {
+                  // If auto-login works
+                  const fullUser = await api.getCurrentUser();
+                  if (fullUser) {
+                      setUser(fullUser);
+                      toast.success("Account created!");
+                  } else {
+                      setLoading(false);
+                  }
+              } else {
+                  setLoading(false);
               }
-          }
+          }, 500);
       } catch (err: any) {
+          clearInterval(animInterval);
           toast.error(err.message || "Signup failed");
-      } finally {
           setLoading(false);
       }
   };
@@ -110,7 +113,7 @@ const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
       try {
           await api.sendPasswordResetOtp(email);
           setAuthMode('forgot_otp');
-          toast.success("Reset code sent to your email.");
+          toast.success("Reset code sent.");
       } catch (err: any) {
           toast.error(err.message);
       } finally {
@@ -124,9 +127,9 @@ const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
       try {
           await api.verifyRecoveryOtp(email, otp);
           setAuthMode('reset_password');
-          toast.success("Code verified. Please set a new password.");
+          toast.success("Code verified.");
       } catch (err: any) {
-          toast.error("Invalid code. Please try again.");
+          toast.error("Invalid code.");
       } finally {
           setLoading(false);
       }
@@ -137,11 +140,10 @@ const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
       setLoading(true);
       try {
           await api.updateUserPassword(newPassword);
-          // Get fresh user to trigger login
           const user = await api.getCurrentUser();
           if (user) {
               setUser(user);
-              toast.success("Password updated successfully!");
+              toast.success("Password updated!");
           }
       } catch (err: any) {
           toast.error(err.message);
@@ -153,7 +155,16 @@ const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
   if (loading) {
     return (
       <div className="min-h-[80vh] flex items-center justify-center px-4">
-        <Card className="w-full max-w-md p-6 sm:p-12 flex flex-col items-center justify-center min-h-[400px]">
+        <Card className="w-full max-w-md p-6 sm:p-12 flex flex-col items-center justify-center min-h-[400px] relative">
+          {/* Emergency Exit Button */}
+          <button 
+            onClick={() => setLoading(false)} 
+            className="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors"
+            title="Cancel Operation"
+          >
+              <XCircle size={20} />
+          </button>
+
           <h2 className="text-2xl font-display font-bold text-white mb-8 animate-pulse text-center">
              <ScrollFloat>Processing...</ScrollFloat>
           </h2>
@@ -174,7 +185,6 @@ const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
     );
   }
 
-  // Common Header Logic
   const renderHeader = () => {
       switch(authMode) {
           case 'signup': return { title: 'Create Account', sub: 'Join Vision Built to start your project.' };
