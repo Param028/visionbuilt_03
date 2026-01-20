@@ -9,21 +9,23 @@ import { formatPrice } from '../constants';
 import { Button } from '../components/ui/Components';
 import { ScrollFloat, GlareCard } from '../components/ui/ReactBits';
 
-const Marketplace: React.FC = () => {
+const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
   const [items, setItems] = useState<MarketplaceItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<User | null>(null);
   const [activeTab, setActiveTab] = useState<'premium' | 'student'>('premium');
   const [sortBy, setSortBy] = useState<string>('newest');
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await api.getMarketplaceItems();
-      const currentUser = await api.getCurrentUser();
-      setItems(data);
-      setUser(currentUser);
-      setLoading(false);
+      try {
+        const data = await api.getMarketplaceItems();
+        setItems(data);
+      } catch (error) {
+        console.error("Failed to load marketplace items", error);
+      } finally {
+        setLoading(false);
+      }
     };
     fetchData();
   }, []);

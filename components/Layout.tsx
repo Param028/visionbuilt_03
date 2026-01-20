@@ -73,7 +73,7 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
         refresh 
       />
 
-      <nav className="fixed top-0 w-full z-50 bg-vision-900/90 backdrop-blur-md border-b border-white/5 h-16 transition-all duration-300">
+      <nav className="fixed top-0 w-full z-50 bg-black/20 backdrop-blur-xl border-b border-white/10 h-16 transition-all duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
           <div className="flex justify-between items-center h-full">
             <Link to="/" className="flex items-center gap-3 group relative z-20">
@@ -108,7 +108,7 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
           </div>
         </div>
 
-        <div className={`md:hidden fixed top-16 left-0 w-full bg-vision-900 border-b border-white/10 transition-all duration-300 overflow-hidden ${isMenuOpen ? 'max-h-[80vh] opacity-100 py-6' : 'max-h-0 opacity-0 py-0'}`}>
+        <div className={`md:hidden fixed top-16 left-0 w-full bg-vision-900/95 backdrop-blur-xl border-b border-white/10 transition-all duration-300 overflow-hidden ${isMenuOpen ? 'max-h-[80vh] opacity-100 py-6' : 'max-h-0 opacity-0 py-0'}`}>
             <div className="px-4 space-y-2">
               {getNavItems().map(item => (
                 <Link key={item.name} to={item.path} className={`flex items-center justify-between px-4 py-4 rounded-lg text-base font-medium ${location.pathname === item.path ? 'bg-white/10 text-white' : 'text-gray-400'}`} onClick={() => setIsMenuOpen(false)}>

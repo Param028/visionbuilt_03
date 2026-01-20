@@ -24,6 +24,10 @@ const DevLogin: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
         // Use password login for devs
         const user = await api.signInWithPassword(email, password);
         
+        if (!user) {
+            throw new Error("Critical Error: User profile could not be loaded.");
+        }
+
         // Check if user actually has permissions
         if (user.role !== 'admin' && user.role !== 'super_admin' && user.role !== 'developer') {
              throw new Error("Unauthorized Access Level: [Role mismatch: " + user.role + "]");

@@ -47,19 +47,21 @@ const getFeatureDescription = (feature: string) => {
   return match ? FEATURE_DESCRIPTIONS[match] : null;
 };
 
-const Services: React.FC = () => {
+const Services: React.FC<{ user: User | null }> = ({ user }) => {
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<User | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await api.getServices();
-      const currentUser = await api.getCurrentUser();
-      setServices(data.filter(s => s.is_enabled));
-      setUser(currentUser);
-      setLoading(false);
+      try {
+        const data = await api.getServices();
+        setServices(data.filter(s => s.is_enabled));
+      } catch (error) {
+        console.error("Failed to load services", error);
+      } finally {
+        setLoading(false);
+      }
     };
     fetchData();
   }, []);

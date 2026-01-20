@@ -46,15 +46,22 @@ const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
   const handleLogin = async (e: React.FormEvent) => {
       e.preventDefault();
       setLoading(true);
+      
       try {
-          await simulateLoading();
-          const user = await api.signInWithPassword(email, password);
-          setUser(user);
-          toast.success("Successfully logged in!");
+          // Run UI animation and API call in parallel for better UX
+          const loginPromise = api.signInWithPassword(email, password);
+          await simulateLoading(); // Ensure visual feedback lasts at least ~2.4s
+          
+          const user = await loginPromise;
+          
+          if (user) {
+              setUser(user);
+              toast.success("Successfully logged in!");
+          }
       } catch (err: any) {
+          console.error("Login Handler Error:", err);
           toast.error(err.message || "Login failed");
-      } finally {
-          setLoading(false);
+          setLoading(false); // Only unset loading on error, otherwise let component unmount/redirect
       }
   };
 
@@ -62,13 +69,16 @@ const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
       e.preventDefault();
       setLoading(true);
       try {
+          const signupPromise = api.signUp(email, password, fullName, country);
           await simulateLoading();
-          const { session, user } = await api.signUp(email, password, fullName, country);
+          
+          const { session, user } = await signupPromise;
           
           if (!session && user) {
               // Email verification required
               setAuthMode('verification_sent');
               toast.success("Confirmation email sent!");
+              setLoading(false);
           } else if (session) {
               // Auto-login (if verification was disabled)
               const fullUser = await api.getCurrentUser();
@@ -79,7 +89,6 @@ const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
           }
       } catch (err: any) {
           toast.error(err.message || "Signup failed");
-      } finally {
           setLoading(false);
       }
   };

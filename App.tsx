@@ -187,9 +187,9 @@ const App: React.FC = () => {
                     <Suspense fallback={<PageLoader />}>
                       <Routes>
                         <Route path="/" element={<Landing />} />
-                        <Route path="/services" element={<Services />} />
-                        <Route path="/marketplace" element={<Marketplace />} />
-                        <Route path="/offers" element={<Offers />} />
+                        <Route path="/services" element={<Services user={user} />} />
+                        <Route path="/marketplace" element={<Marketplace user={user} />} />
+                        <Route path="/offers" element={<Offers user={user} />} />
                         <Route path="/auth" element={!user ? <Auth setUser={setUser} /> : <Navigate to={user.role === 'admin' || user.role === 'super_admin' ? '/admin' : '/dashboard'} />} />
                         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                         <Route path="/terms-of-service" element={<TermsOfService />} />

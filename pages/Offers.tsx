@@ -7,20 +7,22 @@ import { Offer, User } from '../types';
 import { Button } from '../components/ui/Components';
 import { Carousel, ScrollFloat, ShinyText } from '../components/ui/ReactBits';
 
-const Offers: React.FC = () => {
+const Offers: React.FC<{ user: User | null }> = ({ user }) => {
   const [offers, setOffers] = useState<Offer[]>([]);
   const [loading, setLoading] = useState(true);
   const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [user, setUser] = useState<User | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchOffers = async () => {
-      const data = await api.getOffers();
-      const currentUser = await api.getCurrentUser();
-      setOffers(data);
-      setUser(currentUser);
-      setLoading(false);
+      try {
+        const data = await api.getOffers();
+        setOffers(data);
+      } catch (error) {
+        console.error("Failed to fetch offers", error);
+      } finally {
+        setLoading(false);
+      }
     };
     fetchOffers();
   }, []);

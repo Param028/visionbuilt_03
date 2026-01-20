@@ -97,11 +97,40 @@ export class ApiService {
       }
 
       if (data.user) {
-         const user = await this.getCurrentUser();
-         console.log("Login Success. Detected Role:", user?.role);
-         return user as User;
+         // Explicitly fetch profile using the ID from the login response
+         // This avoids race conditions with getSession()
+         let { data: profile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', data.user.id)
+            .maybeSingle();
+
+         // Fallback if profile doesn't exist yet
+         if (!profile) {
+             profile = {
+                 role: 'client',
+                 name: data.user.user_metadata?.full_name || 'User',
+                 country: 'India'
+             };
+         }
+
+         // Construct User object directly
+         const user: User = {
+             id: data.user.id,
+             email: data.user.email!,
+             name: profile.name,
+             role: profile.role || 'client',
+             country: profile.country,
+             email_verified: true,
+             avatar_url: profile.avatar_url,
+             performance_score: profile.performance_score
+         };
+         
+         this.currentUser = user;
+         console.log("Login Success. Detected Role:", user.role);
+         return user;
       }
-      throw new Error("Login failed");
+      throw new Error("Login failed: No user data returned.");
   }
 
   async resendConfirmationEmail(email: string): Promise<void> {
