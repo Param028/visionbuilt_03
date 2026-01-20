@@ -34,9 +34,10 @@ const getEnvVar = (key: string) => {
 };
 
 // Helper for DB timeouts - reduced default timeout
-const withTimeout = <T>(promise: Promise<T>, ms: number, fallback: T): Promise<T> => {
+// Modified to accept PromiseLike to support Supabase PostgrestBuilders
+const withTimeout = <T>(promise: PromiseLike<T>, ms: number, fallback: T): Promise<T> => {
     const timeout = new Promise<T>((resolve) => setTimeout(() => resolve(fallback), ms));
-    return Promise.race([promise, timeout]);
+    return Promise.race([Promise.resolve(promise), timeout]);
 };
 
 export class ApiService {
@@ -253,13 +254,13 @@ export class ApiService {
     // Bypass Write
     if (activeUserId.startsWith('bypass')) {
         return {
+            ...orderData, // Spread first so we can overwrite user_id if needed
             id: 'mock-order-' + Date.now(),
             user_id: activeUserId,
             status: initialStatus,
             amount_paid: paidAmount,
             deposit_amount: 0,
             deliverables: [],
-            ...orderData,
             created_at: new Date().toISOString(),
             is_custom: orderData.type === 'service' && !orderData.service_id
         };
@@ -437,6 +438,7 @@ export class ApiService {
       if (this.currentUser?.id.startsWith('bypass')) return (await this.getTeamMembers()).filter(u => u.id !== id);
       const { error } = await supabase.functions.invoke('delete-team-member', { body: { userId: id }});
       if (error) throw error;
+      this.logActivity(adminId, 'Removed Team Member', `ID: ${id}`);
       return this.getTeamMembers();
   }
 
