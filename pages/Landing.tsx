@@ -15,9 +15,14 @@ const Landing: React.FC = () => {
   useEffect(() => {
       api.getPlatformStats().then(setStats);
       api.getMarketplaceItems().then(items => {
-          // Filter for items with images to ensure good quality previews
-          const withImages = items.filter(i => i.image_url);
-          setFeaturedProjects(withImages.length > 0 ? withImages : []); 
+          // Filter for featured items first, then fallback to images
+          const featured = items.filter(i => i.is_featured);
+          if (featured.length > 0) {
+              setFeaturedProjects(featured);
+          } else {
+              const withImages = items.filter(i => i.image_url);
+              setFeaturedProjects(withImages.length > 0 ? withImages : []); 
+          }
       });
   }, []);
 

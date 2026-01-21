@@ -97,11 +97,14 @@ const App: React.FC = () => {
             setIsRecoveryMode(true);
             // Force user fetch so we are "logged in" enough to change password
             const currentUser = await api.getCurrentUser();
-            setUser(currentUser);
+            if (currentUser) setUser(currentUser);
             // Redirect will be handled by Router logic below checking isRecoveryMode
         } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
             const currentUser = await api.getCurrentUser();
-            setUser(currentUser);
+            // Prevent logging out if session check fails temporarily on refresh
+            if (currentUser) {
+                setUser(currentUser);
+            }
         } else if (event === 'SIGNED_OUT') {
             setUser(null);
             setIsRecoveryMode(false);

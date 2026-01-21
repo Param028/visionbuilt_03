@@ -64,20 +64,24 @@ export class ApiService {
     }
 
     try {
-        // 1. Get Session with strict timeout (reduced to 3s)
-        const sessionPromise = supabase.auth.getSession();
-        const { data: { session } } = await withTimeout(sessionPromise, 3000, { data: { session: null } } as any);
+        // 1. Get Session DIRECTLY (No timeout wrapper for local storage check)
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
+        if (sessionError) {
+             console.warn("Session retrieval error:", sessionError);
+             return null;
+        }
 
         if (session?.user) {
-          // 2. Get Profile with strict timeout
-          // Reduced to 2s. If DB is slow, we just use auth metadata.
+          // 2. Get Profile with safe timeout (DB might be slow)
           const profilePromise = supabase
             .from('profiles')
             .select('*')
             .eq('id', session.user.id)
             .maybeSingle();
             
-          let { data: profile } = await withTimeout(profilePromise, 2000, { data: null } as any);
+          // Increased timeout to 5s to reduce flakiness
+          let { data: profile } = await withTimeout(profilePromise, 5000, { data: null } as any);
 
           // Determine currency based on country
           const userCountry = profile?.country || session.user.user_metadata?.country || 'India';
@@ -98,7 +102,7 @@ export class ApiService {
         }
         return null;
     } catch (err) {
-        console.warn("getCurrentUser failed or timed out", err);
+        console.warn("getCurrentUser failed", err);
         return null;
     }
   }
@@ -158,7 +162,7 @@ export class ApiService {
             .eq('id', authData.user.id)
             .maybeSingle();
             
-         let { data: profile } = await withTimeout(profilePromise, 1500, { data: null } as any);
+         let { data: profile } = await withTimeout(profilePromise, 3000, { data: null } as any);
 
          const userCountry = profile?.country || authData.user.user_metadata?.country || 'India';
          const currencyCode = CURRENCY_CONFIG[userCountry]?.code || 'INR';
@@ -327,11 +331,22 @@ export class ApiService {
 
   async addDeliverable(orderId: string, fileUrl: string): Promise<Order> {
       if (this.currentUser?.id.startsWith('bypass')) return { ...await this.getOrderById(orderId), deliverables: [fileUrl] } as Order;
-      const { data: current } = await supabase.from('orders').select('deliverables').eq('id', orderId).single();
+      // Fetch current array to ensure we append safely
+      const { data: current, error: fetchError } = await supabase.from('orders').select('deliverables').eq('id', orderId).single();
+      if (fetchError) throw fetchError;
+
       const newList = [...(current?.deliverables || []), fileUrl];
       const { data, error } = await supabase.from('orders').update({ deliverables: newList }).eq('id', orderId).select().single();
+      
       if(error) throw error;
       return { ...data, is_custom: data.type === 'service' && !data.service_id };
+  }
+
+  async deleteOrder(orderId: string): Promise<Order[]> {
+    if (this.currentUser?.id.startsWith('bypass')) return this.getOrders();
+    const { error } = await supabase.from('orders').delete().eq('id', orderId);
+    if (error) throw error;
+    return this.getOrders();
   }
 
   async getOrders(userId?: string): Promise<Order[]> {
@@ -409,19 +424,22 @@ export class ApiService {
   }
 
   async getAnalytics(): Promise<AnalyticsData> {
-      const { data: orders } = await supabase.from('orders').select('total_amount, status, created_at');
+      const { data: orders } = await supabase.from('orders').select('amount_paid, status, created_at');
       const { data: items } = await supabase.from('marketplace_items').select('views');
       const { data: devs } = await supabase.from('profiles').select('*').eq('role', 'developer');
 
-      const paidOrders = orders?.filter(o => ['accepted', 'in_progress', 'mockup_ready', 'completed'].includes(o.status)) || [];
-      const totalRevenue = paidOrders.reduce((sum, o) => sum + (o.total_amount || 0), 0);
+      // Calculate revenue based on actual amount_paid, not the quote total
+      const totalRevenue = orders?.reduce((sum, o) => sum + (o.amount_paid || 0), 0) || 0;
+      
       const activeProjects = orders?.filter(o => o.status === 'in_progress').length || 0;
       
       const salesTrend = [0, 0, 0, 0, 0, 0, 0];
       const now = new Date();
-      paidOrders.forEach(o => {
-          const diffDays = Math.floor((now.getTime() - new Date(o.created_at).getTime()) / (86400000));
-          if (diffDays >= 0 && diffDays < 7) salesTrend[6 - diffDays] += (o.total_amount || 0);
+      orders?.forEach(o => {
+          if (o.amount_paid > 0) {
+              const diffDays = Math.floor((now.getTime() - new Date(o.created_at).getTime()) / (86400000));
+              if (diffDays >= 0 && diffDays < 7) salesTrend[6 - diffDays] += (o.amount_paid || 0);
+          }
       });
 
       return {
@@ -512,7 +530,7 @@ export class ApiService {
 
   async createMarketplaceItem(item: Omit<MarketplaceItem, 'id' | 'created_at' | 'views' | 'purchases' | 'rating' | 'review_count'>): Promise<MarketplaceItem[]> {
       if (this.currentUser?.id.startsWith('bypass')) console.warn("Creating item in bypass mode");
-      const { error } = await supabase.from('marketplace_items').insert({ ...item, views: 0, purchases: 0, rating: 0, review_count: 0 });
+      const { error } = await supabase.from('marketplace_items').insert({ ...item, views: 0, purchases: 0, rating: 0, review_count: 0, is_featured: item.is_featured || false });
       if (error) throw error;
       return this.getMarketplaceItems();
   }

@@ -8,17 +8,14 @@ import {
   BarChart3, TrendingUp, DollarSign, Eye, X, TicketPercent, Layers, ToggleLeft, ToggleRight, Settings, 
   Lightbulb,
   User as UserIcon, ChevronLeft, ChevronRight, Mail, Globe as GlobeIcon,
-  CreditCard, HardDrive, Send, LogOut, Shield
+  CreditCard, HardDrive, Send, LogOut, Shield, Zap
 } from 'lucide-react';
 import { api } from '../services/api';
 import { Order, Service, User, Offer, MarketplaceItem, Task, AnalyticsData, Role, ProjectSuggestion } from '../types';
-import { Button, Card, Badge, Input, Textarea } from '../components/ui/Components';
+import { Button, Card, Badge, Input, Textarea, ConfirmDialog } from '../components/ui/Components';
 import { ScrollFloat } from '../components/ui/ReactBits';
 import { useToast } from '../components/ui/Toast';
-
-// ... (Existing Analytics, Services, Orders, Marketplace components - omitted for brevity, they remain unchanged) ...
-// NOTE: In a real environment, I would preserve the content. For this XML response, I will include them to ensure the file is complete and valid.
-// Wait, the instruction says "Full content of file_1". I must provide full content. I will paste previous components.
+import { CURRENCY_CONFIG } from '../constants';
 
 // --- 1. Admin Analytics Component ---
 const AdminAnalytics: React.FC<{ user: User }> = ({ user: _user }) => {
@@ -100,13 +97,18 @@ const AdminAnalytics: React.FC<{ user: User }> = ({ user: _user }) => {
 };
 
 // --- 2. Admin Services Component --- 
-const AdminServices: React.FC<{ user: User }> = ({ user: _user }) => {
+const AdminServices: React.FC<{ user: User }> = ({ user }) => {
     const [services, setServices] = useState<Service[]>([]);
     const [showForm, setShowForm] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
     const toast = useToast();
     
+    // Currency Handling
+    const userCurrencyCode = CURRENCY_CONFIG[user.country || 'India']?.code || 'USD';
+    const userCurrencyRate = CURRENCY_CONFIG[user.country || 'India']?.rate || 1;
+    const [inputCurrency, setInputCurrency] = useState('USD');
+
     // Create Form Data
     const [formData, setFormData] = useState<Partial<Service>>({
         title: '',
@@ -153,12 +155,21 @@ const AdminServices: React.FC<{ user: User }> = ({ user: _user }) => {
         e.preventDefault();
         setIsSubmitting(true);
         try {
+            // Convert prices back to USD if entered in local currency
+            const rate = inputCurrency === 'USD' ? 1 : userCurrencyRate;
+            const payload = {
+                ...formData,
+                base_price: (formData.base_price || 0) / rate,
+                domain_price: (formData.domain_price || 0) / rate,
+                business_email_price: (formData.business_email_price || 0) / rate
+            };
+
             let updated;
             if (editingId) {
-                updated = await api.updateService(editingId, formData);
+                updated = await api.updateService(editingId, payload);
                 toast.success("Service updated successfully");
             } else {
-                updated = await api.createService(formData as any);
+                updated = await api.createService(payload as any);
                 toast.success("Service created successfully");
             }
             setServices(updated);
@@ -171,6 +182,11 @@ const AdminServices: React.FC<{ user: User }> = ({ user: _user }) => {
     };
 
     const handleEdit = (service: Service) => {
+        // Assume stored values are USD. If viewing in local, convert up.
+        // We will default to viewing in USD to keep it simple, or user can toggle.
+        // Let's default to USD for editing to avoid rounding drift on multiple saves.
+        setInputCurrency('USD'); 
+        
         setFormData({
             title: service.title,
             description: service.description,
@@ -192,6 +208,7 @@ const AdminServices: React.FC<{ user: User }> = ({ user: _user }) => {
     const resetForm = () => {
         setShowForm(false);
         setEditingId(null);
+        setInputCurrency('USD');
         setFormData({ 
             title: '', 
             description: '', 
@@ -219,12 +236,30 @@ const AdminServices: React.FC<{ user: User }> = ({ user: _user }) => {
                 <Card id="service-form" className="mb-8 border-vision-primary/30 animate-in fade-in slide-in-from-top-4">
                     <div className="flex justify-between items-center mb-6">
                         <h3 className="font-bold text-lg text-white">{editingId ? 'Edit Service Record' : 'Create New Offering'}</h3>
-                        {editingId && <Badge variant="info">Active Editing</Badge>}
+                        <div className="flex items-center gap-3">
+                            <div className="flex items-center bg-white/5 rounded-lg p-1 border border-white/10">
+                                <button 
+                                    type="button"
+                                    onClick={() => setInputCurrency('USD')}
+                                    className={`px-3 py-1 text-[10px] font-bold rounded transition-colors ${inputCurrency === 'USD' ? 'bg-vision-primary text-black' : 'text-gray-400 hover:text-white'}`}
+                                >
+                                    USD ($)
+                                </button>
+                                <button 
+                                    type="button"
+                                    onClick={() => setInputCurrency(userCurrencyCode)}
+                                    className={`px-3 py-1 text-[10px] font-bold rounded transition-colors ${inputCurrency !== 'USD' ? 'bg-vision-primary text-black' : 'text-gray-400 hover:text-white'}`}
+                                >
+                                    {userCurrencyCode}
+                                </button>
+                            </div>
+                            {editingId && <Badge variant="info">Active Editing</Badge>}
+                        </div>
                     </div>
                     <form onSubmit={handleSave} className="space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <Input label="Service Title" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} placeholder="e.g. Modern Web SaaS" required />
-                            <Input type="number" label="Global Base Rate ($)" value={formData.base_price} onChange={e => setFormData({...formData, base_price: parseFloat(e.target.value)})} required />
+                            <Input type="number" label={`Base Rate (${inputCurrency})`} value={formData.base_price} onChange={e => setFormData({...formData, base_price: parseFloat(e.target.value)})} required />
                         </div>
                         <Textarea label="Executive Summary" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} placeholder="Describe technical scope..." required />
                         
@@ -269,7 +304,7 @@ const AdminServices: React.FC<{ user: User }> = ({ user: _user }) => {
                                     </label>
                                     <Input 
                                         type="number" 
-                                        label="Domain Rate ($)" 
+                                        label={`Domain Rate (${inputCurrency})`} 
                                         value={formData.domain_price} 
                                         onChange={e => setFormData({...formData, domain_price: parseFloat(e.target.value)})}
                                         disabled={!formData.allow_domain}
@@ -287,7 +322,7 @@ const AdminServices: React.FC<{ user: User }> = ({ user: _user }) => {
                                     </label>
                                     <Input 
                                         type="number" 
-                                        label="Email Rate ($)" 
+                                        label={`Email Rate (${inputCurrency})`} 
                                         value={formData.business_email_price} 
                                         onChange={e => setFormData({...formData, business_email_price: parseFloat(e.target.value)})}
                                         disabled={!formData.allow_business_email}
@@ -393,6 +428,7 @@ const AdminOrders: React.FC<{ user: User }> = ({ user }) => {
     const [finDeposit, setFinDeposit] = useState<number>(0);
     const [isUpdatingFin, setIsUpdatingFin] = useState(false);
     const [uploading, setUploading] = useState(false);
+    const [deleteId, setDeleteId] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const toast = useToast();
 
@@ -453,12 +489,33 @@ const AdminOrders: React.FC<{ user: User }> = ({ user }) => {
         }
     };
 
+    const handleDeleteOrder = async () => {
+        if (!deleteId) return;
+        try {
+            await api.deleteOrder(deleteId);
+            toast.success("Order deleted successfully");
+            fetchOrders();
+        } catch (e: any) {
+            toast.error("Failed to delete order: " + e.message);
+        } finally {
+            setDeleteId(null);
+        }
+    };
+
     const filteredOrders = filter === 'all' ? orders : orders.filter(o => o.status === filter);
 
     if (loading) return <div className="flex justify-center p-10"><Loader2 className="animate-spin text-vision-primary" /></div>;
 
     return (
         <div className="space-y-6">
+             <ConfirmDialog 
+                isOpen={!!deleteId}
+                onClose={() => setDeleteId(null)}
+                onConfirm={handleDeleteOrder}
+                title="Delete Order"
+                message="Are you sure you want to delete this order permanently? This action cannot be undone."
+                confirmText="Delete Order"
+            />
              {/* ... (Same layout as before) */}
              <div className="flex justify-between items-center">
                  <h2 className="text-2xl font-bold text-white">Project Command Center</h2>
@@ -572,6 +629,15 @@ const AdminOrders: React.FC<{ user: User }> = ({ user }) => {
                                                 <option value="cancelled">Void</option>
                                              </select>
                                          </div>
+                                         <Button 
+                                            size="sm" 
+                                            variant="ghost" 
+                                            className="h-9 w-9 p-0 hover:bg-red-500/10 hover:text-red-500" 
+                                            title="Delete Order"
+                                            onClick={() => setDeleteId(order.id)}
+                                         >
+                                             <Trash2 size={16} />
+                                         </Button>
                                      </div>
                                  </td>
                              </tr>
@@ -590,10 +656,17 @@ const AdminMarketplace: React.FC<{ user: User }> = ({ user }) => {
     const [sales, setSales] = useState<Order[]>([]); 
     const [showForm, setShowForm] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
-    const [formData, setFormData] = useState<Partial<MarketplaceItem>>({
-        title: '', price: 0, short_description: '', full_description: '', tags: [], features: []
-    });
+    const [deleteId, setDeleteId] = useState<string | null>(null);
     const toast = useToast();
+
+    // Currency Handling
+    const userCurrencyCode = CURRENCY_CONFIG[user.country || 'India']?.code || 'USD';
+    const userCurrencyRate = CURRENCY_CONFIG[user.country || 'India']?.rate || 1;
+    const [inputCurrency, setInputCurrency] = useState('USD');
+
+    const [formData, setFormData] = useState<Partial<MarketplaceItem>>({
+        title: '', price: 0, short_description: '', full_description: '', tags: [], features: [], is_featured: false
+    });
 
     useEffect(() => {
         api.getMarketplaceItems().then(setItems);
@@ -603,12 +676,18 @@ const AdminMarketplace: React.FC<{ user: User }> = ({ user }) => {
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
+            const rate = inputCurrency === 'USD' ? 1 : userCurrencyRate;
+            const payload = {
+                ...formData,
+                price: (formData.price || 0) / rate
+            };
+
             if (editingId) {
-                await api.updateMarketplaceItem(editingId, formData);
+                await api.updateMarketplaceItem(editingId, payload);
                 toast.success("Item updated successfully");
             } else {
                 await api.createMarketplaceItem({
-                    ...formData as any,
+                    ...payload as any,
                     developer_id: user.id,
                     developer_name: user.name
                 });
@@ -616,7 +695,8 @@ const AdminMarketplace: React.FC<{ user: User }> = ({ user }) => {
             }
             setShowForm(false);
             setEditingId(null);
-            setFormData({ title: '', price: 0, short_description: '', full_description: '', tags: [], features: [] });
+            setInputCurrency('USD');
+            setFormData({ title: '', price: 0, short_description: '', full_description: '', tags: [], features: [], is_featured: false });
             api.getMarketplaceItems().then(setItems);
         } catch (e: any) {
             toast.error(e.message);
@@ -624,6 +704,7 @@ const AdminMarketplace: React.FC<{ user: User }> = ({ user }) => {
     };
 
     const handleEdit = (item: MarketplaceItem) => {
+        setInputCurrency('USD');
         setFormData({
             title: item.title,
             price: item.price,
@@ -633,32 +714,49 @@ const AdminMarketplace: React.FC<{ user: User }> = ({ user }) => {
             demo_url: item.demo_url || '',
             download_url: item.download_url || '',
             tags: item.tags || [],
-            features: item.features || []
+            features: item.features || [],
+            is_featured: item.is_featured || false
         });
         setEditingId(item.id);
         setShowForm(true);
         window.scrollTo(0,0);
     };
 
-    const handleDelete = async (id: string) => {
-        if (!window.confirm("Are you sure?")) return;
+    const confirmDelete = (id: string) => {
+        setDeleteId(id);
+    };
+
+    const handleDelete = async () => {
+        if (!deleteId) return;
         try {
-            await api.deleteMarketplaceItem(id);
-            setItems(prev => prev.filter(i => i.id !== id));
+            await api.deleteMarketplaceItem(deleteId);
+            setItems(prev => prev.filter(i => i.id !== deleteId));
             toast.success("Item removed");
         } catch (e: any) {
             toast.error(e.message);
+        } finally {
+            setDeleteId(null);
         }
     };
 
     const cancelEdit = () => {
         setShowForm(false);
         setEditingId(null);
-        setFormData({ title: '', price: 0, short_description: '', full_description: '', tags: [], features: [] });
+        setInputCurrency('USD');
+        setFormData({ title: '', price: 0, short_description: '', full_description: '', tags: [], features: [], is_featured: false });
     };
 
     return (
         <div className="space-y-8">
+             <ConfirmDialog 
+                isOpen={!!deleteId}
+                onClose={() => setDeleteId(null)}
+                onConfirm={handleDelete}
+                title="Delete Listing"
+                message="Are you sure you want to delete this project from the marketplace? This action cannot be undone."
+                confirmText="Delete Project"
+             />
+
              <div className="flex justify-between items-center">
                  <h2 className="text-2xl font-bold text-white">Marketplace Listings</h2>
                  <Button onClick={() => showForm ? cancelEdit() : setShowForm(true)}>
@@ -703,11 +801,31 @@ const AdminMarketplace: React.FC<{ user: User }> = ({ user }) => {
 
              {showForm && (
                  <Card className="mb-6 border-vision-primary/30 animate-in fade-in zoom-in-95 duration-300">
-                     <h3 className="text-lg font-bold text-white mb-4">{editingId ? 'Edit Project' : 'New Project'}</h3>
+                     <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-lg font-bold text-white">{editingId ? 'Edit Project' : 'New Project'}</h3>
+                        <div className="flex items-center gap-3">
+                            <div className="flex items-center bg-white/5 rounded-lg p-1 border border-white/10">
+                                <button 
+                                    type="button"
+                                    onClick={() => setInputCurrency('USD')}
+                                    className={`px-3 py-1 text-[10px] font-bold rounded transition-colors ${inputCurrency === 'USD' ? 'bg-vision-primary text-black' : 'text-gray-400 hover:text-white'}`}
+                                >
+                                    USD ($)
+                                </button>
+                                <button 
+                                    type="button"
+                                    onClick={() => setInputCurrency(userCurrencyCode)}
+                                    className={`px-3 py-1 text-[10px] font-bold rounded transition-colors ${inputCurrency !== 'USD' ? 'bg-vision-primary text-black' : 'text-gray-400 hover:text-white'}`}
+                                >
+                                    {userCurrencyCode}
+                                </button>
+                            </div>
+                        </div>
+                     </div>
                      <form onSubmit={handleSave} className="space-y-4">
                          <div className="grid grid-cols-2 gap-4">
                              <Input label="Project Title" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} required />
-                             <Input type="number" label="Sales Price ($)" value={formData.price} onChange={e => setFormData({...formData, price: parseFloat(e.target.value)})} required />
+                             <Input type="number" label={`Sales Price (${inputCurrency})`} value={formData.price} onChange={e => setFormData({...formData, price: parseFloat(e.target.value)})} required />
                          </div>
                          <Input label="Summary" value={formData.short_description} onChange={e => setFormData({...formData, short_description: e.target.value})} placeholder="Catchy one-liner..." required />
                          <Textarea label="Full Details" value={formData.full_description} onChange={e => setFormData({...formData, full_description: e.target.value})} required />
@@ -716,6 +834,21 @@ const AdminMarketplace: React.FC<{ user: User }> = ({ user }) => {
                              <Input label="Download Link" value={formData.download_url || ''} onChange={e => setFormData({...formData, download_url: e.target.value})} />
                          </div>
                          <Input label="Demo URL" value={formData.demo_url || ''} onChange={e => setFormData({...formData, demo_url: e.target.value})} />
+                         
+                         <div className="pt-2">
+                             <label className="flex items-center space-x-3 cursor-pointer group p-3 rounded-lg border border-white/5 hover:border-white/10 transition-all bg-white/5 w-fit">
+                                <input 
+                                    type="checkbox" 
+                                    checked={formData.is_featured} 
+                                    onChange={e => setFormData({...formData, is_featured: e.target.checked})} 
+                                    className="form-checkbox h-5 w-5 text-vision-primary rounded bg-transparent border-gray-600 focus:ring-0"
+                                />
+                                <span className="text-gray-300 text-sm font-bold uppercase tracking-widest group-hover:text-vision-primary transition-colors flex items-center gap-2">
+                                    <Zap size={14} className="text-yellow-400" /> Feature on Homepage
+                                </span>
+                            </label>
+                         </div>
+
                          <div className="flex justify-end pt-4 border-t border-white/5 gap-2">
                              <Button type="button" variant="ghost" onClick={cancelEdit}>Cancel</Button>
                              <Button type="submit">{editingId ? 'Update Listing' : 'Publish to Marketplace'}</Button>
@@ -737,10 +870,15 @@ const AdminMarketplace: React.FC<{ user: User }> = ({ user }) => {
                                  <Button size="icon" variant="secondary" className="w-8 h-8 rounded-full" onClick={() => handleEdit(item)} title="Edit Project">
                                      <Edit size={14} />
                                  </Button>
-                                 <Button size="icon" variant="ghost" className="bg-black/50 hover:bg-red-500/80 w-8 h-8 rounded-full" onClick={() => handleDelete(item.id)} title="Delete Project">
+                                 <Button size="icon" variant="ghost" className="bg-black/50 hover:bg-red-500/80 w-8 h-8 rounded-full" onClick={() => confirmDelete(item.id)} title="Delete Project">
                                      <Trash2 size={14} className="text-white" />
                                  </Button>
                              </div>
+                             {item.is_featured && (
+                                 <div className="absolute bottom-2 left-2 bg-yellow-500/90 text-black text-[9px] font-bold px-2 py-0.5 rounded uppercase flex items-center gap-1">
+                                     <Zap size={10} fill="currentColor"/> Featured
+                                 </div>
+                             )}
                          </div>
                          <h3 className="font-bold text-white mb-1">{item.title}</h3>
                          <div className="text-[10px] text-gray-500 mb-2 uppercase tracking-widest flex items-center gap-1">
@@ -764,6 +902,7 @@ const AdminTeam: React.FC<{ user: User }> = ({ user }) => {
     const [inviteRole, setInviteRole] = useState<Role>('developer');
     const [invitePassword, setInvitePassword] = useState(''); // New Password Field
     const [isInviting, setIsInviting] = useState(false);
+    const [deleteId, setDeleteId] = useState<string | null>(null);
     const toast = useToast();
 
     useEffect(() => {
@@ -787,19 +926,34 @@ const AdminTeam: React.FC<{ user: User }> = ({ user }) => {
         }
     };
 
-    const handleRemove = async (id: string) => {
-        if (!window.confirm("Access revocation is permanent. Remove this user?")) return;
+    const confirmRemove = (id: string) => {
+        setDeleteId(id);
+    };
+
+    const handleRemove = async () => {
+        if (!deleteId) return;
         try {
-            const updated = await api.removeTeamMember(id, user.id);
+            const updated = await api.removeTeamMember(deleteId, user.id);
             setMembers(updated);
             toast.success("Access revoked");
         } catch (e: any) {
             toast.error(e.message);
+        } finally {
+            setDeleteId(null);
         }
     };
 
     return (
         <div className="space-y-6">
+            <ConfirmDialog 
+                isOpen={!!deleteId}
+                onClose={() => setDeleteId(null)}
+                onConfirm={handleRemove}
+                title="Revoke User Access"
+                message="Are you sure you want to remove this user? They will lose access immediately. This action is permanent."
+                confirmText="Revoke Access"
+            />
+
             <h2 className="text-2xl font-bold text-white">System Access Control</h2>
             
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -823,7 +977,7 @@ const AdminTeam: React.FC<{ user: User }> = ({ user }) => {
                                      {member.role.replace('_', ' ')}
                                  </Badge>
                                  {member.id !== user.id && user.role === 'super_admin' && (
-                                     <button onClick={() => handleRemove(member.id)} className="text-gray-600 hover:text-red-500 transition-colors p-2" title="Revoke Access">
+                                     <button onClick={() => confirmRemove(member.id)} className="text-gray-600 hover:text-red-500 transition-colors p-2" title="Revoke Access">
                                          <Trash2 size={16} />
                                      </button>
                                  )}
@@ -866,6 +1020,7 @@ const AdminTeam: React.FC<{ user: User }> = ({ user }) => {
     );
 };
 
+// ... (Rest of Admin components remain largely the same, imports handle ConfirmDialog for Offers if desired, but request specifically mentioned Dev Delete) ...
 // --- 6. Admin Offers (Unchanged)
 const AdminOffers: React.FC = () => {
     // ... (Previous Logic)

@@ -3,6 +3,7 @@ import React, { useRef, useState } from 'react';
 import { motion, HTMLMotionProps, AnimatePresence } from 'framer-motion';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { AlertTriangle, X } from 'lucide-react';
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -191,6 +192,56 @@ export const Tooltip: React.FC<TooltipProps> = ({ content, children, className }
           </motion.div>
         )}
       </AnimatePresence>
+    </div>
+  );
+};
+
+// --- Confirmation Dialog ---
+interface ConfirmDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  title: string;
+  message: string;
+  confirmText?: string;
+  cancelText?: string;
+  variant?: 'danger' | 'warning' | 'info';
+}
+
+export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ 
+  isOpen, onClose, onConfirm, title, message, 
+  confirmText = 'Confirm', cancelText = 'Cancel', variant = 'danger' 
+}) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.9 }}
+        className="w-full max-w-md bg-vision-900 border border-white/10 rounded-2xl p-6 shadow-2xl relative"
+      >
+        <button onClick={onClose} className="absolute top-4 right-4 text-gray-500 hover:text-white"><X size={20} /></button>
+        <div className="flex items-start gap-4">
+           <div className={cn("p-3 rounded-full flex-shrink-0", variant === 'danger' ? "bg-red-500/10 text-red-500" : "bg-blue-500/10 text-blue-500")}>
+              <AlertTriangle size={24} />
+           </div>
+           <div>
+              <h3 className="text-lg font-bold text-white mb-2">{title}</h3>
+              <p className="text-sm text-gray-400 leading-relaxed mb-6">{message}</p>
+              <div className="flex gap-3">
+                  <Button variant="ghost" onClick={onClose} className="flex-1">{cancelText}</Button>
+                  <Button 
+                    onClick={onConfirm} 
+                    className={cn("flex-1", variant === 'danger' ? "bg-red-600 hover:bg-red-700 text-white border-none shadow-none" : "bg-vision-primary text-black")}
+                  >
+                      {confirmText}
+                  </Button>
+              </div>
+           </div>
+        </div>
+      </motion.div>
     </div>
   );
 };

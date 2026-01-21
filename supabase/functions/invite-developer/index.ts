@@ -34,59 +34,84 @@ Deno.serve(async (req: Request) => {
 
     const assignedRole = (role === 'admin' || role === 'developer') ? role : 'developer';
     
-    console.log(`Inviting ${email} as ${assignedRole} by ${invited_by}`);
+    console.log(`Processing invite for ${email} as ${assignedRole} by ${invited_by}`);
 
-    let targetUserId;
+    // Check if user already exists
+    const { data: existingUser } = await supabaseAdmin.from('profiles').select('id').eq('email', email).single();
+    let targetUserId = existingUser?.id;
 
-    if (password) {
-        // Method 1: Direct Creation with Password (Admin sets it)
-        const { data: createData, error: createError } = await supabaseAdmin.auth.admin.createUser({
-            email,
-            password,
-            email_confirm: true, // Auto verify since admin created it
+    if (existingUser) {
+        // User exists - Update password and role
+        console.log(`User exists (${existingUser.id}), updating credentials...`);
+        
+        const updateData: any = {
+            email_confirm: true,
             user_metadata: {
                 full_name: name,
-                role: assignedRole,
-                invited_by
+                role: assignedRole
             }
-        });
+        };
+        if (password) {
+            updateData.password = password;
+        }
 
-        if (createError) throw createError;
-        targetUserId = createData.user.id;
+        const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(existingUser.id, updateData);
+        if (updateError) throw updateError;
 
     } else {
-        // Method 2: Standard Invite Link (No password set yet)
-        const { data: inviteData, error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
-            data: { 
-                full_name: name,
-                role: assignedRole,
-                invited_by: invited_by
-            },
-            redirectTo: redirectTo
-        });
+        // User does not exist - Create new
+        if (password) {
+            // Method 1: Direct Creation with Password (Admin sets it)
+            const { data: createData, error: createError } = await supabaseAdmin.auth.admin.createUser({
+                email,
+                password,
+                email_confirm: true, // Auto verify since admin created it
+                user_metadata: {
+                    full_name: name,
+                    role: assignedRole,
+                    invited_by
+                }
+            });
 
-        if (inviteError) throw inviteError;
-        targetUserId = inviteData.user.id;
+            if (createError) throw createError;
+            targetUserId = createData.user.id;
+
+        } else {
+            // Method 2: Standard Invite Link (No password set yet)
+            const { data: inviteData, error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
+                data: { 
+                    full_name: name,
+                    role: assignedRole,
+                    invited_by: invited_by
+                },
+                redirectTo: redirectTo
+            });
+
+            if (inviteError) throw inviteError;
+            targetUserId = inviteData.user.id;
+        }
     }
 
     // 2. Ensure Profile Exists & Update Role (Trigger might have done this, but upsert ensures role is correct)
-    const { error: profileError } = await supabaseAdmin
-        .from('profiles')
-        .upsert({
-            id: targetUserId,
-            email: email,
-            name: name,
-            role: assignedRole,
-            email_verified: true
-        })
-    
-    if (profileError) {
-        console.error("Profile creation error:", profileError);
-        throw new Error("User created but profile sync failed: " + profileError.message);
+    if (targetUserId) {
+        const { error: profileError } = await supabaseAdmin
+            .from('profiles')
+            .upsert({
+                id: targetUserId,
+                email: email,
+                name: name,
+                role: assignedRole,
+                email_verified: true
+            });
+        
+        if (profileError) {
+            console.error("Profile sync error:", profileError);
+            throw new Error("User auth updated but profile sync failed: " + profileError.message);
+        }
     }
 
     return new Response(
-      JSON.stringify({ message: password ? "User created with password successfully" : "Invitation sent successfully" }),
+      JSON.stringify({ message: "User account configured successfully" }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,

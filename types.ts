@@ -50,7 +50,8 @@ export interface MarketplaceItem {
   rating: number;
   review_count: number;
   created_at: string;
-  free_until?: string | null; 
+  free_until?: string | null;
+  is_featured?: boolean; // New field for landing page control
 }
 
 export interface ProjectSuggestion {

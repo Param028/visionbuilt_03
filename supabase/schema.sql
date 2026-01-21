@@ -59,8 +59,11 @@ CREATE TABLE IF NOT EXISTS public.marketplace_items (
     rating NUMERIC DEFAULT 0,
     review_count INTEGER DEFAULT 0,
     free_until TIMESTAMP WITH TIME ZONE,
+    is_featured BOOLEAN DEFAULT false,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now())
 );
+
+ALTER TABLE public.marketplace_items ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT false;
 
 -- OFFERS (Coupons)
 CREATE TABLE IF NOT EXISTS public.offers (
@@ -96,6 +99,8 @@ CREATE TABLE IF NOT EXISTS public.orders (
     deliverables TEXT[] DEFAULT '{}',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now())
 );
+
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS deliverables TEXT[] DEFAULT '{}';
 
 -- MESSAGES (Chat)
 CREATE TABLE IF NOT EXISTS public.messages (
@@ -178,6 +183,7 @@ BEGIN
     DROP POLICY IF EXISTS "Users see own orders" ON public.orders;
     DROP POLICY IF EXISTS "Users create orders" ON public.orders;
     DROP POLICY IF EXISTS "Admin update orders" ON public.orders;
+    DROP POLICY IF EXISTS "Admin delete orders" ON public.orders;
     DROP POLICY IF EXISTS "Order participants read messages" ON public.messages;
     DROP POLICY IF EXISTS "Order participants send messages" ON public.messages;
     DROP POLICY IF EXISTS "Public read offers" ON public.offers;
@@ -218,6 +224,9 @@ CREATE POLICY "Users see own orders" ON public.orders FOR SELECT USING (
 );
 CREATE POLICY "Users create orders" ON public.orders FOR INSERT WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "Admin update orders" ON public.orders FOR UPDATE USING (
+  auth.uid() IN (SELECT id FROM public.profiles WHERE role IN ('admin', 'super_admin', 'developer'))
+);
+CREATE POLICY "Admin delete orders" ON public.orders FOR DELETE USING (
   auth.uid() IN (SELECT id FROM public.profiles WHERE role IN ('admin', 'super_admin', 'developer'))
 );
 
