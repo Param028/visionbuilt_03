@@ -16,7 +16,7 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    const { email, name, invited_by, role, redirectTo } = await req.json()
+    const { email, name, invited_by, role, redirectTo, password } = await req.json()
 
     // Validate inputs
     if (!email || !name) {
@@ -38,28 +38,38 @@ Deno.serve(async (req: Request) => {
 
     let targetUserId;
 
-    // 1. Try to invite the user
-    const { data: inviteData, error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
-        data: { 
-            full_name: name,
-            role: assignedRole,
-            invited_by: invited_by
-        },
-        redirectTo: redirectTo
-    })
+    if (password) {
+        // Method 1: Direct Creation with Password (Admin sets it)
+        const { data: createData, error: createError } = await supabaseAdmin.auth.admin.createUser({
+            email,
+            password,
+            email_confirm: true, // Auto verify since admin created it
+            user_metadata: {
+                full_name: name,
+                role: assignedRole,
+                invited_by
+            }
+        });
 
-    if (inviteError) {
-       console.log("Invite error:", inviteError.message);
-       throw inviteError;
-    }
-    
-    if (inviteData.user) {
-        targetUserId = inviteData.user.id;
+        if (createError) throw createError;
+        targetUserId = createData.user.id;
+
     } else {
-        throw new Error("Failed to retrieve user ID from invite.");
+        // Method 2: Standard Invite Link (No password set yet)
+        const { data: inviteData, error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
+            data: { 
+                full_name: name,
+                role: assignedRole,
+                invited_by: invited_by
+            },
+            redirectTo: redirectTo
+        });
+
+        if (inviteError) throw inviteError;
+        targetUserId = inviteData.user.id;
     }
 
-    // 2. Ensure Profile Exists & Update Role
+    // 2. Ensure Profile Exists & Update Role (Trigger might have done this, but upsert ensures role is correct)
     const { error: profileError } = await supabaseAdmin
         .from('profiles')
         .upsert({
@@ -67,15 +77,16 @@ Deno.serve(async (req: Request) => {
             email: email,
             name: name,
             role: assignedRole,
+            email_verified: true
         })
     
     if (profileError) {
         console.error("Profile creation error:", profileError);
-        throw new Error("User invited but profile creation failed: " + profileError.message);
+        throw new Error("User created but profile sync failed: " + profileError.message);
     }
 
     return new Response(
-      JSON.stringify({ user: inviteData.user, message: "Invitation sent successfully" }),
+      JSON.stringify({ message: password ? "User created with password successfully" : "Invitation sent successfully" }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,

@@ -28,6 +28,7 @@ const ProjectCheckout = React.lazy(() => import('./pages/ProjectCheckout'));
 const PrivacyPolicy = React.lazy(() => import('./pages/PrivacyPolicy'));
 const TermsOfService = React.lazy(() => import('./pages/TermsOfService'));
 const RefundPolicy = React.lazy(() => import('./pages/RefundPolicy'));
+const Profile = React.lazy(() => import('./pages/Profile'));
 
 // Simple loading spinner for page transitions
 const PageLoader = () => (
@@ -41,6 +42,8 @@ const App: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [showSplash, setShowSplash] = useState(true);
   const [connectionError, setConnectionError] = useState(false);
+  // Add state to track if we are in recovery mode to prevent auto-redirect to dashboard
+  const [isRecoveryMode, setIsRecoveryMode] = useState(false);
 
   useEffect(() => {
     if (window.location.protocol === 'http:' && window.location.hostname !== 'localhost') {
@@ -76,12 +79,6 @@ const App: React.FC = () => {
 
     // 1. Initial Fetch with Failsafe Timeout
     const timeoutId = setTimeout(() => {
-        // We only force loading to false if it's still true.
-        // This handler might run even if initSession finished successfully 
-        // (if it finished *just* before and state update hasn't reflected in this closure yet, 
-        // though that's unlikely with React's batching).
-        // However, checking the *ref* or just dispatching the update is safer.
-        // Since setLoading is stable, calling it again with false is harmless.
         setLoading(prev => {
             if (prev) {
                 console.warn("Session check timed out - forcing load");
@@ -95,12 +92,19 @@ const App: React.FC = () => {
 
     // 2. Listen for Auth Changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event) => {
-        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-            // Re-fetch user on explicit sign-in events
+        console.log("Auth Event:", event);
+        if (event === 'PASSWORD_RECOVERY') {
+            setIsRecoveryMode(true);
+            // Force user fetch so we are "logged in" enough to change password
+            const currentUser = await api.getCurrentUser();
+            setUser(currentUser);
+            // Redirect will be handled by Router logic below checking isRecoveryMode
+        } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
             const currentUser = await api.getCurrentUser();
             setUser(currentUser);
         } else if (event === 'SIGNED_OUT') {
             setUser(null);
+            setIsRecoveryMode(false);
         }
     });
 
@@ -193,11 +197,21 @@ const App: React.FC = () => {
             <Layout user={user} setUser={setUser}>
                 <Routes>
                     <Route path="/" element={<Landing />} />
-                    <Route path="/auth" element={!user ? <Auth setUser={setUser} /> : <Navigate to={user.role === 'admin' || user.role === 'super_admin' ? '/admin' : '/dashboard'} />} />
+                    
+                    {/* Auth Logic with Recovery Handling */}
+                    <Route path="/auth" element={
+                        isRecoveryMode 
+                        ? <Auth setUser={setUser} /> 
+                        : !user 
+                            ? <Auth setUser={setUser} /> 
+                            : <Navigate to={user.role === 'admin' || user.role === 'super_admin' ? '/admin' : '/dashboard'} />
+                    } />
+                    
                     <Route path="/dashboard" element={user ? <Dashboard user={user} /> : <Navigate to="/auth" />} />
                     
                     {/* Lazy Loaded Routes */}
                     <Route path="/protocol/access" element={<Suspense fallback={<PageLoader />}><DevLogin setUser={setUser} /></Suspense>} />
+                    <Route path="/profile" element={<Suspense fallback={<PageLoader />}>{user ? <Profile user={user} setUser={setUser} /> : <Navigate to="/auth" />}</Suspense>} />
                     <Route path="/services" element={<Suspense fallback={<PageLoader />}><Services user={user} /></Suspense>} />
                     <Route path="/marketplace" element={<Suspense fallback={<PageLoader />}><Marketplace user={user} /></Suspense>} />
                     <Route path="/offers" element={<Suspense fallback={<PageLoader />}><Offers user={user} /></Suspense>} />

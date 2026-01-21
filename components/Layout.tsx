@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, LogOut, Instagram, Mail, ChevronRight } from 'lucide-react';
+import { Menu, X, LogOut, Instagram, Mail, ChevronRight, User as UserIcon } from 'lucide-react';
 import { User } from '../types';
 import { api } from '../services/api';
 import { PillNav, Particles } from './ui/ReactBits';
@@ -87,8 +87,13 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
               <PillNav items={getNavItems()} />
                
               {user && (
-                  <div className="flex items-center gap-4 pl-4 border-l border-white/10">
-                    <Button onClick={handleLogout} variant="ghost" size="icon" className="rounded-full text-gray-400 hover:text-red-400">
+                  <div className="flex items-center gap-2 pl-4 border-l border-white/10">
+                    <Link to="/profile">
+                        <Button variant="ghost" size="icon" className="rounded-full text-gray-400 hover:text-white" title="My Profile">
+                            <UserIcon size={18} />
+                        </Button>
+                    </Link>
+                    <Button onClick={handleLogout} variant="ghost" size="icon" className="rounded-full text-gray-400 hover:text-red-400" title="Logout">
                       <LogOut size={18} />
                     </Button>
                   </div>
@@ -116,12 +121,18 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
                   <ChevronRight size={16} />
                 </Link>
               ))}
-              <div className="pt-4 mt-4 border-t border-white/10">
+              <div className="pt-4 mt-4 border-t border-white/10 space-y-2">
                  {user ? (
-                   <button onClick={handleLogout} className="w-full flex items-center justify-between px-4 py-4 rounded-lg text-red-400">
-                      <span>Log Out</span>
-                      <LogOut size={16} />
-                   </button>
+                   <>
+                       <Link to="/profile" onClick={() => setIsMenuOpen(false)} className="w-full flex items-center justify-between px-4 py-4 rounded-lg text-gray-300 hover:bg-white/5">
+                          <span>My Profile</span>
+                          <UserIcon size={16} />
+                       </Link>
+                       <button onClick={handleLogout} className="w-full flex items-center justify-between px-4 py-4 rounded-lg text-red-400 hover:bg-white/5">
+                          <span>Log Out</span>
+                          <LogOut size={16} />
+                       </button>
+                   </>
                  ) : (
                    <div className="grid grid-cols-2 gap-3 px-1">
                       <Link to="/auth?mode=login" onClick={() => setIsMenuOpen(false)} className="w-full"><Button variant="ghost" className="w-full">Log In</Button></Link>

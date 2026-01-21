@@ -239,6 +239,12 @@ export class ApiService {
       if (error) throw error;
   }
 
+  async updateProfile(userId: string, updates: { name?: string, country?: string }): Promise<User | null> {
+      const { error } = await supabase.from('profiles').update(updates).eq('id', userId);
+      if (error) throw error;
+      return this.getCurrentUser(); // Refresh user state
+  }
+
   // --- DATA METHODS (With Bypass Handling) ---
 
   async createOrder(orderData: Omit<Order, 'id' | 'created_at' | 'status' | 'amount_paid' | 'deposit_amount' | 'deliverables'>): Promise<Order> {
@@ -440,10 +446,10 @@ export class ApiService {
       return data as User[] || [];
   }
 
-  async inviteTeamMember(name: string, email: string, role: Role, adminId: string): Promise<User[]> {
+  async inviteTeamMember(name: string, email: string, role: Role, adminId: string, password?: string): Promise<User[]> {
       if (this.currentUser?.id.startsWith('bypass')) return [...(await this.getTeamMembers()), { id: 'mock', name, email, role } as User];
       const redirectTo = window.location.origin + '/auth';
-      const { error } = await supabase.functions.invoke('invite-developer', { body: { email, name, invited_by: adminId, role, redirectTo }});
+      const { error } = await supabase.functions.invoke('invite-developer', { body: { email, name, invited_by: adminId, role, redirectTo, password }});
       if (error) throw error;
       this.logActivity(adminId, `Added Team Member`, `${name} (${role}) invited`);
       return this.getTeamMembers();
