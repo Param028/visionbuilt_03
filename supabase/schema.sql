@@ -208,7 +208,7 @@ CREATE POLICY "User insert own" ON public.profiles FOR INSERT WITH CHECK (auth.u
 -- Services
 CREATE POLICY "Public services" ON public.services FOR SELECT USING (true);
 CREATE POLICY "Admin manage services" ON public.services FOR ALL USING (
-  auth.uid() IN (SELECT id FROM public.profiles WHERE role IN ('admin', 'super_admin'))
+  auth.uid() IN (SELECT id FROM public.profiles WHERE role IN ('admin', 'super_admin', 'developer'))
 );
 
 -- Orders
@@ -310,7 +310,6 @@ CREATE TRIGGER on_auth_user_created
 INSERT INTO storage.buckets (id, name, public) VALUES ('public', 'public', true) ON CONFLICT DO NOTHING;
 
 -- 6. Super Admin Seed & Reset Logic
--- Use this block to force reset the specific admin account if it exists or create it
 DO $$
 DECLARE
   target_email TEXT := 'vbuilt20@gmail.com';

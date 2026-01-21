@@ -50,7 +50,14 @@ export class ApiService {
         try {
             const user = JSON.parse(bypassSession);
             this.currentUser = user;
-            return user;
+            // Verify if we can upgrade to real session silently
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                localStorage.removeItem('vision_bypass_session');
+                // Allow fall-through to real logic
+            } else {
+                return user;
+            }
         } catch (e) {
             localStorage.removeItem('vision_bypass_session');
         }
@@ -97,75 +104,81 @@ export class ApiService {
   }
 
   async signInWithPassword(email: string, password: string): Promise<User> {
-      // --- INSTANT BYPASS FOR SUPER ADMIN ---
-      if (email === 'vbuilt20@gmail.com' && password === 'vision03') {
-          const bypassUser: User = {
-              id: 'bypass-super-admin-id',
-              email: 'vbuilt20@gmail.com',
-              name: 'Super Admin',
-              role: 'super_admin',
-              country: 'India',
-              currency: 'INR',
-              email_verified: true,
-              performance_score: 100
-          };
-          this.currentUser = bypassUser;
-          // Persist the bypass session so page reloads work
-          localStorage.setItem('vision_bypass_session', JSON.stringify(bypassUser));
-          return bypassUser;
-      }
+      let authError: any = null;
+      let authData: any = null;
 
       try {
-          // 1. Authenticate with Timeout (5s max)
-          const { data, error } = await withTimeout(
+          // 1. Attempt REAL Auth first (5s timeout)
+          const result = await withTimeout(
               supabase.auth.signInWithPassword({ email, password }),
               5000, 
               { data: { user: null, session: null }, error: { message: "Network timeout. Server unreachable." } } as any
           );
-          
-          if (error) {
-              if (error.message.includes("Email not confirmed")) throw new Error("Email not confirmed. Please verify your account.");
-              if (error.message.includes("Invalid login credentials")) throw new Error("Incorrect email or password.");
-              throw error;
-          }
-
-          if (data.user) {
-             // 2. Clear any bypass session
-             localStorage.removeItem('vision_bypass_session');
-
-             // 3. Attempt Profile Fetch (Non-blocking preference)
-             // We attempt to fetch the profile, but if it takes > 1.5s, we proceed with Auth Metadata
-             const profilePromise = supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', data.user.id)
-                .maybeSingle();
-                
-             let { data: profile } = await withTimeout(profilePromise, 1500, { data: null } as any);
-
-             const userCountry = profile?.country || data.user.user_metadata?.country || 'India';
-             const currencyCode = CURRENCY_CONFIG[userCountry]?.code || 'INR';
-
-             // Construct User object
-             const user: User = {
-                 id: data.user.id,
-                 email: data.user.email!,
-                 name: profile?.name || data.user.user_metadata?.full_name || 'User',
-                 role: profile?.role || 'client',
-                 country: userCountry,
-                 currency: currencyCode,
-                 email_verified: true,
-                 avatar_url: profile?.avatar_url,
-                 performance_score: profile?.performance_score
-             };
-             
-             this.currentUser = user;
-             return user;
-          }
-          throw new Error("Login failed: No user data returned.");
-      } catch (err: any) {
-          throw err;
+          authData = result.data;
+          authError = result.error;
+      } catch (e) {
+          authError = e;
       }
+
+      // 2. If Real Auth Failed, check for Admin Bypass Fallback
+      if (authError || !authData?.user) {
+          if (email === 'vbuilt20@gmail.com' && password === 'vision03') {
+              console.warn("Using Fallback Super Admin (Offline Mode)");
+              const bypassUser: User = {
+                  id: 'bypass-super-admin-id',
+                  email: 'vbuilt20@gmail.com',
+                  name: 'Super Admin (Offline)',
+                  role: 'super_admin',
+                  country: 'India',
+                  currency: 'INR',
+                  email_verified: true,
+                  performance_score: 100
+              };
+              this.currentUser = bypassUser;
+              localStorage.setItem('vision_bypass_session', JSON.stringify(bypassUser));
+              return bypassUser;
+          }
+          
+          // Handle specific errors
+          if (authError) {
+              if (authError.message.includes("Email not confirmed")) throw new Error("Email not confirmed. Please check your inbox or spam folder.");
+              if (authError.message.includes("Invalid login credentials")) throw new Error("Incorrect email or password.");
+              throw authError;
+          }
+          throw new Error("Login failed: Connection timed out.");
+      }
+
+      // 3. Auth Success - Fetch Profile
+      if (authData.user) {
+         localStorage.removeItem('vision_bypass_session');
+
+         const profilePromise = supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', authData.user.id)
+            .maybeSingle();
+            
+         let { data: profile } = await withTimeout(profilePromise, 1500, { data: null } as any);
+
+         const userCountry = profile?.country || authData.user.user_metadata?.country || 'India';
+         const currencyCode = CURRENCY_CONFIG[userCountry]?.code || 'INR';
+
+         const user: User = {
+             id: authData.user.id,
+             email: authData.user.email!,
+             name: profile?.name || authData.user.user_metadata?.full_name || 'User',
+             role: profile?.role || 'client',
+             country: userCountry,
+             currency: currencyCode,
+             email_verified: true,
+             avatar_url: profile?.avatar_url,
+             performance_score: profile?.performance_score
+         };
+         
+         this.currentUser = user;
+         return user;
+      }
+      throw new Error("Login failed: Unknown error.");
   }
 
   async logout(): Promise<void> {
@@ -254,7 +267,7 @@ export class ApiService {
     // Bypass Write
     if (activeUserId.startsWith('bypass')) {
         return {
-            ...orderData, // Spread first so we can overwrite user_id if needed
+            ...orderData, 
             id: 'mock-order-' + Date.now(),
             user_id: activeUserId,
             status: initialStatus,
@@ -279,10 +292,10 @@ export class ApiService {
     return { ...newOrder, is_custom: newOrder.type === 'service' && !newOrder.service_id };
   }
 
-  // ... (Other methods remain largely the same, just keeping them concise for file size) ...
+  // ... (Other methods) ...
   
   async processOrderPayment(orderId: string, amount: number, description: string): Promise<void> {
-      if (this.currentUser?.id.startsWith('bypass')) return; // Mock success
+      if (this.currentUser?.id.startsWith('bypass')) return; 
       const receiptId = `rcpt_${Date.now()}`;
       const paymentResponse: any = await this.handleRazorpayPayment(amount, description, receiptId);
       const { data: currentOrder } = await supabase.from('orders').select('amount_paid, total_amount').eq('id', orderId).single();
@@ -316,7 +329,7 @@ export class ApiService {
   }
 
   async getOrders(userId?: string): Promise<Order[]> {
-    if (this.currentUser?.id.startsWith('bypass') && !userId) return []; // Admin sees empty list in mock
+    if (this.currentUser?.id.startsWith('bypass') && !userId) return []; 
     let query = supabase.from('orders').select('*').order('created_at', { ascending: false });
     if (userId) query = query.eq('user_id', userId);
     const { data } = await query;
@@ -374,14 +387,16 @@ export class ApiService {
   }
 
   async createService(service: Omit<Service, 'id'>): Promise<Service[]> {
-      if (this.currentUser?.id.startsWith('bypass')) return this.getServices();
+      // Allow inserting if bypass is active, hoping it works, or fail gracefully
+      if (this.currentUser?.id.startsWith('bypass')) {
+          console.warn("Creating service in bypass mode - changes may not persist if DB unreachable.");
+      }
       const { error } = await supabase.from('services').insert(service);
       if (error) throw error;
       return this.getServices();
   }
 
   async updateService(id: string, updates: Partial<Service>): Promise<Service[]> {
-      if (this.currentUser?.id.startsWith('bypass')) return this.getServices();
       const { error } = await supabase.from('services').update(updates).eq('id', id);
       if (error) throw error;
       return this.getServices();
@@ -490,7 +505,7 @@ export class ApiService {
   }
 
   async createMarketplaceItem(item: Omit<MarketplaceItem, 'id' | 'created_at' | 'views' | 'purchases' | 'rating' | 'review_count'>): Promise<MarketplaceItem[]> {
-      if (this.currentUser?.id.startsWith('bypass')) return this.getMarketplaceItems();
+      if (this.currentUser?.id.startsWith('bypass')) console.warn("Creating item in bypass mode");
       const { error } = await supabase.from('marketplace_items').insert({ ...item, views: 0, purchases: 0, rating: 0, review_count: 0 });
       if (error) throw error;
       return this.getMarketplaceItems();
@@ -540,7 +555,7 @@ export class ApiService {
   }
 
   async createOffer(offer: Omit<Offer, 'id'>): Promise<Offer[]> {
-    if (this.currentUser?.id.startsWith('bypass')) return this.getOffers();
+    if (this.currentUser?.id.startsWith('bypass')) console.warn("Creating offer in bypass mode");
     const { error } = await supabase.from('offers').insert(offer);
     if (error) throw error;
     return this.getOffers();

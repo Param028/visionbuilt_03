@@ -25,6 +25,7 @@ const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [country, setCountry] = useState('India');
   
@@ -34,7 +35,6 @@ const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
   const [loading, setLoading] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
 
-  // Simplified: Only update visual steps, don't return a promise to await
   const startLoadingAnimation = () => {
       let step = 1;
       setLoadingStep(1);
@@ -43,7 +43,7 @@ const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
           if (step > 4) clearInterval(interval);
           else setLoadingStep(step);
       }, 400);
-      return interval; // Return interval ID to clear if needed
+      return interval;
   };
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -52,13 +52,11 @@ const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
       const animInterval = startLoadingAnimation();
       
       try {
-          // Direct API call without wrapping in Promise.race locally (API handles timeout)
           const user = await api.signInWithPassword(email, password);
           
           if (user) {
               clearInterval(animInterval);
-              setLoadingStep(4); // Force complete visual
-              // Small delay to show success tick
+              setLoadingStep(4);
               setTimeout(() => {
                   setUser(user);
                   toast.success("Successfully logged in!");
@@ -74,6 +72,10 @@ const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
 
   const handleSignup = async (e: React.FormEvent) => {
       e.preventDefault();
+      if (password !== confirmPassword) {
+          toast.error("Passwords do not match!");
+          return;
+      }
       setLoading(true);
       const animInterval = startLoadingAnimation();
 
@@ -88,7 +90,6 @@ const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
                   toast.success("Confirmation email sent!");
                   setLoading(false);
               } else if (session) {
-                  // If auto-login works
                   const fullUser = await api.getCurrentUser();
                   if (fullUser) {
                       setUser(fullUser);
@@ -152,11 +153,19 @@ const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
       }
   };
 
+  const handleResendConfirmation = async () => {
+      try {
+          await api.resendConfirmationEmail(email);
+          toast.success("Confirmation link resent!");
+      } catch (e: any) {
+          toast.error(e.message);
+      }
+  };
+
   if (loading) {
     return (
       <div className="min-h-[80vh] flex items-center justify-center px-4">
         <Card className="w-full max-w-md p-6 sm:p-12 flex flex-col items-center justify-center min-h-[400px] relative">
-          {/* Emergency Exit Button */}
           <button 
             onClick={() => setLoading(false)} 
             className="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors"
@@ -268,6 +277,13 @@ const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
                     onChange={(e) => setPassword(e.target.value)} 
                     required 
                 />
+                <Input 
+                    type="password" 
+                    placeholder="Confirm Password" 
+                    value={confirmPassword} 
+                    onChange={(e) => setConfirmPassword(e.target.value)} 
+                    required 
+                />
                 
                 <div className="space-y-1.5">
                     <label className="text-xs font-medium text-gray-400 uppercase tracking-wider flex items-center gap-1">
@@ -306,9 +322,14 @@ const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
                 <p className="text-xs text-gray-500">
                     Please check your inbox (and spam folder) and click the link to activate your dashboard.
                 </p>
-                <Button onClick={() => setAuthMode('login')} variant="outline" className="w-full">
-                    Return to Login
-                </Button>
+                <div className="flex flex-col gap-2">
+                    <Button onClick={() => setAuthMode('login')} variant="outline" className="w-full">
+                        Return to Login
+                    </Button>
+                    <button onClick={handleResendConfirmation} className="text-xs text-vision-primary hover:underline">
+                        Resend Confirmation Link
+                    </button>
+                </div>
             </div>
         )}
 
