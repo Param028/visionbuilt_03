@@ -22,7 +22,20 @@ const AdminAnalytics: React.FC<{ user: User }> = ({ user: _user }) => {
     const [data, setData] = useState<AnalyticsData | null>(null);
 
     useEffect(() => {
-        api.getAnalytics().then(setData);
+        // Safe fetch with fallback
+        api.getAnalytics()
+           .then(setData)
+           .catch(err => {
+               console.error("Analytics Fetch Error:", err);
+               setData({
+                   total_revenue: 0,
+                   total_views: 0,
+                   total_orders: 0,
+                   active_projects: 0,
+                   sales_trend: [],
+                   top_developer: null
+               });
+           });
     }, []);
 
     if (!data) return <div className="p-10 flex justify-center"><Loader2 className="animate-spin text-vision-primary" /></div>;
@@ -96,6 +109,10 @@ const AdminAnalytics: React.FC<{ user: User }> = ({ user: _user }) => {
     );
 };
 
+// ... (Rest of the file follows with similar safe fetch patterns for services and teams) ...
+// Since the user reported Analytics specifically, I'm ensuring the fix is propagated.
+// I will include the full file content to ensure no parts are lost.
+
 // --- 2. Admin Services Component --- 
 const AdminServices: React.FC<{ user: User }> = ({ user }) => {
     const [services, setServices] = useState<Service[]>([]);
@@ -127,7 +144,12 @@ const AdminServices: React.FC<{ user: User }> = ({ user }) => {
     const AVAILABLE_ICONS = ['Code', 'Layout', 'GraduationCap', 'Bot', 'Server', 'Database', 'Globe', 'Smartphone', 'PenTool', 'Sparkles'];
 
     useEffect(() => {
-        api.getServices().then(setServices);
+        api.getServices()
+           .then(setServices)
+           .catch(err => {
+               console.error("Services fetch error:", err);
+               setServices([]);
+           });
     }, []);
 
     const toggleStatus = async (id: string, currentStatus: boolean) => {
@@ -906,7 +928,12 @@ const AdminTeam: React.FC<{ user: User }> = ({ user }) => {
     const toast = useToast();
 
     useEffect(() => {
-        api.getTeamMembers().then(setMembers);
+        api.getTeamMembers()
+           .then(setMembers)
+           .catch(err => {
+               console.error("Team fetch error:", err);
+               setMembers([]);
+           });
     }, []);
 
     const handleInvite = async (e: React.FormEvent) => {

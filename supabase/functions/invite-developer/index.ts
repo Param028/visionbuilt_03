@@ -20,14 +20,21 @@ Deno.serve(async (req: Request) => {
 
     // Validate inputs
     if (!email || !name) {
-      throw new Error("Email and Name are required.");
+      return new Response(
+        JSON.stringify({ error: "Email and Name are required." }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+      );
     }
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
     if (!supabaseUrl || !supabaseServiceKey) {
-        throw new Error("Server Misconfiguration: Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY in Secrets.");
+        console.error("Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY");
+        return new Response(
+            JSON.stringify({ error: "Server Misconfiguration: Missing API Keys in Secrets." }),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+        );
     }
 
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
@@ -120,7 +127,7 @@ Deno.serve(async (req: Request) => {
   } catch (error: any) {
     console.error("Edge Function Error:", error.message);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: error.message || "Internal Server Error" }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400,

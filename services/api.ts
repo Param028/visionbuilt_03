@@ -33,10 +33,15 @@ const getEnvVar = (key: string) => {
   return '';
 };
 
-// Helper for DB timeouts - reduced default timeout
-// Modified to accept PromiseLike to support Supabase PostgrestBuilders
+// Helper for DB timeouts - Increased to 20s to accommodate slower connections
 const withTimeout = <T>(promise: PromiseLike<T>, ms: number, fallback: T): Promise<T> => {
-    const timeout = new Promise<T>((resolve) => setTimeout(() => resolve(fallback), ms));
+    const timeout = new Promise<T>((resolve) => 
+        setTimeout(() => {
+            // We resolve with fallback instead of rejecting to prevent app crashes on slow net
+            console.warn(`Operation timed out after ${ms}ms`);
+            resolve(fallback); 
+        }, ms)
+    );
     return Promise.race([Promise.resolve(promise), timeout]);
 };
 
@@ -44,33 +49,8 @@ export class ApiService {
   private currentUser: User | null = null;
 
   async getCurrentUser(): Promise<User | null> {
-    // Check if we have a "fake" session stored for bypass
-    const bypassSession = localStorage.getItem('vision_bypass_session');
-    if (bypassSession) {
-        try {
-            const user = JSON.parse(bypassSession);
-            this.currentUser = user;
-            // Verify if we can upgrade to real session silently
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session) {
-                localStorage.removeItem('vision_bypass_session');
-                // Allow fall-through to real logic
-            } else {
-                return user;
-            }
-        } catch (e) {
-            localStorage.removeItem('vision_bypass_session');
-        }
-    }
-
     try {
-        // 1. Get Session DIRECTLY (No timeout wrapper for local storage check)
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-
-        if (sessionError) {
-             console.warn("Session retrieval error:", sessionError);
-             return null;
-        }
 
         if (session?.user) {
           // 2. Get Profile with safe timeout (DB might be slow)
@@ -80,10 +60,8 @@ export class ApiService {
             .eq('id', session.user.id)
             .maybeSingle();
             
-          // Increased timeout to 5s to reduce flakiness
-          let { data: profile } = await withTimeout(profilePromise, 5000, { data: null } as any);
+          let { data: profile } = await withTimeout(profilePromise, 10000, { data: null } as any);
 
-          // Determine currency based on country
           const userCountry = profile?.country || session.user.user_metadata?.country || 'India';
           const currencyCode = CURRENCY_CONFIG[userCountry]?.code || 'INR';
 
@@ -99,70 +77,68 @@ export class ApiService {
             performance_score: profile?.performance_score
           };
           return this.currentUser;
+        } else if (sessionError) {
+             console.warn("Session retrieval error:", sessionError);
+             throw sessionError; // Re-throw to let App.tsx handle connection error
         }
-        return null;
     } catch (err) {
         console.warn("getCurrentUser failed", err);
-        return null;
+        throw err; // Propagate error for UI handling
     }
+
+    return null;
   }
 
   async signInWithPassword(email: string, password: string): Promise<User> {
       let authError: any = null;
       let authData: any = null;
+      let isNetworkError = false;
 
       try {
-          // 1. Attempt REAL Auth first (5s timeout)
-          const result = await withTimeout(
+          // 1. Attempt REAL Auth first (15s timeout)
+          const result = await Promise.race([
               supabase.auth.signInWithPassword({ email, password }),
-              5000, 
-              { data: { user: null, session: null }, error: { message: "Network timeout. Server unreachable." } } as any
-          );
+              new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT_ERROR')), 15000))
+          ]) as any;
+          
           authData = result.data;
           authError = result.error;
-      } catch (e) {
+      } catch (e: any) {
           authError = e;
+          // Identify network errors vs logic errors
+          if (e.message === 'TIMEOUT_ERROR' || e.message.includes('fetch') || e.message.includes('network') || e.name === 'TypeError') {
+              isNetworkError = true;
+          }
       }
 
-      // 2. If Real Auth Failed, check for Admin Bypass Fallback
+      // 2. Handle Errors
       if (authError || !authData?.user) {
-          if (email === 'vbuilt20@gmail.com' && password === 'vision03') {
-              console.warn("Using Fallback Super Admin (Offline Mode)");
-              const bypassUser: User = {
-                  id: 'bypass-super-admin-id',
-                  email: 'vbuilt20@gmail.com',
-                  name: 'Super Admin (Offline)',
-                  role: 'super_admin',
-                  country: 'India',
-                  currency: 'INR',
-                  email_verified: true,
-                  performance_score: 100
-              };
-              this.currentUser = bypassUser;
-              localStorage.setItem('vision_bypass_session', JSON.stringify(bypassUser));
-              return bypassUser;
+          console.error("Auth Error Detail:", authError);
+
+          // STRICT ONLINE MODE: Fail on network error
+          if (isNetworkError) {
+                throw new Error("Network connection failed. Please check your internet.");
           }
           
-          // Handle specific errors
+          // Propagate the actual error (e.g. Invalid Credentials)
           if (authError) {
-              if (authError.message.includes("Email not confirmed")) throw new Error("Email not confirmed. Please check your inbox or spam folder.");
               if (authError.message.includes("Invalid login credentials")) throw new Error("Incorrect email or password.");
+              if (authError.message.includes("Email not confirmed")) throw new Error("Email not confirmed. Please check your inbox.");
               throw authError;
           }
-          throw new Error("Login failed: Connection timed out.");
+          throw new Error("Login failed: Unknown error.");
       }
 
       // 3. Auth Success - Fetch Profile
       if (authData.user) {
-         localStorage.removeItem('vision_bypass_session');
-
          const profilePromise = supabase
             .from('profiles')
             .select('*')
             .eq('id', authData.user.id)
             .maybeSingle();
             
-         let { data: profile } = await withTimeout(profilePromise, 3000, { data: null } as any);
+         // Safe profile fetch
+         let { data: profile } = await withTimeout(profilePromise, 8000, { data: null } as any);
 
          const userCountry = profile?.country || authData.user.user_metadata?.country || 'India';
          const currencyCode = CURRENCY_CONFIG[userCountry]?.code || 'INR';
@@ -186,7 +162,6 @@ export class ApiService {
   }
 
   async logout(): Promise<void> {
-    localStorage.removeItem('vision_bypass_session');
     await supabase.auth.signOut();
     this.currentUser = null;
   }
@@ -249,18 +224,16 @@ export class ApiService {
       return this.getCurrentUser(); // Refresh user state
   }
 
-  // --- DATA METHODS (With Bypass Handling) ---
+  // --- DATA METHODS ---
 
   async createOrder(orderData: Omit<Order, 'id' | 'created_at' | 'status' | 'amount_paid' | 'deposit_amount' | 'deliverables'>): Promise<Order> {
     const { data: { user } } = await supabase.auth.getUser();
-    // Check active user or bypass
-    const activeUserId = user?.id || (this.currentUser?.id.startsWith('bypass') ? this.currentUser.id : null);
-
-    if (!activeUserId) throw new Error("Unauthorized: Please log in again.");
+    
+    if (!user) throw new Error("Unauthorized: Please log in again.");
 
     // Payment Logic
     let paidAmount = 0;
-    if (orderData.type === 'project' && orderData.total_amount > 0 && !activeUserId.startsWith('bypass')) {
+    if (orderData.type === 'project' && orderData.total_amount > 0) {
         const receiptId = `rcpt_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
         try {
             await this.handleRazorpayPayment(orderData.total_amount, orderData.service_title, receiptId);
@@ -274,25 +247,10 @@ export class ApiService {
     let initialStatus: Order['status'] = 'pending';
     if (orderData.type === 'project' && paidAmount >= orderData.total_amount) initialStatus = 'completed';
 
-    // Bypass Write
-    if (activeUserId.startsWith('bypass')) {
-        return {
-            ...orderData, 
-            id: 'mock-order-' + Date.now(),
-            user_id: activeUserId,
-            status: initialStatus,
-            amount_paid: paidAmount,
-            deposit_amount: 0,
-            deliverables: [],
-            created_at: new Date().toISOString(),
-            is_custom: orderData.type === 'service' && !orderData.service_id
-        };
-    }
-
     const { is_custom, ...dbPayload } = orderData;
     const { data: newOrder, error: orderError } = await supabase.from('orders').insert({ ...dbPayload, status: initialStatus, amount_paid: paidAmount, deposit_amount: 0, deliverables: [] }).select().single();
     
-    if (orderError) throw new Error("Order creation failed. Please contact support.");
+    if (orderError) throw new Error("Order creation failed: " + orderError.message);
     
     // Emails
     const userEmail = this.currentUser?.email || 'Customer';
@@ -305,7 +263,6 @@ export class ApiService {
   // ... (Other methods) ...
   
   async processOrderPayment(orderId: string, amount: number, description: string): Promise<void> {
-      if (this.currentUser?.id.startsWith('bypass')) return; 
       const receiptId = `rcpt_${Date.now()}`;
       const paymentResponse: any = await this.handleRazorpayPayment(amount, description, receiptId);
       const { data: currentOrder } = await supabase.from('orders').select('amount_paid, total_amount').eq('id', orderId).single();
@@ -317,20 +274,17 @@ export class ApiService {
   }
 
   async getOrderPayments(orderId: string): Promise<Payment[]> {
-      if (this.currentUser?.id.startsWith('bypass')) return [];
       const { data } = await supabase.from('payments').select('*').eq('order_id', orderId).order('created_at', { ascending: false });
       return (data || []).map((p: any) => ({ ...p, date: p.created_at }));
   }
 
   async updateOrderFinancials(orderId: string, total: number, deposit: number): Promise<Order> {
-      if (this.currentUser?.id.startsWith('bypass')) return { ...await this.getOrderById(orderId), total_amount: total, deposit_amount: deposit, status: 'accepted' } as Order;
       const { data, error } = await supabase.from('orders').update({ total_amount: total, deposit_amount: deposit, status: 'accepted' }).eq('id', orderId).select().single();
       if(error) throw error;
       return { ...data, is_custom: data.type === 'service' && !data.service_id };
   }
 
   async addDeliverable(orderId: string, fileUrl: string): Promise<Order> {
-      if (this.currentUser?.id.startsWith('bypass')) return { ...await this.getOrderById(orderId), deliverables: [fileUrl] } as Order;
       // Fetch current array to ensure we append safely
       const { data: current, error: fetchError } = await supabase.from('orders').select('deliverables').eq('id', orderId).single();
       if (fetchError) throw fetchError;
@@ -343,18 +297,21 @@ export class ApiService {
   }
 
   async deleteOrder(orderId: string): Promise<Order[]> {
-    if (this.currentUser?.id.startsWith('bypass')) return this.getOrders();
     const { error } = await supabase.from('orders').delete().eq('id', orderId);
     if (error) throw error;
     return this.getOrders();
   }
 
   async getOrders(userId?: string): Promise<Order[]> {
-    if (this.currentUser?.id.startsWith('bypass') && !userId) return []; 
-    let query = supabase.from('orders').select('*').order('created_at', { ascending: false });
-    if (userId) query = query.eq('user_id', userId);
-    const { data } = await query;
-    return (data || []).map((o: any) => ({ ...o, is_custom: o.type === 'service' && !o.service_id })) as Order[];
+    try {
+        let query = supabase.from('orders').select('*').order('created_at', { ascending: false });
+        if (userId) query = query.eq('user_id', userId);
+        const { data } = await query;
+        return (data || []).map((o: any) => ({ ...o, is_custom: o.type === 'service' && !o.service_id })) as Order[];
+    } catch (e) {
+        console.error("Failed to get orders", e);
+        return [];
+    }
   }
 
   async getOrderById(orderId: string): Promise<Order | undefined> {
@@ -364,7 +321,6 @@ export class ApiService {
   }
 
   async updateOrderStatus(orderId: string, status: Order['status'], adminId?: string): Promise<Order> {
-    if (this.currentUser?.id.startsWith('bypass')) return { ...await this.getOrderById(orderId), status } as Order;
     const { data, error } = await supabase.from('orders').update({ status }).eq('id', orderId).select().single();
     if(error) throw error;
     if (adminId) {
@@ -376,7 +332,6 @@ export class ApiService {
   }
 
   async updateOrderPrice(orderId: string, newPrice: number, adminId?: string): Promise<Order> {
-      if (this.currentUser?.id.startsWith('bypass')) return { ...await this.getOrderById(orderId), total_amount: newPrice } as Order;
       const { data, error } = await supabase.from('orders').update({ total_amount: newPrice }).eq('id', orderId).select().single();
       if(error) throw error;
       if (adminId) this.logActivity(adminId, 'Updated Order Price', `Order #${orderId} -> $${newPrice}`);
@@ -384,7 +339,6 @@ export class ApiService {
   }
 
   async rateOrder(orderId: string, rating: number, review?: string): Promise<Order> {
-      if (this.currentUser?.id.startsWith('bypass')) return { ...await this.getOrderById(orderId), rating, review } as Order;
       const { data, error } = await supabase.from('orders').update({ rating, review }).eq('id', orderId).select().single();
       if(error) throw error;
       return { ...data, is_custom: data.type === 'service' && !data.service_id };
@@ -396,22 +350,22 @@ export class ApiService {
   }
 
   async sendMessage(msg: Omit<Message, 'id' | 'created_at'>): Promise<Message> {
-    if (this.currentUser?.id.startsWith('bypass')) return { id: 'mock-msg-'+Date.now(), created_at: new Date().toISOString(), ...msg } as Message;
     const { data, error } = await supabase.from('messages').insert(msg).select().single();
     if(error) throw error;
     return data;
   }
 
   async getServices(): Promise<Service[]> {
-    const { data } = await supabase.from('services').select('*').order('base_price');
-    return data || [];
+    try {
+        const { data } = await supabase.from('services').select('*').order('base_price');
+        return data || [];
+    } catch (e) {
+        console.error("Failed to load services", e);
+        return [];
+    }
   }
 
   async createService(service: Omit<Service, 'id'>): Promise<Service[]> {
-      // Allow inserting if bypass is active, hoping it works, or fail gracefully
-      if (this.currentUser?.id.startsWith('bypass')) {
-          console.warn("Creating service in bypass mode - changes may not persist if DB unreachable.");
-      }
       const { error } = await supabase.from('services').insert(service);
       if (error) throw error;
       return this.getServices();
@@ -424,32 +378,40 @@ export class ApiService {
   }
 
   async getAnalytics(): Promise<AnalyticsData> {
-      const { data: orders } = await supabase.from('orders').select('amount_paid, status, created_at');
-      const { data: items } = await supabase.from('marketplace_items').select('views');
-      const { data: devs } = await supabase.from('profiles').select('*').eq('role', 'developer');
+      try {
+          const { data: orders } = await supabase.from('orders').select('amount_paid, status, created_at');
+          const { data: items } = await supabase.from('marketplace_items').select('views');
+          const { data: devs } = await supabase.from('profiles').select('*').eq('role', 'developer');
 
-      // Calculate revenue based on actual amount_paid, not the quote total
-      const totalRevenue = orders?.reduce((sum, o) => sum + (o.amount_paid || 0), 0) || 0;
-      
-      const activeProjects = orders?.filter(o => o.status === 'in_progress').length || 0;
-      
-      const salesTrend = [0, 0, 0, 0, 0, 0, 0];
-      const now = new Date();
-      orders?.forEach(o => {
-          if (o.amount_paid > 0) {
-              const diffDays = Math.floor((now.getTime() - new Date(o.created_at).getTime()) / (86400000));
-              if (diffDays >= 0 && diffDays < 7) salesTrend[6 - diffDays] += (o.amount_paid || 0);
-          }
-      });
+          // Calculate revenue based on actual amount_paid, not the quote total
+          const totalRevenue = orders?.reduce((sum, o) => sum + (o.amount_paid || 0), 0) || 0;
+          
+          const activeProjects = orders?.filter(o => o.status === 'in_progress').length || 0;
+          
+          const salesTrend = [0, 0, 0, 0, 0, 0, 0];
+          const now = new Date();
+          orders?.forEach(o => {
+              if (o.amount_paid > 0) {
+                  const diffDays = Math.floor((now.getTime() - new Date(o.created_at).getTime()) / (86400000));
+                  if (diffDays >= 0 && diffDays < 7) salesTrend[6 - diffDays] += (o.amount_paid || 0);
+              }
+          });
 
-      return {
-          total_revenue: totalRevenue,
-          total_views: items?.reduce((sum, i) => sum + i.views, 0) || 0,
-          total_orders: orders?.length || 0,
-          active_projects: activeProjects,
-          sales_trend: salesTrend, 
-          top_developer: devs?.[0] as User || null
-      };
+          return {
+              total_revenue: totalRevenue,
+              total_views: items?.reduce((sum, i) => sum + i.views, 0) || 0,
+              total_orders: orders?.length || 0,
+              active_projects: activeProjects,
+              sales_trend: salesTrend, 
+              top_developer: devs?.[0] as User || null
+          };
+      } catch (e) {
+          console.error("Analytics load failed (Returning empty):", e);
+          // Return valid empty structure to prevent infinite loading
+          return {
+              total_revenue: 0, total_views: 0, total_orders: 0, active_projects: 0, sales_trend: [], top_developer: null
+          };
+      }
   }
 
   async getPlatformStats(): Promise<{ totalDelivered: number, averageRating: number }> {
@@ -460,21 +422,29 @@ export class ApiService {
   }
 
   async getTeamMembers(): Promise<User[]> {
-      const { data } = await supabase.from('profiles').select('*').in('role', ['developer', 'admin', 'super_admin']);
-      return data as User[] || [];
+      try {
+          const { data, error } = await supabase.from('profiles').select('*').in('role', ['developer', 'admin', 'super_admin']);
+          if (error) throw error;
+          return data as User[] || [];
+      } catch (e) {
+          console.error("Failed to load team members:", e);
+          return [];
+      }
   }
 
   async inviteTeamMember(name: string, email: string, role: Role, adminId: string, password?: string): Promise<User[]> {
-      if (this.currentUser?.id.startsWith('bypass')) return [...(await this.getTeamMembers()), { id: 'mock', name, email, role } as User];
       const redirectTo = window.location.origin + '/auth';
-      const { error } = await supabase.functions.invoke('invite-developer', { body: { email, name, invited_by: adminId, role, redirectTo, password }});
-      if (error) throw error;
+      const { data, error } = await supabase.functions.invoke('invite-developer', { body: { email, name, invited_by: adminId, role, redirectTo, password }});
+      
+      if (error || (data && data.error)) {
+          throw new Error(error?.message || data?.error || "Failed to invite member");
+      }
+      
       this.logActivity(adminId, `Added Team Member`, `${name} (${role}) invited`);
       return this.getTeamMembers();
   }
 
   async removeTeamMember(id: string, adminId: string): Promise<User[]> {
-      if (this.currentUser?.id.startsWith('bypass')) return (await this.getTeamMembers()).filter(u => u.id !== id);
       const { error } = await supabase.functions.invoke('delete-team-member', { body: { userId: id }});
       if (error) throw error;
       this.logActivity(adminId, 'Removed Team Member', `ID: ${id}`);
@@ -486,14 +456,17 @@ export class ApiService {
   async removeDeveloper(id: string, adminId: string): Promise<User[]> { return this.removeTeamMember(id, adminId); }
 
   async getTasks(userId?: string, role?: Role): Promise<Task[]> {
-      let query = supabase.from('tasks').select('*').order('due_date', { ascending: true });
-      if (role === 'developer' && userId) query = query.eq('assigned_to_id', userId);
-      const { data } = await query;
-      return data as Task[] || [];
+      try {
+        let query = supabase.from('tasks').select('*').order('due_date', { ascending: true });
+        if (role === 'developer' && userId) query = query.eq('assigned_to_id', userId);
+        const { data } = await query;
+        return data as Task[] || [];
+      } catch (e) {
+          return [];
+      }
   }
 
   async addTask(task: Omit<Task, 'id' | 'assigned_to_name' | 'status' | 'created_by_id'>, adminId: string): Promise<Task[]> {
-      if (this.currentUser?.id.startsWith('bypass')) return [...(await this.getTasks()), { ...task, id: 'mock', status: 'todo' } as Task];
       const { data: assignee } = await supabase.from('profiles').select('name').eq('id', task.assigned_to_id).single();
       const { error } = await supabase.from('tasks').insert({ ...task, assigned_to_name: assignee?.name || 'Unknown', created_by_id: adminId, status: 'todo' });
       if (error) throw error;
@@ -501,26 +474,32 @@ export class ApiService {
   }
 
   async updateTaskStatus(taskId: string, status: Task['status'], _adminId: string): Promise<Task[]> {
-      if (this.currentUser?.id.startsWith('bypass')) return this.getTasks();
       const { error } = await supabase.from('tasks').update({ status }).eq('id', taskId);
       if (error) throw error;
       return this.getTasks();
   }
 
   async getMarketplaceItems(developerId?: string): Promise<MarketplaceItem[]> {
-    let query = supabase.from('marketplace_items').select('*');
-    if (developerId) query = query.eq('developer_id', developerId);
-    const { data } = await query;
-    return data || [];
+    try {
+        let query = supabase.from('marketplace_items').select('*');
+        if (developerId) query = query.eq('developer_id', developerId);
+        const { data } = await query;
+        return data || [];
+    } catch (e) {
+        return [];
+    }
   }
 
   async getMarketplaceSales(developerId: string): Promise<Order[]> {
-      if (this.currentUser?.id.startsWith('bypass')) return [];
-      const { data: items } = await supabase.from('marketplace_items').select('id').eq('developer_id', developerId);
-      const itemIds = items?.map(i => i.id) || [];
-      if (itemIds.length === 0) return [];
-      const { data: orders } = await supabase.from('orders').select('*').in('project_id', itemIds).eq('type', 'project').order('created_at', { ascending: false });
-      return (orders || []).map((o: any) => ({ ...o, is_custom: o.type === 'service' && !o.service_id })) as Order[];
+      try {
+          const { data: items } = await supabase.from('marketplace_items').select('id').eq('developer_id', developerId);
+          const itemIds = items?.map(i => i.id) || [];
+          if (itemIds.length === 0) return [];
+          const { data: orders } = await supabase.from('orders').select('*').in('project_id', itemIds).eq('type', 'project').order('created_at', { ascending: false });
+          return (orders || []).map((o: any) => ({ ...o, is_custom: o.type === 'service' && !o.service_id })) as Order[];
+      } catch (e) {
+          return [];
+      }
   }
 
   async getMarketplaceItemById(id: string): Promise<MarketplaceItem | undefined> {
@@ -529,21 +508,18 @@ export class ApiService {
   }
 
   async createMarketplaceItem(item: Omit<MarketplaceItem, 'id' | 'created_at' | 'views' | 'purchases' | 'rating' | 'review_count'>): Promise<MarketplaceItem[]> {
-      if (this.currentUser?.id.startsWith('bypass')) console.warn("Creating item in bypass mode");
       const { error } = await supabase.from('marketplace_items').insert({ ...item, views: 0, purchases: 0, rating: 0, review_count: 0, is_featured: item.is_featured || false });
       if (error) throw error;
       return this.getMarketplaceItems();
   }
 
   async updateMarketplaceItem(id: string, updates: Partial<MarketplaceItem>): Promise<MarketplaceItem[]> {
-      if (this.currentUser?.id.startsWith('bypass')) return this.getMarketplaceItems();
       const { error } = await supabase.from('marketplace_items').update(updates).eq('id', id);
       if (error) throw error;
       return this.getMarketplaceItems();
   }
 
   async deleteMarketplaceItem(id: string): Promise<MarketplaceItem[]> {
-      if (this.currentUser?.id.startsWith('bypass')) return this.getMarketplaceItems();
       const { error } = await supabase.from('marketplace_items').delete().eq('id', id);
       if (error) throw error;
       return this.getMarketplaceItems();
@@ -567,7 +543,6 @@ export class ApiService {
   }
 
   async updateProjectSuggestionStatus(id: string, status: ProjectSuggestion['status']): Promise<ProjectSuggestion[]> {
-      if (this.currentUser?.id.startsWith('bypass')) return this.getProjectSuggestions();
       const { error } = await supabase.from('project_suggestions').update({ status }).eq('id', id);
       if(error) throw error;
       return this.getProjectSuggestions();
@@ -579,14 +554,12 @@ export class ApiService {
   }
 
   async createOffer(offer: Omit<Offer, 'id'>): Promise<Offer[]> {
-    if (this.currentUser?.id.startsWith('bypass')) console.warn("Creating offer in bypass mode");
     const { error } = await supabase.from('offers').insert(offer);
     if (error) throw error;
     return this.getOffers();
   }
 
   async deleteOffer(id: string): Promise<Offer[]> {
-    if (this.currentUser?.id.startsWith('bypass')) return this.getOffers();
     const { error } = await supabase.from('offers').delete().eq('id', id);
     if (error) throw error;
     return this.getOffers();
@@ -600,7 +573,6 @@ export class ApiService {
   }
 
   async uploadFile(file: File, bucket: string = 'public'): Promise<string> {
-      if (this.currentUser?.id.startsWith('bypass')) return URL.createObjectURL(file);
       const fileExt = file.name.split('.').pop();
       const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
       const { error } = await supabase.storage.from(bucket).upload(fileName, file);
@@ -610,7 +582,6 @@ export class ApiService {
   }
 
   private async logActivity(adminId: string, action: string, details?: string) {
-      if (adminId.startsWith('bypass')) return; 
       supabase.from('admin_activity').insert({ admin_id: adminId, action, details, timestamp: new Date().toISOString() }).then();
   }
 
