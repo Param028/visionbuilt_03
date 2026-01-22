@@ -55,13 +55,13 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
   useEffect(() => {
     let isMounted = true;
 
-    // Failsafe: Force stop loading after 5 seconds if DB hangs
+    // Failsafe: Force stop loading after 15 seconds if DB hangs (Updated from 5s)
     const timeoutId = setTimeout(() => {
         if (isMounted && loading) {
             console.warn("Services fetch timed out - forcing UI render");
             setLoading(false);
         }
-    }, 5000);
+    }, 15000);
 
     const fetchData = async () => {
       try {

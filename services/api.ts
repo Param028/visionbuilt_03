@@ -33,7 +33,7 @@ const getEnvVar = (key: string) => {
   return '';
 };
 
-// Helper for DB timeouts - Increased to 20s to accommodate slower connections
+// Helper for DB timeouts - Increased to 30s to accommodate cold starts
 const withTimeout = <T>(promise: PromiseLike<T>, ms: number, fallback: T): Promise<T> => {
     const timeout = new Promise<T>((resolve) => 
         setTimeout(() => {
@@ -60,7 +60,8 @@ export class ApiService {
             .eq('id', session.user.id)
             .maybeSingle();
             
-          let { data: profile } = await withTimeout(profilePromise, 10000, { data: null } as any);
+          // Increased timeout to 20s
+          let { data: profile } = await withTimeout(profilePromise, 20000, { data: null } as any);
 
           const userCountry = profile?.country || session.user.user_metadata?.country || 'India';
           const currencyCode = CURRENCY_CONFIG[userCountry]?.code || 'INR';
@@ -95,10 +96,10 @@ export class ApiService {
       let isNetworkError = false;
 
       try {
-          // 1. Attempt REAL Auth first (15s timeout)
+          // 1. Attempt REAL Auth first (30s timeout for cold starts)
           const result = await Promise.race([
               supabase.auth.signInWithPassword({ email, password }),
-              new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT_ERROR')), 15000))
+              new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT_ERROR')), 30000))
           ]) as any;
           
           authData = result.data;
@@ -137,8 +138,8 @@ export class ApiService {
             .eq('id', authData.user.id)
             .maybeSingle();
             
-         // Safe profile fetch
-         let { data: profile } = await withTimeout(profilePromise, 8000, { data: null } as any);
+         // Safe profile fetch - Increased timeout to 20s
+         let { data: profile } = await withTimeout(profilePromise, 20000, { data: null } as any);
 
          const userCountry = profile?.country || authData.user.user_metadata?.country || 'India';
          const currencyCode = CURRENCY_CONFIG[userCountry]?.code || 'INR';

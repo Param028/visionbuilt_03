@@ -77,7 +77,7 @@ const App: React.FC = () => {
       }
     };
 
-    // 1. Initial Fetch with Failsafe Timeout
+    // 1. Initial Fetch with Failsafe Timeout - Increased to 15s
     const timeoutId = setTimeout(() => {
         setLoading(prev => {
             if (prev) {
@@ -86,7 +86,7 @@ const App: React.FC = () => {
             }
             return prev;
         });
-    }, 5000);
+    }, 15000);
 
     initSession().then(() => clearTimeout(timeoutId));
 

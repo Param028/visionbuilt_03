@@ -19,12 +19,12 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
   useEffect(() => {
     let isMounted = true;
     
-    // Failsafe timeout
+    // Failsafe timeout increased to 15s
     const timeoutId = setTimeout(() => {
         if (isMounted && loading) {
             setLoading(false);
         }
-    }, 5000);
+    }, 15000);
 
     const fetchData = async () => {
       try {
