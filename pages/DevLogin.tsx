@@ -22,9 +22,10 @@ const DevLogin: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
 
     try {
         // Use password login for devs with a timeout wrapper to prevent hanging
+        // Increased timeout to 60s (was 10s) to handle Supabase cold starts on slower connections
         const user = await Promise.race([
             api.signInWithPassword(email, password),
-            new Promise<never>((_, reject) => setTimeout(() => reject(new Error("Authentication timed out. Check connection.")), 10000))
+            new Promise<never>((_, reject) => setTimeout(() => reject(new Error("Authentication timed out. Database might be waking up, please try again.")), 60000))
         ]);
         
         if (!user) {

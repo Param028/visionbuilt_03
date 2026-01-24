@@ -9,7 +9,7 @@ import { api } from './services/api';
 import { User } from './types';
 import { isConfigured, supabase } from './lib/supabase';
 import { AnimatePresence } from 'framer-motion';
-import { WifiOff, RefreshCw, Settings, Key } from 'lucide-react';
+import { RefreshCw, Settings, Key } from 'lucide-react';
 
 // --- Static Imports for Core Pages (Fixes loading spinner freeze) ---
 import Landing from './pages/Landing';
@@ -41,8 +41,6 @@ const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [showSplash, setShowSplash] = useState(true);
-  const [connectionError, setConnectionError] = useState(false);
-  // Add state to track if we are in recovery mode to prevent auto-redirect to dashboard
   const [isRecoveryMode, setIsRecoveryMode] = useState(false);
 
   useEffect(() => {
@@ -62,22 +60,14 @@ const App: React.FC = () => {
       try {
         const currentUser = await api.getCurrentUser();
         setUser(currentUser);
-        setConnectionError(false);
       } catch (error: any) {
-        console.error("Session check failed", error);
-        if (isConfigured && error.message && (
-            error.message.includes('Failed to fetch') || 
-            error.message.includes('NetworkError') ||
-            error.message.includes('error connecting')
-        )) {
-            setConnectionError(true);
-        }
+        console.warn("Initial session check finished with error (Non-fatal):", error);
       } finally {
         setLoading(false);
       }
     };
 
-    // 1. Initial Fetch with Failsafe Timeout - Increased to 15s
+    // 1. Initial Fetch with Failsafe Timeout
     const timeoutId = setTimeout(() => {
         setLoading(prev => {
             if (prev) {
@@ -95,13 +85,10 @@ const App: React.FC = () => {
         console.log("Auth Event:", event);
         if (event === 'PASSWORD_RECOVERY') {
             setIsRecoveryMode(true);
-            // Force user fetch so we are "logged in" enough to change password
             const currentUser = await api.getCurrentUser();
             if (currentUser) setUser(currentUser);
-            // Redirect will be handled by Router logic below checking isRecoveryMode
         } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
             const currentUser = await api.getCurrentUser();
-            // Prevent logging out if session check fails temporarily on refresh
             if (currentUser) {
                 setUser(currentUser);
             }
@@ -161,26 +148,6 @@ const App: React.FC = () => {
                           Need help? Check the deployment guide in the README.
                       </p>
                   </div>
-              </Card>
-          </div>
-      );
-  }
-
-  // --- 2. Connection Failed Screen (Network/Config Error) ---
-  if (connectionError && isConfigured) {
-      return (
-          <div className="min-h-screen bg-vision-900 flex items-center justify-center p-4">
-              <Card className="max-w-md w-full text-center border-red-500/30">
-                  <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6 text-red-500">
-                      <WifiOff size={32} />
-                  </div>
-                  <h2 className="text-2xl font-bold text-white mb-2">Connection Failed</h2>
-                  <p className="text-gray-400 mb-6 text-sm">
-                      Could not reach the database. Please check your internet connection and ensure your Supabase project is active.
-                  </p>
-                  <Button onClick={() => window.location.reload()} className="w-full">
-                      <RefreshCw size={16} className="mr-2" /> Retry Connection
-                  </Button>
               </Card>
           </div>
       );

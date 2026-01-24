@@ -33,11 +33,10 @@ const getEnvVar = (key: string) => {
   return '';
 };
 
-// Helper for DB timeouts - Increased to 30s to accommodate cold starts
+// Helper for DB timeouts
 const withTimeout = <T>(promise: PromiseLike<T>, ms: number, fallback: T): Promise<T> => {
     const timeout = new Promise<T>((resolve) => 
         setTimeout(() => {
-            // We resolve with fallback instead of rejecting to prevent app crashes on slow net
             console.warn(`Operation timed out after ${ms}ms`);
             resolve(fallback); 
         }, ms)
@@ -50,18 +49,30 @@ export class ApiService {
 
   async getCurrentUser(): Promise<User | null> {
     try {
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        // Attempt to get session
+        const { data: { session }, error: sessionError } = await withTimeout(
+            supabase.auth.getSession(),
+            10000, 
+            { data: { session: null }, error: null } as any
+        );
+
+        if (sessionError) {
+             // If specific error, might be corruption. Clear storage to be safe.
+             if (sessionError.message.includes("JSON")) {
+                 console.warn("Detected corrupted session. Clearing storage.");
+                 localStorage.clear();
+             }
+             throw sessionError;
+        }
 
         if (session?.user) {
-          // 2. Get Profile with safe timeout (DB might be slow)
           const profilePromise = supabase
             .from('profiles')
             .select('*')
             .eq('id', session.user.id)
             .maybeSingle();
             
-          // Increased timeout to 20s
-          let { data: profile } = await withTimeout(profilePromise, 20000, { data: null } as any);
+          let { data: profile } = await withTimeout(profilePromise, 15000, { data: null } as any);
 
           const userCountry = profile?.country || session.user.user_metadata?.country || 'India';
           const currencyCode = CURRENCY_CONFIG[userCountry]?.code || 'INR';
@@ -78,13 +89,12 @@ export class ApiService {
             performance_score: profile?.performance_score
           };
           return this.currentUser;
-        } else if (sessionError) {
-             console.warn("Session retrieval error:", sessionError);
-             throw sessionError; // Re-throw to let App.tsx handle connection error
         }
-    } catch (err) {
-        console.warn("getCurrentUser failed", err);
-        throw err; // Propagate error for UI handling
+    } catch (err: any) {
+        console.warn("getCurrentUser failed (Session invalid or network issue)", err);
+        // Do not throw here. Return null to allow App to load as Guest.
+        // This fixes the "Stuck on loading" issue if the DB is unreachable.
+        return null;
     }
 
     return null;
@@ -96,32 +106,28 @@ export class ApiService {
       let isNetworkError = false;
 
       try {
-          // 1. Attempt REAL Auth first (30s timeout for cold starts)
           const result = await Promise.race([
               supabase.auth.signInWithPassword({ email, password }),
-              new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT_ERROR')), 30000))
+              new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT_ERROR')), 60000))
           ]) as any;
           
           authData = result.data;
           authError = result.error;
       } catch (e: any) {
           authError = e;
-          // Identify network errors vs logic errors
           if (e.message === 'TIMEOUT_ERROR' || e.message.includes('fetch') || e.message.includes('network') || e.name === 'TypeError') {
               isNetworkError = true;
           }
       }
 
-      // 2. Handle Errors
       if (authError || !authData?.user) {
           console.error("Auth Error Detail:", authError);
 
-          // STRICT ONLINE MODE: Fail on network error
           if (isNetworkError) {
-                throw new Error("Network connection failed. Please check your internet.");
+                // More specific error for the user
+                throw new Error("Connection failed. Check for VPNs, AdBlockers, or Firewalls that might be blocking database access.");
           }
           
-          // Propagate the actual error (e.g. Invalid Credentials)
           if (authError) {
               if (authError.message.includes("Invalid login credentials")) throw new Error("Incorrect email or password.");
               if (authError.message.includes("Email not confirmed")) throw new Error("Email not confirmed. Please check your inbox.");
@@ -130,7 +136,6 @@ export class ApiService {
           throw new Error("Login failed: Unknown error.");
       }
 
-      // 3. Auth Success - Fetch Profile
       if (authData.user) {
          const profilePromise = supabase
             .from('profiles')
@@ -138,7 +143,6 @@ export class ApiService {
             .eq('id', authData.user.id)
             .maybeSingle();
             
-         // Safe profile fetch - Increased timeout to 20s
          let { data: profile } = await withTimeout(profilePromise, 20000, { data: null } as any);
 
          const userCountry = profile?.country || authData.user.user_metadata?.country || 'India';
@@ -164,6 +168,7 @@ export class ApiService {
 
   async logout(): Promise<void> {
     await supabase.auth.signOut();
+    localStorage.clear(); // Ensure clean state on logout
     this.currentUser = null;
   }
 
@@ -196,7 +201,6 @@ export class ApiService {
       });
       if (error) throw error;
       
-      // Fire-and-forget email trigger
       supabase.functions.invoke('send-email', {
           body: { type: 'welcome', email, data: { name: fullName, uniqueId: Date.now() }}
       }).catch(err => console.warn("Welcome email trigger failed:", err));
@@ -222,7 +226,7 @@ export class ApiService {
   async updateProfile(userId: string, updates: { name?: string, country?: string }): Promise<User | null> {
       const { error } = await supabase.from('profiles').update(updates).eq('id', userId);
       if (error) throw error;
-      return this.getCurrentUser(); // Refresh user state
+      return this.getCurrentUser(); 
   }
 
   // --- DATA METHODS ---
@@ -232,7 +236,6 @@ export class ApiService {
     
     if (!user) throw new Error("Unauthorized: Please log in again.");
 
-    // Payment Logic
     let paidAmount = 0;
     if (orderData.type === 'project' && orderData.total_amount > 0) {
         const receiptId = `rcpt_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
@@ -253,7 +256,6 @@ export class ApiService {
     
     if (orderError) throw new Error("Order creation failed: " + orderError.message);
     
-    // Emails
     const userEmail = this.currentUser?.email || 'Customer';
     supabase.functions.invoke('send-email', { body: { type: 'order_confirmation', email: userEmail, data: { orderId: newOrder.id, amount: orderData.total_amount, serviceTitle: orderData.service_title }}}).catch(console.error);
     supabase.functions.invoke('send-email', { body: { type: 'admin_alert', email: 'admin_override', data: { amount: orderData.total_amount, userEmail, serviceTitle: orderData.service_title }}}).catch(console.error);
@@ -261,8 +263,6 @@ export class ApiService {
     return { ...newOrder, is_custom: newOrder.type === 'service' && !newOrder.service_id };
   }
 
-  // ... (Other methods) ...
-  
   async processOrderPayment(orderId: string, amount: number, description: string): Promise<void> {
       const receiptId = `rcpt_${Date.now()}`;
       const paymentResponse: any = await this.handleRazorpayPayment(amount, description, receiptId);
@@ -286,7 +286,6 @@ export class ApiService {
   }
 
   async addDeliverable(orderId: string, fileUrl: string): Promise<Order> {
-      // Fetch current array to ensure we append safely
       const { data: current, error: fetchError } = await supabase.from('orders').select('deliverables').eq('id', orderId).single();
       if (fetchError) throw fetchError;
 
@@ -384,11 +383,8 @@ export class ApiService {
           const { data: items } = await supabase.from('marketplace_items').select('views');
           const { data: devs } = await supabase.from('profiles').select('*').eq('role', 'developer');
 
-          // Calculate revenue based on actual amount_paid, not the quote total
           const totalRevenue = orders?.reduce((sum, o) => sum + (o.amount_paid || 0), 0) || 0;
-          
           const activeProjects = orders?.filter(o => o.status === 'in_progress').length || 0;
-          
           const salesTrend = [0, 0, 0, 0, 0, 0, 0];
           const now = new Date();
           orders?.forEach(o => {
@@ -408,7 +404,6 @@ export class ApiService {
           };
       } catch (e) {
           console.error("Analytics load failed (Returning empty):", e);
-          // Return valid empty structure to prevent infinite loading
           return {
               total_revenue: 0, total_views: 0, total_orders: 0, active_projects: 0, sales_trend: [], top_developer: null
           };
