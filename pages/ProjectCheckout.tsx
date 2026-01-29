@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
@@ -5,7 +6,7 @@ import { MarketplaceItem, User, Offer } from '../types';
 import { formatPrice } from '../constants';
 import { Button, Card, Input, Badge } from '../components/ui/Components';
 import { Stepper, ScrollFloat } from '../components/ui/ReactBits';
-import { TicketPercent, X, Loader2, Shield, Download, Star, Eye, Image as ImageIcon, User as UserIcon, Check, Gift } from 'lucide-react';
+import { TicketPercent, X, Loader2, Shield, Eye, Image as ImageIcon, User as UserIcon, Gift, Rocket } from 'lucide-react';
 import { useToast } from '../components/ui/Toast';
 
 const ProjectCheckout: React.FC<{ user: User }> = ({ user }) => {
@@ -56,15 +57,18 @@ const ProjectCheckout: React.FC<{ user: User }> = ({ user }) => {
       setOfferError(null);
   };
 
+  // Logic: Item is free if explicitly categorized as Free Projects OR has a valid free_until date
+  const isFreeProject = item?.category === 'Free Projects';
   const isFreeLimitedTime = item?.free_until && new Date(item.free_until) > new Date();
+  const isZeroCost = isFreeProject || isFreeLimitedTime;
 
   const calculateTotal = () => {
       if (!item) return { total: 0, discount: 0, final: 0 };
       
       let base = item.price;
       
-      // If free limited time, override price
-      if (isFreeLimitedTime) {
+      // If free, override price
+      if (isZeroCost) {
           return { total: 0, discount: item.price, final: 0 };
       }
 
@@ -94,7 +98,7 @@ const ProjectCheckout: React.FC<{ user: User }> = ({ user }) => {
                 user_id: user.id,
                 type: 'project',
                 project_id: item.id,
-                service_title: item.title, // Map project title to generic display title
+                service_title: item.title,
                 domain_requested: false,
                 business_email_requested: false,
                 total_amount: final,
@@ -104,22 +108,22 @@ const ProjectCheckout: React.FC<{ user: User }> = ({ user }) => {
                     business_name: 'Instant Purchase',
                     business_category: 'N/A',
                     address_or_online: 'N/A',
-                    requirements_text: isFreeLimitedTime ? 'Free Student Download' : 'Marketplace Purchase',
+                    requirements_text: isZeroCost ? 'Free Download' : 'Marketplace Purchase',
                     reference_links: ''
                 }
             });
             
             setProcessingStep(4);
-            toast.success("Purchase successful! Accessing files...");
+            toast.success("Success! Redirecting to files...");
             setTimeout(() => navigate('/dashboard'), 1000);
 
         } catch (error: any) {
              console.error(error);
              setIsProcessing(false);
              if (error.message && error.message.includes("VITE_RAZORPAY_KEY_ID")) {
-                toast.error("Deployment Error: Razorpay Key missing in environment variables.");
+                toast.error("Deployment Error: Razorpay Key missing.");
              } else {
-                toast.error(error.message || "Transaction failed. Please try again.");
+                toast.error(error.message || "Transaction failed.");
              }
         }
     }
@@ -132,7 +136,7 @@ const ProjectCheckout: React.FC<{ user: User }> = ({ user }) => {
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-vision-primary via-vision-secondary to-vision-primary animate-gradient-x"></div>
                 
                 <h2 className="text-3xl font-display font-bold text-white mb-2">
-                    <ScrollFloat>{isFreeLimitedTime ? 'Preparing Download' : 'Processing Purchase'}</ScrollFloat>
+                    <ScrollFloat>{isZeroCost ? 'Preparing Download' : 'Processing Purchase'}</ScrollFloat>
                 </h2>
                 <p className="text-gray-400 mb-12">Generating secure download link...</p>
                 
@@ -140,19 +144,12 @@ const ProjectCheckout: React.FC<{ user: User }> = ({ user }) => {
                      <Stepper 
                         currentStep={processingStep}
                         steps={[
-                            { id: 1, label: isFreeLimitedTime ? "Verifying" : "Payment" },
-                            { id: 2, label: isFreeLimitedTime ? "Accessing" : "Verifying" },
+                            { id: 1, label: isZeroCost ? "Verifying" : "Payment" },
+                            { id: 2, label: isZeroCost ? "Accessing" : "Verifying" },
                             { id: 3, label: "Generating" },
                             { id: 4, label: "Complete" }
                         ]}
                     />
-                </div>
-
-                <div className="mt-16 bg-white/5 rounded-lg p-4 inline-block">
-                    <div className="flex items-center space-x-3 text-sm text-gray-300">
-                        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                        <span>Secure 256-bit Encryption Active</span>
-                    </div>
                 </div>
             </Card>
         </div>
@@ -212,20 +209,7 @@ const ProjectCheckout: React.FC<{ user: User }> = ({ user }) => {
                              {item.developer_name}
                          </Badge>
                          {isFreeLimitedTime && <Badge variant="success">FREE LIMITED TIME</Badge>}
-                     </div>
-                     <div className="flex items-center gap-4 text-sm text-gray-400 mb-6">
-                         <div className="flex items-center gap-1 text-yellow-500">
-                             <Star size={14} fill="currentColor" />
-                             <span>{item.rating}</span>
-                         </div>
-                         <div className="flex items-center gap-1">
-                             <Eye size={14} />
-                             <span>{item.views} views</span>
-                         </div>
-                         <div className="flex items-center gap-1">
-                             <Download size={14} />
-                             <span>{item.purchases} sold</span>
-                         </div>
+                         {isFreeProject && <Badge variant="success">FREE PROJECT</Badge>}
                      </div>
                 </div>
                 {item.demo_url && (
@@ -236,20 +220,8 @@ const ProjectCheckout: React.FC<{ user: User }> = ({ user }) => {
             </div>
 
             <div className="prose prose-invert max-w-none text-gray-300 text-sm mb-8 border-t border-white/10 pt-6">
-                <h3 className="text-white font-bold mb-2">About this Project</h3>
+                <h3 className="text-white font-bold mb-2">Project Details</h3>
                 <p className="leading-relaxed">{item.full_description}</p>
-            </div>
-
-            <div className="mb-8">
-                <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-3">Included Features</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {item.features.map((feature, i) => (
-                        <div key={i} className="flex items-center text-sm text-gray-400 p-2 rounded bg-white/5 border border-white/5">
-                            <Check className="w-4 h-4 text-vision-primary mr-2 flex-shrink-0" />
-                            {feature}
-                        </div>
-                    ))}
-                </div>
             </div>
         </div>
 
@@ -258,25 +230,22 @@ const ProjectCheckout: React.FC<{ user: User }> = ({ user }) => {
             <Card className="sticky top-24 border-vision-primary/30 shadow-[0_0_50px_rgba(6,182,212,0.05)]">
                 <div className="mb-6">
                     <h2 className="text-xl font-bold text-white mb-1">
-                        {isFreeLimitedTime ? 'Student Access' : 'Purchase License'}
+                        {isZeroCost ? 'Instant Access' : 'Purchase License'}
                     </h2>
-                    <p className="text-gray-400 text-sm">Unlock full source code & documentation.</p>
+                    <p className="text-gray-400 text-sm">{isZeroCost ? 'Download source code immediately.' : 'Unlock full source code & documentation.'}</p>
                 </div>
 
                  <form onSubmit={handleSubmit} className="space-y-6">
                      <div className="bg-white/5 rounded-lg p-6 mb-4 text-left space-y-3">
                          <div className="flex justify-between text-gray-300">
                              <span className="font-medium">Standard License</span>
-                             <span className={isFreeLimitedTime ? "font-bold text-gray-500 line-through" : "font-bold text-white"}>
+                             <span className={isZeroCost ? "font-bold text-gray-500 line-through" : "font-bold text-white"}>
                                  {formatPrice(item.price, country)}
                              </span>
                          </div>
-                         <div className="flex justify-between text-gray-500 text-xs border-b border-white/5 pb-3">
-                             <span>Instant Download • Lifetime Updates</span>
-                         </div>
 
                          {/* Coupon Section (Only if not free) */}
-                         {!isFreeLimitedTime && (
+                         {!isZeroCost && (
                             <div className="pt-3">
                                 {appliedOffer ? (
                                     <div className="flex justify-between items-center bg-green-500/10 border border-green-500/20 p-2 rounded-lg">
@@ -313,9 +282,9 @@ const ProjectCheckout: React.FC<{ user: User }> = ({ user }) => {
                          )}
                          
                          {/* Discount Line */}
-                         {isFreeLimitedTime ? (
+                         {isZeroCost ? (
                              <div className="flex justify-between text-green-400 text-sm font-medium animate-in fade-in slide-in-from-top-1">
-                                 <span className="flex items-center gap-1"><Gift size={12}/> Limited Time Free</span>
+                                 <span className="flex items-center gap-1"><Gift size={12}/> Free Access</span>
                                  <span>-{formatPrice(item.price, country)}</span>
                              </div>
                          ) : appliedOffer && (
@@ -328,7 +297,7 @@ const ProjectCheckout: React.FC<{ user: User }> = ({ user }) => {
                          <div className="border-t border-white/10 pt-3 flex justify-between text-xl font-bold text-vision-primary items-center mt-2">
                              <span>Total</span>
                              <div className="text-right">
-                                 {isFreeLimitedTime ? (
+                                 {isZeroCost ? (
                                      <span className="text-green-400">FREE</span>
                                  ) : (
                                      <>
@@ -340,13 +309,13 @@ const ProjectCheckout: React.FC<{ user: User }> = ({ user }) => {
                          </div>
                      </div>
                      
-                     <Button type="submit" isLoading={isProcessing} className={`w-full h-12 text-base shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_30px_rgba(6,182,212,0.5)] ${isFreeLimitedTime ? 'bg-green-500 text-black hover:bg-green-400 border-none' : ''}`}>
-                         {isFreeLimitedTime ? 'Download Now' : 'Complete Purchase & Download'}
+                     <Button type="submit" isLoading={isProcessing} className={`w-full h-12 text-base shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_30px_rgba(6,182,212,0.5)] ${isZeroCost ? 'bg-green-500 text-black hover:bg-green-400 border-none' : ''}`}>
+                         {isZeroCost ? <><Rocket size={18} className="mr-2"/> Launch Project</> : 'Complete Purchase & Download'}
                      </Button>
                      
                      <div className="flex items-center justify-center gap-2 text-xs text-gray-500 mt-4">
                          <Shield size={12} className="text-green-500" />
-                         <span>Secure SSL Encrypted {isFreeLimitedTime ? 'Connection' : 'Payment'}</span>
+                         <span>Secure SSL Encrypted {isZeroCost ? 'Connection' : 'Payment'}</span>
                      </div>
                  </form>
             </Card>

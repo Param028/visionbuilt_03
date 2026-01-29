@@ -5,6 +5,8 @@ export type OrderStatus = 'pending' | 'accepted' | 'in_progress' | 'mockup_ready
 
 export type OrderType = 'service' | 'project';
 
+export type ProjectCategory = 'Websites' | 'UI/UX Design' | 'Free Projects';
+
 export interface User {
   id: string;
   name: string;
@@ -34,6 +36,7 @@ export interface Service {
 export interface MarketplaceItem {
   id: string;
   title: string;
+  category: ProjectCategory; // New restricted category
   short_description: string;
   full_description: string;
   price: number;
@@ -51,7 +54,7 @@ export interface MarketplaceItem {
   review_count: number;
   created_at: string;
   free_until?: string | null;
-  is_featured?: boolean; // New field for landing page control
+  is_featured?: boolean;
 }
 
 export interface ProjectSuggestion {
@@ -83,8 +86,8 @@ export interface OrderRequirements {
   // Custom project fields
   client_name?: string;
   client_email?: string;
-  client_phone?: string; // Now mandatory logic-wise
-  client_budget?: string;
+  client_phone?: string; 
+  // removed client_budget
 }
 
 export interface Order {
@@ -101,16 +104,17 @@ export interface Order {
   business_email_requested: boolean;
   
   // Financials
-  total_amount: number; // The agreed total
-  deposit_amount: number; // The initial step 1 payment
-  amount_paid: number; // How much has been paid so far
+  total_amount: number; 
+  deposit_amount: number; 
+  amount_paid: number; 
   currency?: string; 
   
   requirements: OrderRequirements; 
+  reference_project_ids?: string[]; // IDs of selected marketplace items as reference
+  
   created_at: string;
   
-  // Deliverables / Previews
-  deliverables?: string[]; // URLs to images/files uploaded by dev
+  deliverables?: string[]; 
 
   rating?: number; 
   review?: string;

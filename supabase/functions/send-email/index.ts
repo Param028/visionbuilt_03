@@ -85,18 +85,41 @@ Deno.serve(async (req: Request) => {
         break;
 
       case 'order_confirmation':
-        subject = `Order Confirmation #${data.orderId.slice(0, 8)}`;
+        // LOGIC: Distinguish between Paid Order, Free Download, and Custom Request
+        const isZeroAmount = data.amount === 0;
+        const isRequest = !data.amount || data.amount === 0; 
+        
+        let title = 'Order Confirmed';
+        let statusText = 'Processing';
+        let amountDisplay = `$${data.amount}`;
+        
+        if (isZeroAmount) {
+            // Check context if possible, or assume generic "Request" / "Free"
+            // For services (Custom), it is "Request Received".
+            // For marketplace (Free), it is "Project Access".
+            // Since we might not differentiate types strictly here, we use generic safe language.
+            title = 'Request Received';
+            statusText = 'Pending Review / Access Granted';
+            amountDisplay = '<span style="color: #10b981;">Free / TBD</span>';
+        }
+
+        subject = `${title}: #${data.orderId.slice(0, 8)}`;
         html = `
           <div style="font-family: sans-serif; color: #333; max-width: 600px; margin: 0 auto;">
-            <h1 style="color: #06b6d4;">Order Received</h1>
-            <p>We have received your request for <strong>${data.serviceTitle}</strong>.</p>
+            <h1 style="color: #06b6d4;">${title}</h1>
+            <p>We have received your order for <strong>${data.serviceTitle}</strong>.</p>
             <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
                 <p style="margin: 5px 0;"><strong>Order ID:</strong> ${data.orderId}</p>
-                <p style="margin: 5px 0;"><strong>Amount:</strong> $${data.amount}</p>
+                <p style="margin: 5px 0;"><strong>Total:</strong> ${amountDisplay}</p>
             </div>
-            <p>A developer will review your requirements and update the status shortly. You will receive an email notification when your quote is ready.</p>
+            ${isZeroAmount 
+                ? `<p style="color: #666;">If this is a <strong>Custom Order</strong>, a developer will review your requirements and send a formal quote shortly.<br/><br/>If this is a <strong>Free Project</strong>, your files are available instantly in the dashboard.</p>` 
+                : `<p>Thank you for your payment. Your project is now in ${statusText} status.</p>`
+            }
             <br/>
-            <a href="https://visionbuilt.in/dashboard/order/${data.orderId}" style="color: #06b6d4; text-decoration: none; font-weight: bold;">View Order Details →</a>
+            <div style="text-align: center;">
+                <a href="https://visionbuilt.in/dashboard/order/${data.orderId}" style="background-color: #06b6d4; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">View Dashboard</a>
+            </div>
             ${hiddenFooter}
           </div>
         `;
@@ -106,19 +129,24 @@ Deno.serve(async (req: Request) => {
         if (ADMIN_EMAIL) {
             to = [ADMIN_EMAIL];
         } else {
-            console.warn("ADMIN_EMAIL not set, skipping admin alert.");
             return new Response(JSON.stringify({ message: "Admin email skipped" }), { headers: corsHeaders });
         }
-        subject = `[NEW ORDER] ${data.amount > 0 ? 'PAID' : 'REQUEST'} - $${data.amount}`;
+        
+        const isPaid = data.amount > 0;
+        subject = `[${isPaid ? 'PAYMENT' : 'ACTION REQUIRED'}] New Order: $${data.amount}`;
+        
         html = `
           <div style="font-family: sans-serif; color: #333;">
-            <h1 style="color: #06b6d4;">New Transaction Alert</h1>
-            <ul style="list-style: none; padding: 0;">
-                <li style="margin-bottom: 10px;"><strong>User:</strong> ${data.userEmail}</li>
-                <li style="margin-bottom: 10px;"><strong>Service:</strong> ${data.serviceTitle}</li>
-                <li style="margin-bottom: 10px;"><strong>Total:</strong> <span style="font-size: 1.2em; font-weight: bold;">$${data.amount}</span></li>
+            <h1 style="color: ${isPaid ? '#22c55e' : '#eab308'};">
+                ${isPaid ? '💰 Payment Received' : '📝 New Request'}
+            </h1>
+            <ul style="list-style: none; padding: 0; font-size: 16px;">
+                <li style="margin-bottom: 10px;"><strong>Client:</strong> ${data.userEmail}</li>
+                <li style="margin-bottom: 10px;"><strong>Item:</strong> ${data.serviceTitle}</li>
+                <li style="margin-bottom: 10px;"><strong>Value:</strong> <span style="font-weight: bold;">$${data.amount}</span></li>
             </ul>
-            <a href="https://visionbuilt.in/admin" style="background-color: #333; color: white; padding: 10px 15px; text-decoration: none; border-radius: 4px;">Open Admin Panel</a>
+            ${!isPaid ? '<p style="background-color: #fffbeb; padding: 10px; border: 1px solid #fcd34d; border-radius: 4px; color: #92400e;"><strong>Action Required:</strong> This is a custom request or free download. Please review the dashboard to set a price or manage the order.</p>' : ''}
+            <a href="https://visionbuilt.in/admin" style="background-color: #1e293b; color: white; padding: 10px 15px; text-decoration: none; border-radius: 4px; display: inline-block; margin-top: 10px;">Open Admin Panel</a>
             ${hiddenFooter}
           </div>
         `;

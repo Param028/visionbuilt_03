@@ -1,7 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-// Added Loader2 and User (as UserIcon) to the import list from lucide-react
 import { Plus, ArrowRight, Clock, Filter, Lightbulb, ThumbsUp, PenTool, Sparkles, Loader2, User as UserIcon } from 'lucide-react';
 import { api } from '../services/api';
 import { Order, User, ProjectSuggestion } from '../types';
@@ -213,9 +212,6 @@ const Dashboard: React.FC<{ user: User }> = ({ user }) => {
                                 <span>REF: #{order.id.slice(-8).toUpperCase()}</span>
                                 <span>•</span>
                                 <span>INIT: {new Date(order.created_at).toLocaleDateString()}</span>
-                                {order.requirements.client_budget && (
-                                     <span className="text-vision-secondary font-bold ml-2">BUDGET: {order.requirements.client_budget}</span>
-                                )}
                             </div>
                         </div>
                         <div className="flex flex-col items-end gap-1">

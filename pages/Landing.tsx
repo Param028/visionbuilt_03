@@ -10,21 +10,27 @@ import { MarketplaceItem } from '../types';
 
 const Landing: React.FC = () => {
   const [stats, setStats] = useState<{ totalDelivered: number, averageRating: number }>({ totalDelivered: 0, averageRating: 0 });
-  const [featuredProjects, setFeaturedProjects] = useState<MarketplaceItem[]>([]);
+  const [projects, setProjects] = useState<MarketplaceItem[]>([]);
+  const [activePreviewTab, setActivePreviewTab] = useState('Websites');
 
   useEffect(() => {
       api.getPlatformStats().then(setStats);
       api.getMarketplaceItems().then(items => {
-          // Filter for featured items first, then fallback to images
-          const featured = items.filter(i => i.is_featured);
-          if (featured.length > 0) {
-              setFeaturedProjects(featured);
-          } else {
-              const withImages = items.filter(i => i.image_url);
-              setFeaturedProjects(withImages.length > 0 ? withImages : []); 
-          }
+          setProjects(items);
       });
   }, []);
+
+  const getFilteredProjects = () => {
+      let filtered = projects.filter(p => p.category === activePreviewTab);
+      // Fallback if no projects in category, just show what we have so section isn't empty
+      if (filtered.length === 0) filtered = projects;
+      return filtered.map(p => ({
+          id: p.id,
+          image: p.image_url!,
+          title: p.title,
+          url: `/marketplace/buy/${p.id}`
+      }));
+  };
 
   const techLogos = [
     { id: 'react', name: 'React', logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg', url: 'https://react.dev' },
@@ -132,28 +138,30 @@ const Landing: React.FC = () => {
       <section className="py-20 bg-black/40 border-y border-white/5 relative overflow-hidden z-20">
          <div className="max-w-7xl mx-auto px-4 mb-8 text-center relative z-10">
               <span className="text-xs font-semibold text-vision-primary uppercase tracking-widest mb-2 block">Our Work</span>
-              <h2 className="text-2xl font-display font-bold text-white mb-2"><ScrollFloat>Featured Deployments</ScrollFloat></h2>
-              <p className="text-gray-400 text-sm max-w-lg mx-auto">
-                 Real-world applications built with our scalable architecture and modern design systems.
-              </p>
+              <h2 className="text-2xl font-display font-bold text-white mb-6"><ScrollFloat>Featured Deployments</ScrollFloat></h2>
+              
+              {/* Category Tabs */}
+              <div className="flex justify-center mb-8 gap-4">
+                  {['Websites', 'UI/UX Design', 'Free Projects'].map((tab) => (
+                      <button
+                        key={tab}
+                        onClick={() => setActivePreviewTab(tab)}
+                        className={`text-sm px-4 py-2 rounded-full border transition-all ${
+                            activePreviewTab === tab 
+                            ? 'bg-vision-primary/10 border-vision-primary text-vision-primary font-bold' 
+                            : 'border-transparent text-gray-500 hover:text-white'
+                        }`}
+                      >
+                          {tab}
+                      </button>
+                  ))}
+              </div>
          </div>
          
-         {featuredProjects.length > 0 ? (
-            <ProjectLoop items={featuredProjects.map(p => ({
-                id: p.id,
-                image: p.image_url!,
-                title: p.title,
-                url: `/marketplace/buy/${p.id}` 
-            }))} />
-         ) : (
-             <ProjectLoop items={[
-                 { id: '1', image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800', title: 'Enterprise Dashboard', url: '/services' },
-                 { id: '2', image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=800', title: 'Fintech Analytics', url: '/services' },
-                 { id: '3', image: 'https://images.unsplash.com/photo-1555421689-491a97ff2040?auto=format&fit=crop&q=80&w=800', title: 'E-Commerce Core', url: '/services' },
-                 { id: '4', image: 'https://images.unsplash.com/photo-1614741118887-7a4ee193a5fa?auto=format&fit=crop&q=80&w=800', title: 'AI Neural Net', url: '/services' },
-                 { id: '5', image: 'https://images.unsplash.com/photo-1642132652075-2d434374c43c?auto=format&fit=crop&q=80&w=800', title: 'Crypto Exchange', url: '/services' }
-             ]} />
-         )}
+         <ProjectLoop items={getFilteredProjects().length > 0 ? getFilteredProjects() : [
+             // Fallback if DB empty
+             { id: '1', image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f', title: 'Example Dashboard', url: '/services' }
+         ]} />
       </section>
 
       {/* Trusted Tech Stack Logo Loop */}
@@ -164,7 +172,7 @@ const Landing: React.FC = () => {
           <LogoLoop items={techLogos} />
       </section>
 
-      {/* Magic Bento Grid Features */}
+      {/* Magic Bento Features (Unchanged) */}
       <section className="py-24 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
            <div className="text-center mb-16">
@@ -186,13 +194,11 @@ const Landing: React.FC = () => {
                  colSpan={2}
               >
                  <span>Full Stack Architecture</span>
-                 <span className="mx-2">•</span>
-                 <span>Cloud Native</span>
               </MagicBentoItem>
               
               <MagicBentoItem 
                  title="Futuristic UI/UX" 
-                 description="Interfaces that feel like they belong in 2050. Smooth animations and deep immersion."
+                 description="Interfaces that feel like they belong in 2050."
                  icon={<Layout className="w-6 h-6" />}
               >
                  <span>Framer Motion</span>
@@ -203,12 +209,12 @@ const Landing: React.FC = () => {
                  description="Bank-grade protection for all your digital assets."
                  icon={<Shield className="w-6 h-6" />}
               >
-                 <span>End-to-End Encrypted</span>
+                 <span>Encrypted</span>
               </MagicBentoItem>
 
               <MagicBentoItem 
                  title="AI Integration" 
-                 description="Leverage machine learning to automate your workflow and analyze data."
+                 description="Leverage machine learning to automate your workflow."
                  icon={<Cpu className="w-6 h-6" />}
               >
                  <span>LLM Support</span>
@@ -216,7 +222,7 @@ const Landing: React.FC = () => {
 
               <MagicBentoItem 
                  title="Global Delivery" 
-                 description="Lightning fast content delivery anywhere on Earth via edge computing."
+                 description="Lightning fast content delivery anywhere on Earth."
                  icon={<Globe className="w-6 h-6" />}
               >
                  <span>Edge Functions</span>

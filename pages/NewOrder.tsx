@@ -2,11 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
-import { Service, User, Offer } from '../types';
-import { formatPrice, SUPPORTED_COUNTRIES } from '../constants';
+import { Service, User, Offer, MarketplaceItem } from '../types';
+import { SUPPORTED_COUNTRIES } from '../constants';
 import { Button, Card, Input, Textarea } from '../components/ui/Components';
 import { Stepper, ScrollFloat } from '../components/ui/ReactBits';
-import { Globe, User as UserIcon, Tag, ShieldCheck } from 'lucide-react';
+import { Globe, User as UserIcon, Tag, ShieldCheck, Image as ImageIcon, Check } from 'lucide-react';
 import { useToast } from '../components/ui/Toast';
 
 const NewOrder: React.FC<{ user: User }> = ({ user }) => {
@@ -16,6 +16,9 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
   const toast = useToast();
   
   const [service, setService] = useState<Service | null>(null);
+  const [marketplaceItems, setMarketplaceItems] = useState<MarketplaceItem[]>([]);
+  const [selectedReferences, setSelectedReferences] = useState<string[]>([]);
+  
   const [step, setStep] = useState(1);
   const [country, setCountry] = useState(user.country || 'India');
   const [isCustom, setIsCustom] = useState(!serviceId);
@@ -25,7 +28,6 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
     client_name: user.name || '',
     client_email: user.email || '',
     client_phone: '',
-    client_budget: '',
     business_name: '',
     business_category: '',
     address_or_online: '',
@@ -53,7 +55,8 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
     } else {
         setIsCustom(true);
     }
-    // Scroll to top on mount
+    // Fetch marketplace items for references
+    api.getMarketplaceItems().then(setMarketplaceItems);
     window.scrollTo(0, 0);
   }, [serviceId]);
 
@@ -67,19 +70,10 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
      setFormData(prev => ({ ...prev, [name]: checked }));
   };
 
-  // Only calculate estimated total for display, not for charging
-  const calculateEstimatedTotal = () => {
-      if (!isCustom && !service) return 0;
-      let base = isCustom ? 0 : (service?.base_price || 0);
-      const dPrice = service?.domain_price ?? 15;
-      const ePrice = service?.business_email_price ?? 50;
-      if (formData.domain_requested) base += dPrice;
-      if (formData.business_email_requested) base += ePrice;
-      
-      if (appliedOffer) {
-          base = base - (base * (appliedOffer.discountPercentage / 100));
-      }
-      return base;
+  const toggleReference = (id: string) => {
+      setSelectedReferences(prev => 
+          prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+      );
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -98,9 +92,6 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
     setProcessingStep(1); 
 
     try {
-        const estimated = calculateEstimatedTotal();
-        
-        // We do NOT charge here. We create a request.
         // Status defaults to 'pending' in API/DB.
         await api.createOrder({
             user_id: user.id,
@@ -110,11 +101,10 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
             is_custom: isCustom,
             domain_requested: formData.domain_requested,
             business_email_requested: formData.business_email_requested,
-            // We pass the estimated amount, but the logic in API ensures no payment is triggered for 'service' type
-            // The status will be 'pending', so the user won't be asked to pay yet.
-            total_amount: isCustom ? 0 : estimated,
+            total_amount: 0, // IMPORTANT: No pricing shown or calculated for Custom Orders initially
             discount_amount: 0, 
             applied_offer_code: appliedOffer?.code,
+            reference_project_ids: selectedReferences, // Send selected preview IDs
             requirements: {
                 business_name: formData.business_name,
                 business_category: formData.business_category,
@@ -123,8 +113,7 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
                 reference_links: formData.reference_links,
                 client_name: formData.client_name,
                 client_email: formData.client_email,
-                client_phone: formData.client_phone,
-                client_budget: formData.client_budget
+                client_phone: formData.client_phone
             }
         });
         
@@ -161,8 +150,6 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
 
   if (!service && !isCustom) return <div className="p-20 text-center">Loading Service...</div>;
 
-  const estimatedTotal = calculateEstimatedTotal();
-
   return (
     <div className="w-full max-w-4xl mx-auto px-4 py-8 sm:py-16">
       <Card className={`${isCustom ? "border-vision-secondary/30" : "border-vision-primary/30"} w-full`}>
@@ -194,11 +181,6 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
                     {isCustom && <Input label="Project Title" name="project_title" value={formData.project_title} onChange={handleChange} placeholder="e.g. Portfolio v2" required className="h-12" />}
                     <Input label="Email Address" type="email" name="client_email" value={formData.client_email} onChange={handleChange} required className="h-12" />
                     <Input label="Phone / WhatsApp (Required)" type="tel" name="client_phone" value={formData.client_phone} onChange={handleChange} placeholder="+1..." required className="h-12" />
-                    {isCustom && (
-                        <div className="col-span-full">
-                            <Input label="Estimated Budget ($)" name="client_budget" value={formData.client_budget} onChange={handleChange} placeholder="e.g. 1000 - 1500" required className="h-12" />
-                        </div>
-                    )}
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -209,14 +191,46 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
                 <Textarea label="Core Requirements" name="requirements_text" value={formData.requirements_text} onChange={handleChange} rows={6} placeholder="Describe the functionality, tech stack, or specific features you need..." required />
                 <Input label="Reference URLs (Links)" name="reference_links" value={formData.reference_links} onChange={handleChange} placeholder="competitor.com, design.com" className="h-12" />
                 
+                {/* Visual References Selection */}
+                <div className="pt-6 border-t border-white/5">
+                    <h4 className="text-xs font-bold text-white uppercase tracking-widest mb-4">Attach Design References</h4>
+                    <p className="text-xs text-gray-500 mb-4">Select projects from our marketplace that match the style or functionality you are looking for.</p>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 max-h-[300px] overflow-y-auto custom-scrollbar p-1">
+                        {marketplaceItems.map(item => (
+                            <div 
+                                key={item.id} 
+                                onClick={() => toggleReference(item.id)}
+                                className={`relative cursor-pointer rounded-lg border overflow-hidden group transition-all ${selectedReferences.includes(item.id) ? 'border-vision-primary ring-1 ring-vision-primary' : 'border-white/10 hover:border-white/30'}`}
+                            >
+                                <div className="aspect-video bg-black/40">
+                                    {item.image_url ? (
+                                        <img src={item.image_url} className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity" alt={item.title} />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center text-gray-700"><ImageIcon size={20} /></div>
+                                    )}
+                                </div>
+                                <div className="p-2 bg-white/5">
+                                    <p className="text-[10px] font-bold text-white truncate">{item.title}</p>
+                                    <p className="text-[9px] text-gray-500">{item.category}</p>
+                                </div>
+                                {selectedReferences.includes(item.id) && (
+                                    <div className="absolute top-1 right-1 bg-vision-primary text-black rounded-full p-0.5">
+                                        <Check size={12} />
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
                 <div className="pt-6 border-t border-white/5 space-y-4">
-                    <h4 className="text-xs font-bold text-white uppercase tracking-widest">Asset Provisions</h4>
+                    <h4 className="text-xs font-bold text-white uppercase tracking-widest">Asset Provisions (Optional)</h4>
                     {(isCustom || service?.allow_domain) && (
                         <label className="flex items-center space-x-3 cursor-pointer p-4 rounded-xl border border-white/10 hover:bg-white/5 transition-all">
                             <input type="checkbox" name="domain_requested" checked={formData.domain_requested} onChange={handleCheckbox} className="form-checkbox h-5 w-5 text-vision-primary rounded bg-transparent border-gray-600 focus:ring-0" />
                             <div className="flex-grow">
                                 <span className="text-gray-200 block text-sm font-medium">Provision Custom Domain</span>
-                                <span className="text-[10px] text-gray-500 uppercase tracking-tighter tracking-wider">+ {formatPrice(service?.domain_price ?? 15, country)}</span>
+                                <span className="text-[10px] text-gray-500 uppercase tracking-tighter tracking-wider">Quote will include domain cost</span>
                             </div>
                         </label>
                     )}
@@ -225,7 +239,7 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
                             <input type="checkbox" name="business_email_requested" checked={formData.business_email_requested} onChange={handleCheckbox} className="form-checkbox h-5 w-5 text-vision-primary rounded bg-transparent border-gray-600 focus:ring-0" />
                             <div className="flex-grow">
                                 <span className="text-gray-200 block text-sm font-medium">Business Workspace Email</span>
-                                <span className="text-[10px] text-gray-500 uppercase tracking-tighter tracking-wider">+ {formatPrice(service?.business_email_price ?? 50, country)}</span>
+                                <span className="text-[10px] text-gray-500 uppercase tracking-tighter tracking-wider">Quote will include email setup cost</span>
                             </div>
                         </label>
                     )}
@@ -245,30 +259,32 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
                      
                      <div className="flex justify-between items-center text-gray-300">
                          <span className="flex items-center gap-2 font-bold text-sm uppercase tracking-wider"><Tag size={14} className="text-vision-primary" /> {isCustom ? formData.project_title : service?.title}</span>
-                         <span className="font-mono text-vision-primary font-bold text-sm bg-vision-primary/10 px-2 py-1 rounded">Requesting Quote</span>
+                         <span className="font-mono text-vision-primary font-bold text-sm bg-vision-primary/10 px-2 py-1 rounded">Pending Review</span>
                      </div>
                      
                      <div className="space-y-2 border-l border-white/10 pl-4 py-2 mt-4 text-xs text-gray-400">
                          <div><span className="text-gray-500 uppercase">Contact:</span> {formData.client_phone}</div>
                          <div><span className="text-gray-500 uppercase">Email:</span> {formData.client_email}</div>
-                         {isCustom && <div><span className="text-gray-500 uppercase">Budget:</span> {formData.client_budget}</div>}
+                         {selectedReferences.length > 0 && (
+                             <div><span className="text-gray-500 uppercase">References:</span> {selectedReferences.length} items attached</div>
+                         )}
                      </div>
 
                      <div className="border-t border-white/10 pt-6 flex justify-between text-xl font-bold text-white items-center mt-4">
-                         <span className="text-base uppercase tracking-widest text-gray-400">Est. Total</span>
+                         <span className="text-base uppercase tracking-widest text-gray-400">Quote Total</span>
                          <div className="text-right">
-                             <span>{isCustom ? 'TBD' : formatPrice(estimatedTotal, country)}</span>
+                             <span className="text-sm text-gray-500">To Be Determined</span>
                          </div>
                      </div>
-                     <p className="text-[10px] text-gray-500 text-right mt-1">Final quote to be confirmed by developer.</p>
+                     <p className="text-[10px] text-gray-500 text-right mt-1">Final pricing will be provided by developer after review.</p>
                  </div>
 
                  <div className="flex items-start gap-3 max-w-lg mx-auto mb-8 p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl">
                     <ShieldCheck className="text-blue-400 shrink-0 mt-0.5" size={20} />
                     <div className="text-left">
-                        <h4 className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-1">No Payment Required Yet</h4>
+                        <h4 className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-1">Zero Cost Submission</h4>
                         <p className="text-xs text-gray-400">
-                            Submitting this request does not charge your card. Our team will review your requirements and send a finalized quote with a deposit link to your dashboard.
+                            Submitting this request is free. Our team will analyze your requirements and send a custom quote with payment options to your dashboard.
                         </p>
                     </div>
                  </div>

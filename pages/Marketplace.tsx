@@ -2,9 +2,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Eye, ShoppingBag, Star, Download, TrendingUp, User as UserIcon, GraduationCap, Sparkles, Clock, ArrowUpDown } from 'lucide-react';
+import { Eye, ShoppingBag, Star, Download, TrendingUp, User as UserIcon, Sparkles, Layout, Rocket, ArrowUpDown } from 'lucide-react';
 import { api } from '../services/api';
-import { MarketplaceItem, User } from '../types';
+import { MarketplaceItem, User, ProjectCategory } from '../types';
 import { formatPrice } from '../constants';
 import { Button } from '../components/ui/Components';
 import { ScrollFloat, GlareCard } from '../components/ui/ReactBits';
@@ -12,14 +12,13 @@ import { ScrollFloat, GlareCard } from '../components/ui/ReactBits';
 const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
   const [items, setItems] = useState<MarketplaceItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'premium' | 'student'>('premium');
+  const [activeTab, setActiveTab] = useState<ProjectCategory>('Websites');
   const [sortBy, setSortBy] = useState<string>('newest');
   const navigate = useNavigate();
 
   useEffect(() => {
     let isMounted = true;
     
-    // Failsafe timeout increased to 15s
     const timeoutId = setTimeout(() => {
         if (isMounted && loading) {
             setLoading(false);
@@ -54,10 +53,6 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
       window.open(url, '_blank');
   };
 
-  // Filter items based on Free Limited Time Status
-  const premiumItems = items.filter(item => !item.free_until || new Date(item.free_until) <= new Date());
-  const freeItems = items.filter(item => item.free_until && new Date(item.free_until) > new Date());
-
   const getSortedItems = (itemsToSort: MarketplaceItem[]) => {
       return [...itemsToSort].sort((a, b) => {
           switch (sortBy) {
@@ -66,19 +61,25 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
               case 'price_desc':
                   return b.price - a.price;
               case 'popularity':
-                  // Sort by purchases first, then views
                   return (b.purchases - a.purchases) || (b.views - a.views);
               case 'rating':
                   return b.rating - a.rating;
               case 'newest':
               default:
-                  // Assuming there is a created_at field, fallback to generic order if missing or equal
                   return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
           }
       });
   };
 
-  const displayedItems = getSortedItems(activeTab === 'premium' ? premiumItems : freeItems);
+  // Strict filtering by Category
+  const filteredItems = items.filter(item => {
+      if (activeTab === 'Free Projects') {
+          return item.category === 'Free Projects';
+      }
+      return item.category === activeTab;
+  });
+
+  const displayedItems = getSortedItems(filteredItems);
 
   if (loading) {
     return (
@@ -92,34 +93,34 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
       <div className="text-center mb-10">
         <h1 className="text-4xl md:text-5xl font-display font-bold text-white mb-4">
-            <ScrollFloat>Ready-Made Projects</ScrollFloat>
+            <ScrollFloat>Marketplace</ScrollFloat>
         </h1>
         <div className="text-gray-400 max-w-2xl mx-auto mb-8">
           <ScrollFloat animationDuration={0.4} stagger={0.01} className="justify-center">
-            Accelerate your development with our premium templates and exclusive student resources.
+            Premium templates and free resources for your next build.
           </ScrollFloat>
         </div>
 
-        {/* Tabs */}
-        <div className="flex justify-center mb-8">
+        {/* Strictly Defined Tabs */}
+        <div className="flex justify-center mb-8 overflow-x-auto pb-2 scrollbar-hide">
             <div className="bg-white/5 border border-white/10 p-1 rounded-full flex space-x-2">
                 <button 
-                    onClick={() => setActiveTab('premium')}
-                    className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${activeTab === 'premium' ? 'bg-vision-primary text-black shadow-[0_0_15px_rgba(6,182,212,0.4)]' : 'text-gray-400 hover:text-white'}`}
+                    onClick={() => setActiveTab('Websites')}
+                    className={`px-6 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 whitespace-nowrap ${activeTab === 'Websites' ? 'bg-vision-primary text-black shadow-[0_0_15px_rgba(6,182,212,0.4)]' : 'text-gray-400 hover:text-white'}`}
                 >
-                    <div className="flex items-center gap-2">
-                        <Sparkles size={16} />
-                        Premium Projects
-                    </div>
+                    <Layout size={16} /> Websites
                 </button>
                 <button 
-                    onClick={() => setActiveTab('student')}
-                    className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${activeTab === 'student' ? 'bg-green-500 text-black shadow-[0_0_15px_rgba(34,197,94,0.4)]' : 'text-gray-400 hover:text-white'}`}
+                    onClick={() => setActiveTab('UI/UX Design')}
+                    className={`px-6 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 whitespace-nowrap ${activeTab === 'UI/UX Design' ? 'bg-vision-secondary text-white shadow-[0_0_15px_rgba(139,92,246,0.4)]' : 'text-gray-400 hover:text-white'}`}
                 >
-                    <div className="flex items-center gap-2">
-                        <GraduationCap size={16} />
-                        Free For Students
-                    </div>
+                    <Sparkles size={16} /> UI/UX Design
+                </button>
+                <button 
+                    onClick={() => setActiveTab('Free Projects')}
+                    className={`px-6 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 whitespace-nowrap ${activeTab === 'Free Projects' ? 'bg-green-500 text-black shadow-[0_0_15px_rgba(34,197,94,0.4)]' : 'text-gray-400 hover:text-white'}`}
+                >
+                    <Rocket size={16} /> Free Projects
                 </button>
             </div>
         </div>
@@ -128,7 +129,7 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
       {/* Sorting Controls */}
       <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4 border-b border-white/5 pb-4">
           <p className="text-sm text-gray-400">
-              Showing <span className="text-white font-bold">{displayedItems.length}</span> {activeTab === 'premium' ? 'Premium' : 'Student'} Projects
+              Showing <span className="text-white font-bold">{displayedItems.length}</span> {activeTab}
           </p>
           <div className="flex items-center gap-3">
               <span className="text-sm text-gray-500">Sort by:</span>
@@ -141,8 +142,12 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
                       <option value="newest" className="bg-vision-900">Newest Arrivals</option>
                       <option value="popularity" className="bg-vision-900">Popularity</option>
                       <option value="rating" className="bg-vision-900">Top Rated</option>
-                      <option value="price_asc" className="bg-vision-900">Price: Low to High</option>
-                      <option value="price_desc" className="bg-vision-900">Price: High to Low</option>
+                      {activeTab !== 'Free Projects' && (
+                          <>
+                            <option value="price_asc" className="bg-vision-900">Price: Low to High</option>
+                            <option value="price_desc" className="bg-vision-900">Price: High to Low</option>
+                          </>
+                      )}
                   </select>
                   <ArrowUpDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none group-hover:text-vision-primary transition-colors" />
               </div>
@@ -154,7 +159,7 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
               <ShoppingBag className="w-12 h-12 text-gray-600 mx-auto mb-4" />
               <h3 className="text-xl font-bold text-white mb-2">No Projects Found</h3>
               <p className="text-gray-400">
-                  {activeTab === 'student' ? 'Check back later for limited-time free drops!' : 'New premium projects coming soon.'}
+                  New items for {activeTab} coming soon.
               </p>
           </div>
       ) : (
@@ -180,7 +185,7 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
                         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-2">
                             {item.demo_url && (
                                 <Button size="sm" variant="secondary" onClick={(e) => handlePreview(e, item.demo_url!)}>
-                                    <Eye size={14} className="mr-2" /> Live Preview
+                                    <Eye size={14} className="mr-2" /> Preview
                                 </Button>
                             )}
                         </div>
@@ -212,39 +217,31 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
 
                         <p className="text-gray-400 text-sm mb-4 line-clamp-2 flex-grow">{item.short_description}</p>
                         
-                        {/* Free Timer */}
-                        {activeTab === 'student' && item.free_until && (
-                            <div className="mb-4 bg-green-500/10 border border-green-500/20 rounded p-2 flex items-center gap-2 text-xs text-green-400">
-                                <Clock size={12} />
-                                <span>Free until: {new Date(item.free_until).toLocaleDateString()}</span>
-                            </div>
-                        )}
-                        
                         {/* Stats */}
                         <div className="flex justify-between items-center text-xs text-gray-500 border-t border-white/10 pt-4 mb-4">
                             <div className="flex items-center gap-1">
                                 <TrendingUp size={14} />
-                                <span>{item.views} interested</span>
+                                <span>{item.views} views</span>
                             </div>
                             <div className="flex items-center gap-1">
                                 <Download size={14} />
-                                <span>{item.purchases} sold</span>
+                                <span>{item.purchases} {activeTab === 'Free Projects' ? 'downloads' : 'sold'}</span>
                             </div>
                         </div>
 
                         {/* Footer */}
                         <div className="flex items-center justify-between gap-4 mt-auto">
                             <div className="text-2xl font-bold text-white font-sora">
-                                {activeTab === 'student' ? (
+                                {activeTab === 'Free Projects' ? (
                                     <span className="text-green-400">FREE</span>
                                 ) : (
                                     formatPrice(item.price, user?.country)
                                 )}
                             </div>
                             {(!user || user.role === 'client') ? (
-                                <Button onClick={() => handleBuy(item.id)} className={`flex-1 ${activeTab === 'student' ? 'bg-green-500 text-black hover:bg-green-400' : ''}`}>
-                                    {activeTab === 'student' ? (
-                                        <span className="flex items-center justify-center gap-2"><Download size={16}/> Download</span>
+                                <Button onClick={() => handleBuy(item.id)} className={`flex-1 ${activeTab === 'Free Projects' ? 'bg-green-500 text-black hover:bg-green-400' : ''}`}>
+                                    {activeTab === 'Free Projects' ? (
+                                        <span className="flex items-center justify-center gap-2"><Download size={16}/> Launch</span>
                                     ) : 'Buy Now'}
                                 </Button>
                             ) : (
