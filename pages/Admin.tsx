@@ -6,16 +6,60 @@ import {
   Edit, Trash2, Plus, 
   ImageIcon, Users, ClipboardList, 
   BarChart3, TicketPercent, Layers, 
-  Lightbulb,
-  User as UserIcon, LogOut, Shield, Zap, RefreshCw
+  Lightbulb, Bell, DollarSign,
+  User as UserIcon, LogOut, Shield, Zap, RefreshCw, X
 } from 'lucide-react';
 import { api } from '../services/api';
-import { User, MarketplaceItem, ProjectCategory, Order, Service, Offer, Task, ProjectSuggestion, AnalyticsData } from '../types';
+import { User, MarketplaceItem, ProjectCategory, Order, Service, Offer, Task, ProjectSuggestion, AnalyticsData, AdminActivity } from '../types';
 import { Button, Card, Badge, Input, Textarea, ConfirmDialog } from '../components/ui/Components';
 import { useToast } from '../components/ui/Toast';
 import { CURRENCY_CONFIG, formatPrice } from '../constants';
 
-// --- Admin Sub-Components ---
+// --- Notifications Component ---
+const AdminNotifications: React.FC = () => {
+    const [activities, setActivities] = useState<AdminActivity[]>([]);
+    const [isOpen, setIsOpen] = useState(false);
+
+    useEffect(() => {
+        api.getAdminActivity().then(setActivities);
+        const interval = setInterval(() => api.getAdminActivity().then(setActivities), 30000);
+        return () => clearInterval(interval);
+    }, []);
+
+    return (
+        <div className="relative">
+            <button onClick={() => setIsOpen(!isOpen)} className="p-2 rounded-full hover:bg-white/10 relative">
+                <Bell size={20} className="text-gray-300" />
+                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+            </button>
+            
+            {isOpen && (
+                <div className="absolute right-0 mt-2 w-80 bg-vision-900 border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden">
+                    <div className="p-3 border-b border-white/10 flex justify-between items-center bg-black/40">
+                        <span className="text-xs font-bold text-white uppercase tracking-wider">System Alerts</span>
+                        <button onClick={() => setIsOpen(false)}><X size={14} className="text-gray-500" /></button>
+                    </div>
+                    <div className="max-h-64 overflow-y-auto custom-scrollbar">
+                        {activities.length === 0 ? (
+                            <div className="p-4 text-center text-xs text-gray-500">No recent activity.</div>
+                        ) : (
+                            activities.map(act => (
+                                <div key={act.id} className="p-3 border-b border-white/5 hover:bg-white/5 transition-colors">
+                                    <div className="flex justify-between items-start mb-1">
+                                        <span className="text-xs font-bold text-vision-primary">{act.action}</span>
+                                        <span className="text-[9px] text-gray-500">{new Date(act.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                                    </div>
+                                    <p className="text-xs text-gray-300">{act.details}</p>
+                                    <p className="text-[9px] text-gray-500 mt-1">By: {act.admin_name || 'System'}</p>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
 
 // 1. Analytics
 const AdminAnalytics: React.FC = () => {
@@ -123,7 +167,7 @@ const AdminOrders: React.FC<{ user: User }> = ({ user }) => {
             <h3 className="text-xl font-bold text-white mb-4">Client Orders</h3>
             <div className="space-y-4">
                 {orders.map(order => (
-                    <Card key={order.id} className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <Card key={order.id} className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:border-vision-primary/30 transition-colors">
                         <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
                                 <h4 className="font-bold text-white">{order.service_title}</h4>
@@ -135,7 +179,7 @@ const AdminOrders: React.FC<{ user: User }> = ({ user }) => {
                         </div>
                         <div className="flex items-center gap-4">
                             <div className="text-right">
-                                <p className="text-lg font-bold text-white cursor-pointer hover:text-vision-primary" onClick={() => handlePriceUpdate(order.id, order.total_amount)}>
+                                <p className="text-lg font-bold text-white cursor-pointer hover:text-vision-primary transition-colors" onClick={() => handlePriceUpdate(order.id, order.total_amount)}>
                                     {formatPrice(order.total_amount, user.country)}
                                 </p>
                                 <p className="text-xs text-gray-500">Paid: {formatPrice(order.amount_paid, user.country)}</p>
@@ -144,7 +188,7 @@ const AdminOrders: React.FC<{ user: User }> = ({ user }) => {
                                 <select 
                                     value={order.status}
                                     onChange={(e) => handleStatusUpdate(order.id, e.target.value as Order['status'])}
-                                    className="bg-black/40 border border-white/10 text-xs text-white rounded px-2 py-1 outline-none"
+                                    className="bg-black/40 border border-white/10 text-xs text-white rounded px-2 py-1 outline-none focus:border-vision-primary"
                                 >
                                     <option value="pending">Pending</option>
                                     <option value="accepted">Accepted</option>
@@ -166,12 +210,43 @@ const AdminOrders: React.FC<{ user: User }> = ({ user }) => {
     );
 };
 
-// 3. Services
+// 3. Services (Restored Edit Functionality)
 const AdminServices: React.FC = () => {
     const [services, setServices] = useState<Service[]>([]);
+    const [showForm, setShowForm] = useState(false);
+    const [editing, setEditing] = useState<Service | null>(null);
+    const [formData, setFormData] = useState<Partial<Service>>({
+        title: '', description: '', base_price: 0, features: [], icon: 'Code', is_enabled: true
+    });
     const toast = useToast();
 
     useEffect(() => { api.getServices().then(setServices); }, []);
+
+    const handleEdit = (s: Service) => {
+        setEditing(s);
+        setFormData(s);
+        setShowForm(true);
+    };
+
+    const handleSave = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            if (editing) {
+                const updated = await api.updateService(editing.id, formData);
+                setServices(updated);
+                toast.success("Service updated");
+            } else {
+                const updated = await api.createService(formData as any);
+                setServices(updated);
+                toast.success("Service created");
+            }
+            setShowForm(false);
+            setEditing(null);
+            setFormData({ title: '', description: '', base_price: 0, features: [], icon: 'Code', is_enabled: true });
+        } catch (e: any) {
+            toast.error(e.message);
+        }
+    };
 
     const handleToggle = async (service: Service) => {
         const updated = await api.updateService(service.id, { is_enabled: !service.is_enabled });
@@ -181,13 +256,35 @@ const AdminServices: React.FC = () => {
 
     return (
         <div className="space-y-6">
-            <h3 className="text-xl font-bold text-white">Service Inventory</h3>
+            <div className="flex justify-between items-center">
+                <h3 className="text-xl font-bold text-white">Service Inventory</h3>
+                <Button onClick={() => { setEditing(null); setShowForm(!showForm); }}>
+                    {showForm ? 'Cancel' : 'Add Service'}
+                </Button>
+            </div>
+
+            {showForm && (
+                <Card className="animate-in fade-in zoom-in-95">
+                    <h4 className="font-bold text-white mb-4">{editing ? 'Edit Service' : 'New Service'}</h4>
+                    <form onSubmit={handleSave} className="space-y-4">
+                        <Input label="Title" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} required />
+                        <Textarea label="Description" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} required />
+                        <Input label="Base Price ($)" type="number" value={formData.base_price} onChange={e => setFormData({...formData, base_price: parseFloat(e.target.value)})} required />
+                        <Input label="Icon Name (Lucide)" value={formData.icon} onChange={e => setFormData({...formData, icon: e.target.value})} />
+                        <Button type="submit" className="w-full">{editing ? 'Update' : 'Create'}</Button>
+                    </form>
+                </Card>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {services.map(s => (
-                    <Card key={s.id} className="relative overflow-hidden group">
+                    <Card key={s.id} className="relative overflow-hidden group hover:border-vision-primary/30 transition-all">
                         <div className="flex justify-between items-start">
                             <div>
-                                <h4 className="font-bold text-white">{s.title}</h4>
+                                <h4 className="font-bold text-white flex items-center gap-2">
+                                    {s.title}
+                                    <button onClick={() => handleEdit(s)} className="text-gray-500 hover:text-white"><Edit size={12}/></button>
+                                </h4>
                                 <p className="text-sm text-gray-400 mt-1 line-clamp-2">{s.description}</p>
                                 <p className="text-vision-primary font-bold mt-2">{formatPrice(s.base_price)}</p>
                             </div>
@@ -198,7 +295,6 @@ const AdminServices: React.FC = () => {
                     </Card>
                 ))}
             </div>
-            <p className="text-xs text-gray-500 text-center mt-4">To add new services, use the database console.</p>
         </div>
     );
 };
@@ -479,7 +575,58 @@ const AdminTeam: React.FC<{ user: User }> = ({ user }) => {
     );
 };
 
-// --- Admin Marketplace (Existing) ---
+// 8. Payouts (New)
+const AdminPayouts: React.FC = () => {
+    const [orders, setOrders] = useState<Order[]>([]);
+    const toast = useToast();
+
+    useEffect(() => {
+        api.getOrders().then(data => {
+            // Filter only completed orders with payment
+            setOrders(data.filter(o => o.status === 'completed' && o.amount_paid > 0));
+        });
+    }, []);
+
+    const markPaid = (id: string) => {
+        toast.success(`Payout processed for Order #${id.slice(0,6)}`);
+        // In real app, this would update a 'payout_status' in DB
+    };
+
+    return (
+        <div className="space-y-6">
+            <h3 className="text-xl font-bold text-white">Developer Payouts</h3>
+            <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                    <thead>
+                        <tr className="text-xs text-gray-500 border-b border-white/10">
+                            <th className="p-3 uppercase">Order ID</th>
+                            <th className="p-3 uppercase">Project</th>
+                            <th className="p-3 uppercase">Total Revenue</th>
+                            <th className="p-3 uppercase">Dev Share (70%)</th>
+                            <th className="p-3 uppercase">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {orders.map(o => (
+                            <tr key={o.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                                <td className="p-3 text-sm text-gray-300 font-mono">#{o.id.slice(0, 6)}</td>
+                                <td className="p-3 text-sm text-white font-bold">{o.service_title}</td>
+                                <td className="p-3 text-sm text-green-400 font-mono">${o.amount_paid}</td>
+                                <td className="p-3 text-sm text-vision-primary font-mono font-bold">${(o.amount_paid * 0.7).toFixed(2)}</td>
+                                <td className="p-3">
+                                    <Button size="sm" variant="outline" onClick={() => markPaid(o.id)}>Process Payout</Button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+                {orders.length === 0 && <p className="text-center p-8 text-gray-500">No pending payouts available.</p>}
+            </div>
+        </div>
+    );
+};
+
+// --- Admin Marketplace (Updated with Premium Projects & Time Limit) ---
 const AdminMarketplace: React.FC<{ user: User }> = ({ user }) => {
     const [items, setItems] = useState<MarketplaceItem[]>([]);
     const [showForm, setShowForm] = useState(false);
@@ -489,8 +636,10 @@ const AdminMarketplace: React.FC<{ user: User }> = ({ user }) => {
     const userCurrencyCode = CURRENCY_CONFIG[user.country || 'India']?.code || 'USD';
     const userCurrencyRate = CURRENCY_CONFIG[user.country || 'India']?.rate || 1;
     const [inputCurrency, setInputCurrency] = useState('USD');
+    const [freeDays, setFreeDays] = useState<number>(0); // For free project calculation
+
     const [formData, setFormData] = useState<Partial<MarketplaceItem>>({
-        title: '', price: 0, category: 'Websites', short_description: '', full_description: '', tags: [], features: [], is_featured: false
+        title: '', price: 0, category: 'Premium Projects', short_description: '', full_description: '', tags: [], features: [], is_featured: false
     });
 
     useEffect(() => { api.getMarketplaceItems().then(setItems); }, [user.id]);
@@ -507,7 +656,15 @@ const AdminMarketplace: React.FC<{ user: User }> = ({ user }) => {
         e.preventDefault();
         try {
             const rate = inputCurrency === 'USD' ? 1 : userCurrencyRate;
-            const payload = { ...formData, price: (formData.price || 0) / rate };
+            let payload: any = { ...formData, price: (formData.price || 0) / rate };
+            
+            // Handle Free Project Time Limit
+            if (formData.category === 'Free Projects' && freeDays > 0) {
+                const expiry = new Date();
+                expiry.setDate(expiry.getDate() + freeDays);
+                payload.free_until = expiry.toISOString();
+            }
+
             if (editingId) {
                 await api.updateMarketplaceItem(editingId, payload);
                 toast.success("Item updated successfully");
@@ -517,8 +674,9 @@ const AdminMarketplace: React.FC<{ user: User }> = ({ user }) => {
             }
             setShowForm(false);
             setEditingId(null);
+            setFreeDays(0);
             setInputCurrency('USD');
-            setFormData({ title: '', price: 0, category: 'Websites', short_description: '', full_description: '', tags: [], features: [], is_featured: false });
+            setFormData({ title: '', price: 0, category: 'Premium Projects', short_description: '', full_description: '', tags: [], features: [], is_featured: false });
             api.getMarketplaceItems().then(setItems);
         } catch (e: any) { toast.error(e.message); }
     };
@@ -528,7 +686,7 @@ const AdminMarketplace: React.FC<{ user: User }> = ({ user }) => {
         setFormData({
             title: item.title,
             price: item.price,
-            category: item.category || 'Websites',
+            category: item.category || 'Premium Projects',
             short_description: item.short_description,
             full_description: item.full_description,
             image_url: item.image_url || '',
@@ -558,8 +716,9 @@ const AdminMarketplace: React.FC<{ user: User }> = ({ user }) => {
     const cancelEdit = () => {
         setShowForm(false);
         setEditingId(null);
+        setFreeDays(0);
         setInputCurrency('USD');
-        setFormData({ title: '', price: 0, category: 'Websites', short_description: '', full_description: '', tags: [], features: [], is_featured: false });
+        setFormData({ title: '', price: 0, category: 'Premium Projects', short_description: '', full_description: '', tags: [], features: [], is_featured: false });
     };
 
     return (
@@ -596,13 +755,17 @@ const AdminMarketplace: React.FC<{ user: User }> = ({ user }) => {
                              <div className="space-y-1">
                                  <label className="text-[10px] uppercase text-gray-500 font-bold tracking-widest">Category</label>
                                  <select value={formData.category} onChange={(e) => handleCategoryChange(e.target.value as ProjectCategory)} className="w-full h-10 bg-black/40 border border-white/10 rounded-lg px-3 text-sm text-white focus:border-vision-primary">
-                                     <option value="Websites">Websites</option>
+                                     <option value="Premium Projects">Premium Projects</option>
                                      <option value="UI/UX Design">UI/UX Design</option>
                                      <option value="Free Projects">Free Projects</option>
                                  </select>
                              </div>
                              <Input label="Project Title" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} required />
-                             <Input type="number" label={`Sales Price (${inputCurrency})`} value={formData.price} onChange={e => setFormData({...formData, price: parseFloat(e.target.value)})} disabled={formData.category === 'Free Projects'} placeholder={formData.category === 'Free Projects' ? "Free ($0)" : "Price"} required />
+                             {formData.category === 'Free Projects' ? (
+                                <Input label="Free Duration (Days, 0 = Forever)" type="number" value={freeDays} onChange={e => setFreeDays(parseInt(e.target.value))} />
+                             ) : (
+                                <Input type="number" label={`Sales Price (${inputCurrency})`} value={formData.price} onChange={e => setFormData({...formData, price: parseFloat(e.target.value)})} placeholder="Price" required />
+                             )}
                          </div>
                          <Input label="Summary" value={formData.short_description} onChange={e => setFormData({...formData, short_description: e.target.value})} placeholder="Catchy one-liner..." required />
                          <Textarea label="Full Details" value={formData.full_description} onChange={e => setFormData({...formData, full_description: e.target.value})} required />
@@ -670,6 +833,7 @@ const Admin: React.FC<{ user: User }> = ({ user }) => {
   const menuItems = [
       { id: 'analytics', label: 'Platform Metrics', icon: BarChart3 },
       { id: 'orders', label: 'Client Orders', icon: ClipboardList },
+      { id: 'payouts', label: 'Payouts', icon: DollarSign },
       { id: 'requests', label: 'Feature Backlog', icon: Lightbulb },
       { id: 'services', label: 'Service Inventory', icon: Layers },
       { id: 'marketplace', label: 'Marketplace Ops', icon: ShoppingBag },
@@ -682,6 +846,7 @@ const Admin: React.FC<{ user: User }> = ({ user }) => {
       switch(activeTab) {
           case 'analytics': return <AdminAnalytics />;
           case 'orders': return <AdminOrders user={user} />;
+          case 'payouts': return <AdminPayouts />;
           case 'requests': return <AdminRequests />;
           case 'services': return <AdminServices />;
           case 'marketplace': return <AdminMarketplace user={user} />;
@@ -702,7 +867,7 @@ const Admin: React.FC<{ user: User }> = ({ user }) => {
                 <Shield size={24} className="text-vision-primary" />
                 VISION BUILT
             </h1>
-            <p className="text-[10px] text-gray-600 mt-2 uppercase tracking-widest font-mono">Control Center v1.2.0</p>
+            <p className="text-[10px] text-gray-600 mt-2 uppercase tracking-widest font-mono">Control Center v2.0</p>
           </div>
           
           <nav className="flex-1 px-4 space-y-1 overflow-y-auto custom-scrollbar">
@@ -747,6 +912,7 @@ const Admin: React.FC<{ user: User }> = ({ user }) => {
         {/* Mobile Header */}
         <div className="md:hidden fixed top-0 w-full bg-vision-900 border-b border-white/10 z-20 flex justify-between items-center p-4">
              <span className="font-bold text-white text-xs uppercase tracking-widest">Admin Control</span>
+             <AdminNotifications />
              <select 
                 value={activeTab} 
                 onChange={(e) => setActiveTab(e.target.value)}
@@ -759,9 +925,14 @@ const Admin: React.FC<{ user: User }> = ({ user }) => {
         {/* Main Content Area */}
         <main className="flex-1 overflow-y-auto bg-black/10 p-4 md:p-10 pt-20 md:pt-10 relative custom-scrollbar">
             <div className="max-w-7xl mx-auto">
-                <div className="mb-10 animate-in fade-in duration-700">
-                    <h1 className="text-3xl font-display font-bold text-white mb-2 uppercase tracking-tight">System / {activeTab}</h1>
-                    <p className="text-sm text-gray-500">Managing global system state and operative logistics.</p>
+                <div className="mb-10 animate-in fade-in duration-700 flex justify-between items-center">
+                    <div>
+                        <h1 className="text-3xl font-display font-bold text-white mb-2 uppercase tracking-tight">System / {activeTab}</h1>
+                        <p className="text-sm text-gray-500">Managing global system state and operative logistics.</p>
+                    </div>
+                    <div className="hidden md:block">
+                        <AdminNotifications />
+                    </div>
                 </div>
                 
                 {renderContent()}

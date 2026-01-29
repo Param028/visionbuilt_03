@@ -12,7 +12,7 @@ import { ScrollFloat, GlareCard } from '../components/ui/ReactBits';
 const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
   const [items, setItems] = useState<MarketplaceItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<ProjectCategory>('Websites');
+  const [activeTab, setActiveTab] = useState<ProjectCategory>('Premium Projects');
   const [sortBy, setSortBy] = useState<string>('newest');
   const navigate = useNavigate();
 
@@ -105,10 +105,10 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
         <div className="flex justify-center mb-8 overflow-x-auto pb-2 scrollbar-hide">
             <div className="bg-white/5 border border-white/10 p-1 rounded-full flex space-x-2">
                 <button 
-                    onClick={() => setActiveTab('Websites')}
-                    className={`px-6 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 whitespace-nowrap ${activeTab === 'Websites' ? 'bg-vision-primary text-black shadow-[0_0_15px_rgba(6,182,212,0.4)]' : 'text-gray-400 hover:text-white'}`}
+                    onClick={() => setActiveTab('Premium Projects')}
+                    className={`px-6 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 whitespace-nowrap ${activeTab === 'Premium Projects' ? 'bg-vision-primary text-black shadow-[0_0_15px_rgba(6,182,212,0.4)]' : 'text-gray-400 hover:text-white'}`}
                 >
-                    <Layout size={16} /> Websites
+                    <Layout size={16} /> Premium Projects
                 </button>
                 <button 
                     onClick={() => setActiveTab('UI/UX Design')}

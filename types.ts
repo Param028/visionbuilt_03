@@ -5,7 +5,7 @@ export type OrderStatus = 'pending' | 'accepted' | 'in_progress' | 'mockup_ready
 
 export type OrderType = 'service' | 'project';
 
-export type ProjectCategory = 'Websites' | 'UI/UX Design' | 'Free Projects';
+export type ProjectCategory = 'Premium Projects' | 'UI/UX Design' | 'Free Projects';
 
 export interface User {
   id: string;
@@ -156,6 +156,15 @@ export interface AdminActivity {
   action: string; 
   details?: string; 
   timestamp: string;
+}
+
+export interface Notification {
+    id: string;
+    title: string;
+    message: string;
+    type: 'info' | 'success' | 'warning' | 'error';
+    read: boolean;
+    timestamp: string;
 }
 
 export interface Task {

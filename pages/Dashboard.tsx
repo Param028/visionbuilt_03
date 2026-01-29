@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Plus, ArrowRight, Clock, Filter, Lightbulb, ThumbsUp, PenTool, Sparkles, Loader2, User as UserIcon } from 'lucide-react';
+import { Plus, ArrowRight, Clock, Filter, Lightbulb, ThumbsUp, PenTool, Sparkles, Loader2, User as UserIcon, Activity } from 'lucide-react';
 import { api } from '../services/api';
 import { Order, User, ProjectSuggestion } from '../types';
 import { Button, Card, Badge, Input, Textarea } from '../components/ui/Components';
@@ -92,46 +92,48 @@ const Dashboard: React.FC<{ user: User }> = ({ user }) => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-10 gap-6">
+      {/* Header Section */}
+      <div className="flex flex-col lg:flex-row lg:justify-between lg:items-end mb-12 gap-6 pb-6 border-b border-white/5">
         <div>
-          <h1 className="text-3xl font-display font-bold text-white">
-              <ScrollFloat>Dashboard</ScrollFloat>
-          </h1>
-          <div className="text-gray-400 mt-1">
-              <ScrollFloat animationDuration={0.4}>
-                 {`Welcome back, ${user.name.split(' ')[0]} / Active Portal Protocol`}
-              </ScrollFloat>
+          <div className="flex items-center gap-3 mb-2">
+             <div className="w-10 h-10 rounded-xl bg-vision-primary/10 flex items-center justify-center text-vision-primary border border-vision-primary/20">
+                 <Activity size={20} />
+             </div>
+             <h1 className="text-3xl font-display font-bold text-white">
+                <ScrollFloat>Client Portal</ScrollFloat>
+             </h1>
           </div>
+          <p className="text-gray-400 text-sm max-w-md">
+             Welcome back, {user.name.split(' ')[0]}. Manage your active developments and track project status in real-time.
+          </p>
         </div>
         
         <div className="flex flex-wrap items-center gap-3">
-             <div className="flex bg-white/5 p-1 rounded-xl border border-white/10 mr-2">
+             <div className="flex bg-white/5 p-1 rounded-lg border border-white/10 mr-2">
                 <button 
                     onClick={() => setViewMode('orders')}
-                    className={`flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-widest rounded-lg transition-all ${viewMode === 'orders' ? 'bg-vision-primary text-vision-900 shadow-lg' : 'text-gray-400 hover:text-white'}`}
+                    className={`flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-widest rounded-md transition-all ${viewMode === 'orders' ? 'bg-vision-900 text-vision-primary border border-vision-primary/30 shadow-lg' : 'text-gray-400 hover:text-white'}`}
                 >
-                    <Filter size={14} /> My Orders
+                    <Filter size={14} /> Orders
                 </button>
                 <button 
                     onClick={() => setViewMode('wishlist')}
-                    className={`flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-widest rounded-lg transition-all ${viewMode === 'wishlist' ? 'bg-vision-primary text-vision-900 shadow-lg' : 'text-gray-400 hover:text-white'}`}
+                    className={`flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-widest rounded-md transition-all ${viewMode === 'wishlist' ? 'bg-vision-900 text-vision-primary border border-vision-primary/30 shadow-lg' : 'text-gray-400 hover:text-white'}`}
                 >
-                    <Lightbulb size={14} /> Wishlist
+                    <Lightbulb size={14} /> Roadmap
                 </button>
              </div>
 
-             <div className="flex gap-2">
-                <Link to="/order/new">
-                    <Button variant="outline" className="border-vision-secondary/50 text-vision-secondary hover:bg-vision-secondary/10 h-11">
-                        <PenTool className="w-4 h-4 mr-2" /> Custom Project
-                    </Button>
-                </Link>
-                <Link to="/services">
-                    <Button variant="primary" className="h-11">
-                        <Plus className="w-4 h-4 mr-2" /> New Order
-                    </Button>
-                </Link>
-             </div>
+             <Link to="/order/new">
+                <Button variant="outline" className="border-vision-secondary/50 text-vision-secondary hover:bg-vision-secondary/10 h-10 text-xs uppercase tracking-widest font-bold">
+                    <PenTool className="w-3 h-3 mr-2" /> Custom
+                </Button>
+             </Link>
+             <Link to="/services">
+                <Button variant="primary" className="h-10 text-xs uppercase tracking-widest font-bold shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+                    <Plus className="w-3 h-3 mr-2" /> New Order
+                </Button>
+             </Link>
         </div>
       </div>
 
@@ -143,21 +145,13 @@ const Dashboard: React.FC<{ user: User }> = ({ user }) => {
                         <button
                             key={f}
                             onClick={() => setFilter(f)}
-                            className={`px-5 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all whitespace-nowrap border ${
+                            className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all whitespace-nowrap border ${
                                 filter === f 
-                                ? 'bg-vision-primary text-black border-vision-primary shadow-[0_0_20px_rgba(6,182,212,0.3)]' 
-                                : 'bg-white/5 text-gray-500 hover:text-white hover:bg-white/10 border-white/5'
+                                ? 'bg-vision-primary/10 text-vision-primary border-vision-primary/50' 
+                                : 'bg-transparent text-gray-500 hover:text-white border-transparent hover:bg-white/5'
                             }`}
                         >
-                            {f} 
-                            <span className={`ml-2 px-1.5 py-0.5 rounded-md text-[9px] ${filter === f ? 'bg-black/20 text-black' : 'bg-white/5 text-gray-600'}`}>
-                                {f === 'all' 
-                                    ? orders.length 
-                                    : f === 'active' 
-                                        ? orders.filter(o => ['pending', 'accepted', 'in_progress', 'mockup_ready'].includes(o.status)).length
-                                        : orders.filter(o => o.status === f).length
-                                }
-                            </span>
+                            {f}
                         </button>
                     ))}
                 </div>
