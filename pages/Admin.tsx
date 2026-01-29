@@ -7,7 +7,7 @@ import {
   ImageIcon, Users, ClipboardList, 
   BarChart3, TicketPercent, Layers, 
   Lightbulb, Bell, DollarSign,
-  User as UserIcon, LogOut, Shield, Zap, RefreshCw, X, Calendar, Search
+  User as UserIcon, LogOut, Shield, Zap, RefreshCw, X, Calendar, Search, Wallet
 } from 'lucide-react';
 import { api } from '../services/api';
 import { User, MarketplaceItem, ProjectCategory, Order, Service, Offer, Task, ProjectSuggestion, AnalyticsData, AdminActivity } from '../types';
@@ -144,12 +144,17 @@ const AdminOrders: React.FC<{ user: User }> = ({ user }) => {
     const [filter, setFilter] = useState('all');
     const [search, setSearch] = useState('');
     
-    // Inline Edit State
-    const [editingPriceId, setEditingPriceId] = useState<string | null>(null);
-    const [tempPrice, setTempPrice] = useState<string>('');
-    
     // Deletion State
     const [deleteId, setDeleteId] = useState<string | null>(null);
+
+    // Payment Request Modal State
+    const [paymentModal, setPaymentModal] = useState<{
+        open: boolean;
+        orderId: string | null;
+        totalAmount: number;
+        depositAmount: number;
+        currency: string;
+    }>({ open: false, orderId: null, totalAmount: 0, depositAmount: 0, currency: 'USD' });
 
     const toast = useToast();
 
@@ -168,25 +173,6 @@ const AdminOrders: React.FC<{ user: User }> = ({ user }) => {
         } catch(e) { toast.error("Update failed"); }
     };
 
-    const startPriceEdit = (order: Order) => {
-        setEditingPriceId(order.id);
-        setTempPrice(order.total_amount.toString());
-    };
-
-    const savePriceEdit = async (id: string) => {
-        const newAmount = parseFloat(tempPrice);
-        if (isNaN(newAmount) || newAmount < 0) {
-            toast.error("Invalid amount");
-            return;
-        }
-        try {
-            await api.updateOrderPrice(id, newAmount, user.id);
-            setOrders(prev => prev.map(o => o.id === id ? { ...o, total_amount: newAmount } : o));
-            setEditingPriceId(null);
-            toast.success("Price updated successfully");
-        } catch(e) { toast.error("Failed to update price"); }
-    };
-
     const handleDeleteOrder = async () => {
         if (!deleteId) return;
         try {
@@ -197,11 +183,30 @@ const AdminOrders: React.FC<{ user: User }> = ({ user }) => {
         finally { setDeleteId(null); }
     };
 
-    const handlePayout = (order: Order) => {
-        // Logic would normally integrate with Stripe Connect or similar payout API
-        // For now, we simulate marking it as processed
-        if (confirm(`Process payout for Order #${order.id.slice(0,6)}?\nAmount: ${formatPrice(order.amount_paid * 0.7)} (70% Share)`)) {
-            toast.success(`Payout processed for Order #${order.id.slice(0,6)}`);
+    const openPaymentRequest = (order: Order) => {
+        setPaymentModal({
+            open: true,
+            orderId: order.id,
+            totalAmount: order.total_amount || 0,
+            depositAmount: order.deposit_amount || 0,
+            currency: order.currency || 'USD'
+        });
+    };
+
+    const submitPaymentRequest = async () => {
+        if (!paymentModal.orderId) return;
+        try {
+            // Update financial data
+            const updated = await api.updateOrderFinancials(paymentModal.orderId, paymentModal.totalAmount, paymentModal.depositAmount);
+            
+            // Update local state
+            setOrders(prev => prev.map(o => o.id === paymentModal.orderId ? updated : o));
+            
+            // Notify Success
+            toast.success("Payment request sent to client");
+            setPaymentModal({ ...paymentModal, open: false });
+        } catch(e: any) {
+            toast.error(e.message || "Failed to send request");
         }
     };
 
@@ -226,6 +231,50 @@ const AdminOrders: React.FC<{ user: User }> = ({ user }) => {
                 variant="danger"
                 confirmText="Delete Order"
             />
+
+            {/* Payment Request Modal */}
+            {paymentModal.open && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in">
+                    <Card className="w-full max-w-md bg-[#0B1121] border border-vision-primary/30 shadow-[0_0_50px_rgba(6,182,212,0.1)] relative">
+                        <button onClick={() => setPaymentModal({ ...paymentModal, open: false })} className="absolute top-4 right-4 text-gray-500 hover:text-white"><X size={20} /></button>
+                        
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="p-3 rounded-full bg-vision-primary/10 text-vision-primary">
+                                <Wallet size={24} />
+                            </div>
+                            <div>
+                                <h3 className="text-xl font-bold text-white">Payment Request</h3>
+                                <p className="text-xs text-gray-400">Update budget and notify client.</p>
+                            </div>
+                        </div>
+
+                        <div className="space-y-4">
+                            <Input 
+                                label="Total Agreed Budget ($)" 
+                                type="number" 
+                                value={paymentModal.totalAmount}
+                                onChange={(e) => setPaymentModal({ ...paymentModal, totalAmount: parseFloat(e.target.value) })}
+                            />
+                            <Input 
+                                label="Required Deposit ($)" 
+                                type="number" 
+                                value={paymentModal.depositAmount}
+                                onChange={(e) => setPaymentModal({ ...paymentModal, depositAmount: parseFloat(e.target.value) })}
+                            />
+                            <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                                <p className="text-xs text-blue-300 flex items-start gap-2">
+                                    <Shield size={14} className="mt-0.5 shrink-0" />
+                                    Updating this will automatically notify the client via email and unlock payment options in their dashboard.
+                                </p>
+                            </div>
+                            <div className="flex gap-3 pt-2">
+                                <Button variant="ghost" onClick={() => setPaymentModal({ ...paymentModal, open: false })} className="flex-1">Cancel</Button>
+                                <Button onClick={submitPaymentRequest} className="flex-1">Send Request</Button>
+                            </div>
+                        </div>
+                    </Card>
+                </div>
+            )}
 
             <div className="flex flex-col md:flex-row justify-between gap-4 mb-6">
                 <h3 className="text-xl font-bold text-white flex items-center gap-2">
@@ -283,27 +332,10 @@ const AdminOrders: React.FC<{ user: User }> = ({ user }) => {
                                 </div>
                             </div>
 
-                            {/* Financials (Inline Edit) */}
+                            {/* Financials (Display Only) */}
                             <div className="flex flex-col items-start lg:items-end min-w-[150px]">
                                 <span className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Total Budget</span>
-                                {editingPriceId === order.id ? (
-                                    <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-2">
-                                        <input 
-                                            type="number" 
-                                            value={tempPrice}
-                                            onChange={(e) => setTempPrice(e.target.value)}
-                                            className="w-24 bg-black/50 border border-vision-primary text-white text-sm rounded px-2 py-1 outline-none"
-                                            autoFocus
-                                        />
-                                        <button onClick={() => savePriceEdit(order.id)} className="p-1 bg-green-500/20 text-green-400 rounded hover:bg-green-500/40"><CheckCircle size={16} /></button>
-                                        <button onClick={() => setEditingPriceId(null)} className="p-1 bg-red-500/20 text-red-400 rounded hover:bg-red-500/40"><X size={16} /></button>
-                                    </div>
-                                ) : (
-                                    <div className="flex items-center gap-2 group/price cursor-pointer" onClick={() => startPriceEdit(order)}>
-                                        <span className="text-xl font-bold text-white font-mono">{formatPrice(order.total_amount, user.country)}</span>
-                                        <Edit size={12} className="text-gray-600 group-hover/price:text-vision-primary transition-colors" />
-                                    </div>
-                                )}
+                                <span className="text-xl font-bold text-white font-mono">{formatPrice(order.total_amount, user.country)}</span>
                                 <span className="text-xs text-gray-500 mt-1">Paid: <span className="text-green-400">{formatPrice(order.amount_paid, user.country)}</span></span>
                             </div>
 
@@ -325,21 +357,22 @@ const AdminOrders: React.FC<{ user: User }> = ({ user }) => {
                                     <option value="cancelled">Cancelled</option>
                                 </select>
 
+                                {/* Payment Request Button */}
+                                <Button 
+                                    size="sm" 
+                                    variant="outline"
+                                    onClick={() => openPaymentRequest(order)}
+                                    className="h-9 whitespace-nowrap bg-vision-primary/10 border-vision-primary/30 text-vision-primary hover:bg-vision-primary/20"
+                                    title="Set Budget & Request Payment"
+                                >
+                                    <DollarSign size={14} className="mr-1" /> Request Payment
+                                </Button>
+
                                 <Link to={`/dashboard/order/${order.id}`}>
                                     <Button size="sm" variant="ghost" className="w-full sm:w-auto h-9 border border-white/10 hover:border-vision-primary/50">
                                         Chat
                                     </Button>
                                 </Link>
-
-                                {order.status === 'completed' && order.amount_paid > 0 && (
-                                    <Button 
-                                        size="sm" 
-                                        onClick={() => handlePayout(order)}
-                                        className="h-9 bg-green-500/10 text-green-400 hover:bg-green-500/20 border-green-500/30"
-                                    >
-                                        <DollarSign size={14} className="mr-1" /> Payout
-                                    </Button>
-                                )}
 
                                 <Button 
                                     size="icon" 
