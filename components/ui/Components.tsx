@@ -142,7 +142,7 @@ export const Textarea: React.FC<TextareaProps> = ({ label, error, className, ...
 // --- Badge ---
 interface BadgeProps {
   children: React.ReactNode;
-  variant?: 'default' | 'success' | 'warning' | 'info';
+  variant?: 'default' | 'success' | 'warning' | 'info' | 'danger';
   className?: string;
 }
 
@@ -151,7 +151,8 @@ export const Badge: React.FC<BadgeProps> = ({ children, variant = 'default', cla
     default: "bg-gray-800 text-gray-300 border-gray-700",
     success: "bg-green-500/10 text-green-400 border-green-500/20",
     warning: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
-    info: "bg-blue-500/10 text-blue-400 border-blue-500/20"
+    info: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+    danger: "bg-red-500/10 text-red-400 border-red-500/20"
   };
 
   return (

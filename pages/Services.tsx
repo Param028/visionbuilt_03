@@ -2,10 +2,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Check, ShoppingCart, Code, Layout, GraduationCap, Bot, Sparkles, Server, Database, Globe, AlertCircle } from 'lucide-react';
+import { Check, MessageSquare, Code, Layout, GraduationCap, Bot, Sparkles, Server, Database, Globe, AlertCircle } from 'lucide-react';
 import { api } from '../services/api';
 import { Service, User } from '../types';
-import { formatPrice } from '../constants';
 import { Button, Card, Tooltip } from '../components/ui/Components';
 import { ScrollFloat } from '../components/ui/ReactBits';
 
@@ -118,7 +117,7 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
         </h1>
         <div className="text-gray-400 max-w-2xl mx-auto">
           <ScrollFloat animationDuration={0.4} stagger={0.01} className="justify-center">
-            Choose from our premium catalog of digital solutions. Prices are estimated in your local currency.
+            Choose from our premium catalog of digital solutions. Contact us for a tailored quote.
           </ScrollFloat>
         </div>
       </div>
@@ -157,8 +156,8 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
                     
                     <p className="text-gray-400 text-sm h-12 mb-4 line-clamp-2">{service.description}</p>
                     
-                    <div className="text-3xl font-bold text-white font-sora">
-                    {formatPrice(service.base_price, user?.country)} <span className="text-sm font-normal text-gray-500">/ starting</span>
+                    <div className="text-lg font-bold text-vision-primary font-sora">
+                       Request Custom Quote
                     </div>
                 </div>
 
@@ -184,7 +183,7 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
 
                 {(!user || user.role === 'client') ? (
                     <Button onClick={() => handleOrder(service.id)} className="w-full group/btn">
-                        Select Service <ShoppingCart className="ml-2 w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                        Get Quote <MessageSquare className="ml-2 w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
                     </Button>
                 ) : (
                     <div className="w-full py-2 text-center text-xs text-gray-500 border border-white/5 rounded-lg bg-white/5 uppercase tracking-wider">

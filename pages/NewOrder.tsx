@@ -93,6 +93,7 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
 
     try {
         // Status defaults to 'pending' in API/DB.
+        // PRICE IS SET TO 0 (TBD) for both Custom and Standard Services as per request
         await api.createOrder({
             user_id: user.id,
             type: 'service',
@@ -101,10 +102,10 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
             is_custom: isCustom,
             domain_requested: formData.domain_requested,
             business_email_requested: formData.business_email_requested,
-            total_amount: 0, // IMPORTANT: No pricing shown or calculated for Custom Orders initially
+            total_amount: 0, // Set to 0 so developer sets it later
             discount_amount: 0, 
             applied_offer_code: appliedOffer?.code,
-            reference_project_ids: selectedReferences, // Send selected preview IDs
+            reference_project_ids: selectedReferences, 
             requirements: {
                 business_name: formData.business_name,
                 business_category: formData.business_category,
@@ -230,7 +231,7 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
                             <input type="checkbox" name="domain_requested" checked={formData.domain_requested} onChange={handleCheckbox} className="form-checkbox h-5 w-5 text-vision-primary rounded bg-transparent border-gray-600 focus:ring-0" />
                             <div className="flex-grow">
                                 <span className="text-gray-200 block text-sm font-medium">Provision Custom Domain</span>
-                                <span className="text-[10px] text-gray-500 uppercase tracking-tighter tracking-wider">Quote will include domain cost</span>
+                                <span className="text-[10px] text-gray-500 uppercase tracking-tighter tracking-wider">Include in quote request</span>
                             </div>
                         </label>
                     )}
@@ -239,7 +240,7 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
                             <input type="checkbox" name="business_email_requested" checked={formData.business_email_requested} onChange={handleCheckbox} className="form-checkbox h-5 w-5 text-vision-primary rounded bg-transparent border-gray-600 focus:ring-0" />
                             <div className="flex-grow">
                                 <span className="text-gray-200 block text-sm font-medium">Business Workspace Email</span>
-                                <span className="text-[10px] text-gray-500 uppercase tracking-tighter tracking-wider">Quote will include email setup cost</span>
+                                <span className="text-[10px] text-gray-500 uppercase tracking-tighter tracking-wider">Include in quote request</span>
                             </div>
                         </label>
                     )}
@@ -265,24 +266,32 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
                      <div className="space-y-2 border-l border-white/10 pl-4 py-2 mt-4 text-xs text-gray-400">
                          <div><span className="text-gray-500 uppercase">Contact:</span> {formData.client_phone}</div>
                          <div><span className="text-gray-500 uppercase">Email:</span> {formData.client_email}</div>
+                         {formData.domain_requested && <div><span className="text-gray-500 uppercase">Feature:</span> Custom Domain Requested</div>}
+                         {formData.business_email_requested && <div><span className="text-gray-500 uppercase">Feature:</span> Business Email Requested</div>}
                          {selectedReferences.length > 0 && (
                              <div><span className="text-gray-500 uppercase">References:</span> {selectedReferences.length} items attached</div>
                          )}
                      </div>
 
                      <div className="border-t border-white/10 pt-6 flex justify-between text-xl font-bold text-white items-center mt-4">
-                         <span className="text-base uppercase tracking-widest text-gray-400">Quote Total</span>
+                         <span className="text-base uppercase tracking-widest text-gray-400">
+                            Quote Total
+                         </span>
                          <div className="text-right">
                              <span className="text-sm text-gray-500">To Be Determined</span>
                          </div>
                      </div>
-                     <p className="text-[10px] text-gray-500 text-right mt-1">Final pricing will be provided by developer after review.</p>
+                     <p className="text-[10px] text-gray-500 text-right mt-1">
+                        Final pricing will be provided by developer after review.
+                     </p>
                  </div>
 
                  <div className="flex items-start gap-3 max-w-lg mx-auto mb-8 p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl">
                     <ShieldCheck className="text-blue-400 shrink-0 mt-0.5" size={20} />
                     <div className="text-left">
-                        <h4 className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-1">Zero Cost Submission</h4>
+                        <h4 className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-1">
+                             Quote Request
+                        </h4>
                         <p className="text-xs text-gray-400">
                             Submitting this request is free. Our team will analyze your requirements and send a custom quote with payment options to your dashboard.
                         </p>
