@@ -184,6 +184,6 @@ export interface AnalyticsData {
   total_views: number;
   total_orders: number;
   active_projects: number;
-  sales_trend: number[]; 
+  sales_trend: { label: string; value: number; date: string }[]; 
   top_developer: User | null;
 }

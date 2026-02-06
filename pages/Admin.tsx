@@ -7,7 +7,7 @@ import {
   ImageIcon, Users, ClipboardList, 
   BarChart3, TicketPercent, Layers, 
   Lightbulb, Bell, DollarSign,
-  User as UserIcon, LogOut, Shield, Zap, RefreshCw, X, Calendar, Search, Wallet
+  User as UserIcon, LogOut, Shield, Zap, RefreshCw, X, Calendar, Search, Wallet, Mail, Phone
 } from 'lucide-react';
 import { api } from '../services/api';
 import { User, MarketplaceItem, ProjectCategory, Order, Service, Offer, Task, ProjectSuggestion, AnalyticsData, AdminActivity } from '../types';
@@ -71,7 +71,12 @@ const AdminNotifications: React.FC = () => {
 // 1. Analytics
 const AdminAnalytics: React.FC = () => {
     const [data, setData] = useState<AnalyticsData | null>(null);
-    useEffect(() => { api.getAnalytics().then(setData); }, []);
+    const [timeRange, setTimeRange] = useState<'7d' | '30d' | '1y'>('7d');
+    const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
+    useEffect(() => { 
+        api.getAnalytics(timeRange).then(setData); 
+    }, [timeRange]);
 
     if (!data) return <div className="p-20 text-center"><RefreshCw className="animate-spin w-8 h-8 mx-auto text-vision-primary" /></div>;
 
@@ -85,6 +90,8 @@ const AdminAnalytics: React.FC = () => {
         </div>
     );
 
+    const maxValue = Math.max(...data.sales_trend.map(d => d.value)) || 1;
+
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -96,19 +103,59 @@ const AdminAnalytics: React.FC = () => {
             
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <Card className="lg:col-span-2 border-white/5 bg-[#0f172a]/40">
-                    <div className="flex justify-between items-center mb-6">
+                    <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
                         <h3 className="text-lg font-bold text-white">Revenue Velocity</h3>
-                        <Badge variant="default">Last 7 Days</Badge>
+                        <div className="flex bg-black/40 p-1 rounded-lg border border-white/10">
+                            {(['7d', '30d', '1y'] as const).map(range => (
+                                <button
+                                    key={range}
+                                    onClick={() => setTimeRange(range)}
+                                    className={`px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-md transition-all ${
+                                        timeRange === range 
+                                        ? 'bg-vision-primary text-black shadow-lg' 
+                                        : 'text-gray-500 hover:text-white'
+                                    }`}
+                                >
+                                    {range === '7d' ? 'Week' : range === '30d' ? 'Month' : 'Year'}
+                                </button>
+                            ))}
+                        </div>
                     </div>
-                    <div className="h-64 flex items-end gap-4 px-4 pb-4">
-                        {data.sales_trend.map((val, i) => (
-                             <div key={i} className="flex-1 flex flex-col justify-end group cursor-pointer">
-                                 <div className="relative w-full bg-vision-primary/10 hover:bg-vision-primary/30 rounded-t-lg transition-all duration-300" style={{ height: `${Math.max(5, (val / (Math.max(...data.sales_trend) || 1)) * 100)}%` }}>
-                                     <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-vision-900 border border-vision-primary/30 text-vision-primary text-xs font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity mb-2">
-                                         ${val}
+                    
+                    {/* Interactive Chart */}
+                    <div className="h-64 w-full flex items-end gap-2 px-4 pb-4 overflow-x-auto custom-scrollbar">
+                        {data.sales_trend.map((item, i) => (
+                             <div 
+                                key={i} 
+                                className="flex-1 min-w-[20px] h-full flex flex-col justify-end group relative"
+                                onMouseEnter={() => setHoveredIndex(i)}
+                                onMouseLeave={() => setHoveredIndex(null)}
+                             >
+                                 {/* Tooltip */}
+                                 {hoveredIndex === i && (
+                                     <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 animate-in fade-in slide-in-from-bottom-1 pointer-events-none">
+                                         <div className="bg-vision-900 border border-white/20 rounded-lg px-3 py-2 shadow-xl whitespace-nowrap text-center backdrop-blur-xl">
+                                             <p className="text-[10px] text-gray-400 uppercase tracking-widest mb-0.5">{new Date(item.date).toLocaleDateString()}</p>
+                                             <p className="text-sm font-bold text-vision-primary">${item.value}</p>
+                                         </div>
+                                         <div className="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-white/20 mx-auto"></div>
                                      </div>
+                                 )}
+
+                                 {/* Bar */}
+                                 <div 
+                                    className={`relative w-full rounded-t-sm transition-all duration-500 ${
+                                        hoveredIndex === i 
+                                        ? 'bg-vision-primary opacity-100 shadow-[0_0_15px_rgba(6,182,212,0.5)]' 
+                                        : 'bg-vision-primary/20 hover:bg-vision-primary/40'
+                                    }`} 
+                                    style={{ height: `${Math.max(5, (item.value / maxValue) * 100)}%` }}
+                                 ></div>
+                                 
+                                 {/* Label */}
+                                 <div className="mt-2 text-[9px] text-gray-500 text-center font-mono truncate">
+                                     {item.label}
                                  </div>
-                                 <div className="h-1 w-full bg-white/5 mt-1 rounded-full group-hover:bg-vision-primary/50 transition-colors"></div>
                              </div>
                         ))}
                     </div>
@@ -327,8 +374,23 @@ const AdminOrders: React.FC<{ user: User }> = ({ user }) => {
                                 </div>
                                 <h4 className="text-lg font-bold text-white mb-1 truncate">{order.service_title}</h4>
                                 <div className="flex items-center gap-4 text-xs text-gray-400">
-                                    <span className="flex items-center gap-1"><UserIcon size={12}/> {order.user_id}</span>
+                                    <span className="flex items-center gap-1"><UserIcon size={12}/> {order.requirements?.client_name || order.user_id}</span>
                                     {order.type === 'project' && <span className="bg-vision-secondary/10 text-vision-secondary px-2 py-0.5 rounded text-[10px] uppercase font-bold">Marketplace Project</span>}
+                                </div>
+                                {/* Contact Details Section */}
+                                <div className="mt-3 p-3 bg-black/20 rounded-lg border border-white/5 flex flex-wrap gap-4 text-xs">
+                                    {order.requirements?.client_email && (
+                                        <span className="flex items-center gap-1.5 text-gray-400">
+                                            <Mail size={12} className="text-vision-primary"/> 
+                                            {order.requirements.client_email}
+                                        </span>
+                                    )}
+                                    {order.requirements?.client_phone && (
+                                        <span className="flex items-center gap-1.5 text-gray-400">
+                                            <Phone size={12} className="text-vision-primary"/> 
+                                            {order.requirements.client_phone}
+                                        </span>
+                                    )}
                                 </div>
                             </div>
 
@@ -568,7 +630,7 @@ const AdminOffers: React.FC = () => {
     );
 };
 
-// 5. Tasks
+// 5. Tasks (Updated with Inline Editing)
 const AdminTasks: React.FC<{ user: User }> = ({ user }) => {
     const [tasks, setTasks] = useState<Task[]>([]);
     const [newTask, setNewTask] = useState({ title: '', description: '', assigned_to_id: user.id, priority: 'medium' as any, due_date: '' });
@@ -595,6 +657,16 @@ const AdminTasks: React.FC<{ user: User }> = ({ user }) => {
         setTasks(updated);
     };
 
+    const handleUpdate = async (id: string, field: keyof Task, value: any) => {
+        try {
+            const updated = await api.updateTask(id, { [field]: value });
+            setTasks(updated);
+            toast.success("Task updated");
+        } catch (e) {
+            toast.error("Failed to update task");
+        }
+    };
+
     return (
         <div className="space-y-6">
             <h3 className="text-xl font-bold text-white flex items-center gap-2">
@@ -606,17 +678,42 @@ const AdminTasks: React.FC<{ user: User }> = ({ user }) => {
                  <div className="lg:col-span-2 space-y-4">
                      {tasks.map(t => (
                          <div key={t.id} className="flex justify-between items-start bg-[#0f172a]/60 border border-white/5 rounded-xl p-5 hover:border-white/10 transition-all">
-                             <div>
+                             <div className="flex-1 mr-4">
                                  <div className="flex items-center gap-3 mb-2">
-                                     <h4 className={`font-bold text-lg ${t.status === 'done' ? 'text-gray-500 line-through' : 'text-white'}`}>{t.title}</h4>
+                                     <input 
+                                        defaultValue={t.title}
+                                        onBlur={(e) => { if(e.target.value !== t.title) handleUpdate(t.id, 'title', e.target.value) }}
+                                        className={`bg-transparent border-b border-transparent hover:border-white/10 focus:border-vision-primary focus:outline-none font-bold text-lg w-full transition-colors ${t.status === 'done' ? 'text-gray-500 line-through' : 'text-white'}`}
+                                     />
                                      <Badge variant={t.priority === 'high' ? 'danger' : t.priority === 'medium' ? 'warning' : 'info'} className="text-[10px] uppercase">{t.priority}</Badge>
                                  </div>
-                                 <p className="text-sm text-gray-400 leading-relaxed mb-3">{t.description}</p>
-                                 <div className="flex items-center gap-2 text-xs text-gray-500">
-                                     <div className="w-5 h-5 rounded-full bg-vision-primary/20 flex items-center justify-center text-vision-primary font-bold text-[10px]">
-                                         {t.assigned_to_name.charAt(0)}
+                                 <textarea
+                                    defaultValue={t.description}
+                                    onBlur={(e) => { if(e.target.value !== t.description) handleUpdate(t.id, 'description', e.target.value) }}
+                                    className="bg-transparent border border-transparent hover:border-white/10 focus:border-vision-primary focus:bg-black/20 focus:outline-none text-sm text-gray-400 w-full rounded p-1 transition-all resize-y min-h-[60px]"
+                                 />
+                                 <div className="flex items-center gap-4 text-xs text-gray-500 mt-2">
+                                     <div className="flex items-center gap-2">
+                                         <div className="w-5 h-5 rounded-full bg-vision-primary/20 flex items-center justify-center text-vision-primary font-bold text-[10px]">
+                                             {t.assigned_to_name.charAt(0)}
+                                         </div>
+                                         <span>Assigned to {t.assigned_to_name}</span>
                                      </div>
-                                     <span>Assigned to {t.assigned_to_name}</span>
+                                     <div className="flex items-center gap-2 group/date">
+                                        <Calendar size={12} className="text-gray-600 group-hover/date:text-vision-primary transition-colors" />
+                                        <input 
+                                            type="date"
+                                            className="bg-transparent text-xs text-gray-500 hover:text-white focus:text-white outline-none cursor-pointer font-mono"
+                                            defaultValue={t.due_date ? new Date(t.due_date).toISOString().split('T')[0] : ''}
+                                            onBlur={(e) => {
+                                                const val = e.target.value ? new Date(e.target.value).toISOString() : null;
+                                                // Only update if changed and valid
+                                                if (val && (!t.due_date || val.split('T')[0] !== t.due_date.split('T')[0])) {
+                                                    handleUpdate(t.id, 'due_date', val);
+                                                }
+                                            }}
+                                        />
+                                    </div>
                                  </div>
                              </div>
                              <div className="flex flex-col gap-2 min-w-[120px]">

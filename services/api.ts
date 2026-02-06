@@ -201,9 +201,9 @@ export class ApiService {
       });
       if (error) throw error;
       
-      supabase.functions.invoke('send-email', {
-          body: { type: 'welcome', email, data: { name: fullName, uniqueId: Date.now() }}
-      }).catch(err => console.warn("Welcome email trigger failed:", err));
+      // DISABLED WELCOME EMAIL to avoid duplicate with Supabase Confirmation email
+      // const firstName = fullName.split(' ')[0];
+      // supabase.functions.invoke('send-email', { body: { type: 'welcome', email, data: { name: firstName } }}).catch(console.error);
 
       return { user: data.user, session: data.session };
   }
@@ -377,7 +377,7 @@ export class ApiService {
       return this.getServices();
   }
 
-  async getAnalytics(): Promise<AnalyticsData> {
+  async getAnalytics(timeRange: '7d' | '30d' | '1y' = '7d'): Promise<AnalyticsData> {
       try {
           const { data: orders } = await supabase.from('orders').select('amount_paid, status, created_at');
           const { data: items } = await supabase.from('marketplace_items').select('views');
@@ -385,14 +385,48 @@ export class ApiService {
 
           const totalRevenue = orders?.reduce((sum, o) => sum + (o.amount_paid || 0), 0) || 0;
           const activeProjects = orders?.filter(o => o.status === 'in_progress').length || 0;
-          const salesTrend = [0, 0, 0, 0, 0, 0, 0];
+          
+          // Dynamic Data Grouping for Chart
           const now = new Date();
-          orders?.forEach(o => {
-              if (o.amount_paid > 0) {
-                  const diffDays = Math.floor((now.getTime() - new Date(o.created_at).getTime()) / (86400000));
-                  if (diffDays >= 0 && diffDays < 7) salesTrend[6 - diffDays] += (o.amount_paid || 0);
+          let salesTrend: { label: string, value: number, date: string }[] = [];
+          
+          if (timeRange === '1y') {
+              // Group by Month
+              for(let i=11; i>=0; i--) {
+                  const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                  const label = d.toLocaleString('default', { month: 'short' });
+                  salesTrend.push({ label, value: 0, date: d.toISOString() });
               }
-          });
+              
+              orders?.forEach(o => {
+                  if (o.amount_paid > 0) {
+                      const orderDate = new Date(o.created_at);
+                      // Check if within last 12 months (simplified logic)
+                      const monthsDiff = (now.getFullYear() - orderDate.getFullYear()) * 12 + (now.getMonth() - orderDate.getMonth());
+                      if (monthsDiff >= 0 && monthsDiff < 12) {
+                          salesTrend[11 - monthsDiff].value += o.amount_paid;
+                      }
+                  }
+              });
+          } else {
+              // Group by Day (7d or 30d)
+              const days = timeRange === '30d' ? 30 : 7;
+              for(let i=days-1; i>=0; i--) {
+                  const d = new Date();
+                  d.setDate(now.getDate() - i);
+                  const label = timeRange === '30d' ? d.getDate().toString() : d.toLocaleDateString('en-US', { weekday: 'short' });
+                  salesTrend.push({ label, value: 0, date: d.toISOString() });
+              }
+
+              orders?.forEach(o => {
+                  if (o.amount_paid > 0) {
+                      const diffDays = Math.floor((now.getTime() - new Date(o.created_at).getTime()) / (86400000));
+                      if (diffDays >= 0 && diffDays < days) {
+                          salesTrend[days - 1 - diffDays].value += o.amount_paid;
+                      }
+                  }
+              });
+          }
 
           return {
               total_revenue: totalRevenue,
@@ -471,6 +505,12 @@ export class ApiService {
 
   async updateTaskStatus(taskId: string, status: Task['status'], _adminId: string): Promise<Task[]> {
       const { error } = await supabase.from('tasks').update({ status }).eq('id', taskId);
+      if (error) throw error;
+      return this.getTasks();
+  }
+
+  async updateTask(taskId: string, updates: Partial<Task>): Promise<Task[]> {
+      const { error } = await supabase.from('tasks').update(updates).eq('id', taskId);
       if (error) throw error;
       return this.getTasks();
   }
