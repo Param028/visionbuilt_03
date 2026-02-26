@@ -11,6 +11,8 @@ import { isConfigured, supabase } from './lib/supabase';
 import { AnimatePresence } from 'framer-motion';
 import { RefreshCw, Settings, Key } from 'lucide-react';
 
+import { NetworkDiagnostic } from './components/NetworkDiagnostic';
+
 // --- Static Imports for Core Pages (Fixes loading spinner freeze) ---
 import Landing from './pages/Landing';
 import Auth from './pages/Auth';
@@ -163,6 +165,7 @@ const App: React.FC = () => {
       
       {!isInitializing && (
         <ToastProvider>
+          <NetworkDiagnostic />
           <HashRouter>
             <Layout user={user} setUser={setUser}>
                 <Routes>

@@ -30,10 +30,23 @@ export const isConfigured = !!supabaseUrl && !!supabaseAnonKey;
 const validUrl = isConfigured ? supabaseUrl : 'https://placeholder.supabase.co';
 const validKey = isConfigured ? supabaseAnonKey : 'placeholder';
 
+// Debug logging for connection issues
+if (typeof window !== 'undefined') {
+    console.log(`[Supabase] Initializing client with URL: ${validUrl.replace(/^(https?:\/\/)([^.]+)(.*)$/, '$1***$3')}`);
+    if (!isConfigured) {
+        console.warn('[Supabase] Client not configured. Using placeholder URL.');
+    }
+}
+
 export const supabase = createClient(validUrl, validKey, {
     auth: {
         persistSession: true,
         autoRefreshToken: true,
         detectSessionInUrl: true
+    },
+    global: {
+        fetch: (url, options) => {
+            return fetch(url, { ...options, signal: AbortSignal.timeout(15000) }); // 15s timeout
+        }
     }
 });
