@@ -48,6 +48,7 @@ const getFeatureDescription = (feature: string) => {
 
 const Services: React.FC<{ user: User | null }> = ({ user }) => {
   const [services, setServices] = useState<Service[]>([]);
+  const [recurringServices, setRecurringServices] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -64,9 +65,13 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
 
     const fetchData = async () => {
       try {
-        const data = await api.getServices();
+        const [data, recurring] = await Promise.all([
+            api.getServices(),
+            api.getRecurringServices()
+        ]);
         if (isMounted) {
             setServices(data.filter(s => s.is_enabled));
+            setRecurringServices(recurring.filter(s => s.is_active));
         }
       } catch (error) {
         console.error("Failed to load services", error);
@@ -193,6 +198,60 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
                 </Card>
             </motion.div>
             ))}
+        </div>
+      )}
+
+      {/* Recurring Plans Section */}
+      {recurringServices.length > 0 && (
+        <div className="mt-24">
+            <div className="text-center mb-12">
+                <h2 className="text-3xl font-display font-bold text-white mb-4">
+                    <ScrollFloat>Monthly Subscriptions</ScrollFloat>
+                </h2>
+                <p className="text-gray-400 max-w-2xl mx-auto">
+                    Ongoing support and development packages to keep your business running smoothly.
+                </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {recurringServices.map((plan, index) => (
+                    <motion.div
+                        key={plan.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: index * 0.1 }}
+                    >
+                        <Card className="h-full flex flex-col border-vision-primary/20 hover:border-vision-primary/50 transition-all duration-300 relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity text-vision-primary">
+                                <Sparkles size={64} />
+                            </div>
+                            
+                            <div className="mb-6 relative z-10">
+                                <h3 className="text-xl font-bold font-display text-white mb-2">{plan.title}</h3>
+                                <div className="flex items-baseline gap-1 mb-4">
+                                    <span className="text-4xl font-bold text-vision-primary">${plan.price}</span>
+                                    <span className="text-sm text-gray-400">/{plan.interval}</span>
+                                </div>
+                                <p className="text-gray-400 text-sm mb-6 min-h-[40px]">{plan.description}</p>
+                                
+                                <Button onClick={() => handleOrder(plan.id)} variant="outline" className="w-full border-vision-primary/30 hover:bg-vision-primary/10">
+                                    Subscribe Now
+                                </Button>
+                            </div>
+
+                            <div className="space-y-3 pt-6 border-t border-white/5 relative z-10 flex-1">
+                                {plan.features?.map((feature: string, i: number) => (
+                                    <div key={i} className="flex items-start text-sm text-gray-300">
+                                        <Check className="w-4 h-4 text-vision-secondary mr-2 flex-shrink-0 mt-0.5" />
+                                        <span>{feature}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </Card>
+                    </motion.div>
+                ))}
+            </div>
         </div>
       )}
     </div>

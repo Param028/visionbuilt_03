@@ -1,6 +1,6 @@
 
 import { supabase } from '../lib/supabase';
-import { User, Service, Order, Message, ContactInfo, Offer, MarketplaceItem, AdminActivity, Task, AnalyticsData, Role, ProjectSuggestion, Payment } from '../types';
+import { User, Service, Order, Message, ContactInfo, Offer, MarketplaceItem, AdminActivity, Task, AnalyticsData, Role, ProjectSuggestion, Payment, RecurringService } from '../types';
 import { INITIAL_CONTACT_INFO, CURRENCY_CONFIG } from '../constants';
 
 // Helper to open Razorpay
@@ -363,6 +363,34 @@ export class ApiService {
         console.error("Failed to load services", e);
         return [];
     }
+  }
+
+  async getRecurringServices(): Promise<RecurringService[]> {
+      try {
+          const { data } = await supabase.from('recurring_services').select('*').order('price');
+          return data as RecurringService[] || [];
+      } catch (e) {
+          console.error("Failed to load recurring services", e);
+          return [];
+      }
+  }
+
+  async createRecurringService(service: Omit<RecurringService, 'id' | 'created_at' | 'updated_at'>): Promise<RecurringService[]> {
+      const { error } = await supabase.from('recurring_services').insert(service);
+      if (error) throw error;
+      return this.getRecurringServices();
+  }
+
+  async updateRecurringService(id: string, updates: Partial<RecurringService>): Promise<RecurringService[]> {
+      const { error } = await supabase.from('recurring_services').update({ ...updates, updated_at: new Date().toISOString() }).eq('id', id);
+      if (error) throw error;
+      return this.getRecurringServices();
+  }
+
+  async deleteRecurringService(id: string): Promise<RecurringService[]> {
+      const { error } = await supabase.from('recurring_services').delete().eq('id', id);
+      if (error) throw error;
+      return this.getRecurringServices();
   }
 
   async createService(service: Omit<Service, 'id'>): Promise<Service[]> {

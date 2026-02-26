@@ -19,6 +19,20 @@ export interface User {
   performance_score?: number; // 0-100
 }
 
+export interface RecurringService {
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+  currency: string;
+  interval: 'month' | 'year';
+  features: string[];
+  is_active: boolean;
+  show_on_home: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Service {
   id: string;
   title: string;

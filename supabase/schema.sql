@@ -175,3 +175,37 @@ ALTER TABLE public.project_suggestions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.offers ENABLE ROW LEVEL SECURITY;
 
 -- Note: Re-run existing policies if needed from previous schema
+
+-- Recurring Services / Subscriptions
+CREATE TABLE IF NOT EXISTS public.recurring_services (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  title TEXT NOT NULL,
+  description TEXT,
+  price NUMERIC NOT NULL,
+  currency TEXT DEFAULT 'USD',
+  interval TEXT DEFAULT 'month', -- 'month', 'year'
+  features TEXT[] DEFAULT '{}',
+  is_active BOOLEAN DEFAULT true,
+  show_on_home BOOLEAN DEFAULT false,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now()),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now())
+);
+
+ALTER TABLE public.recurring_services ENABLE ROW LEVEL SECURITY;
+
+-- Drop existing policies to allow updates without errors
+DROP POLICY IF EXISTS "Public read access" ON public.recurring_services;
+DROP POLICY IF EXISTS "Admin full access" ON public.recurring_services;
+
+CREATE POLICY "Public read access" ON public.recurring_services
+  FOR SELECT USING (true);
+
+CREATE POLICY "Admin full access" ON public.recurring_services
+  FOR ALL USING (
+    EXISTS (
+      SELECT 1 FROM public.profiles
+      WHERE id = auth.uid() 
+      AND (role = 'admin' OR role = 'super_admin')
+    )
+  );
+

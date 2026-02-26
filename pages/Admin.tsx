@@ -1108,6 +1108,157 @@ const AdminMarketplace: React.FC<{ user: User }> = ({ user }) => {
     );
 };
 
+// 7. Subscriptions (Recurring Services)
+const AdminSubscriptions: React.FC = () => {
+    const [subscriptions, setSubscriptions] = useState<any[]>([]);
+    const [showForm, setShowForm] = useState(false);
+    const [editing, setEditing] = useState<any | null>(null);
+    const [formData, setFormData] = useState<{
+        title: string;
+        description: string;
+        price: number;
+        interval: 'month' | 'year';
+        features: string[];
+        is_active: boolean;
+        show_on_home: boolean;
+        currency: string;
+    }>({
+        title: '', description: '', price: 0, interval: 'month', features: [], is_active: true, show_on_home: false, currency: 'USD'
+    });
+    const toast = useToast();
+
+    useEffect(() => { api.getRecurringServices().then(setSubscriptions); }, []);
+
+    const handleEdit = (s: any) => {
+        setEditing(s);
+        setFormData(s);
+        setShowForm(true);
+    };
+
+    const handleSave = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            if (editing) {
+                const updated = await api.updateRecurringService(editing.id, formData);
+                setSubscriptions(updated);
+                toast.success("Subscription updated");
+            } else {
+                const updated = await api.createRecurringService(formData);
+                setSubscriptions(updated);
+                toast.success("Subscription created");
+            }
+            setShowForm(false);
+            setEditing(null);
+            setFormData({ title: '', description: '', price: 0, interval: 'month', features: [], is_active: true, show_on_home: false, currency: 'USD' });
+        } catch (e: any) {
+            toast.error(e.message);
+        }
+    };
+
+    const handleDelete = async (id: string) => {
+        if(!window.confirm("Delete this subscription plan?")) return;
+        try {
+            const updated = await api.deleteRecurringService(id);
+            setSubscriptions(updated);
+            toast.success("Subscription deleted");
+        } catch(e: any) { toast.error(e.message); }
+    };
+
+    return (
+        <div className="space-y-6">
+            <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                    <RefreshCw className="text-vision-primary" /> Recurring Plans
+                </h3>
+                <Button onClick={() => { setEditing(null); setShowForm(!showForm); }}>
+                    {showForm ? 'Cancel' : <><Plus size={16} className="mr-2"/> Add Plan</>}
+                </Button>
+            </div>
+
+            {showForm && (
+                <Card className="animate-in fade-in slide-in-from-top-4 mb-8 border-vision-primary/30">
+                    <h4 className="font-bold text-white mb-6 text-lg">{editing ? 'Edit Plan' : 'New Subscription Plan'}</h4>
+                    <form onSubmit={handleSave} className="space-y-5">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <Input label="Plan Title" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} required />
+                            <div className="grid grid-cols-2 gap-3">
+                                <Input label="Price" type="number" value={formData.price} onChange={e => setFormData({...formData, price: parseFloat(e.target.value)})} required />
+                                <div className="space-y-1.5">
+                                    <label className="text-xs text-gray-400 uppercase font-bold tracking-wider">Interval</label>
+                                    <select 
+                                        className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-vision-primary/50 outline-none"
+                                        value={formData.interval}
+                                        onChange={e => setFormData({...formData, interval: e.target.value as 'month' | 'year'})}
+                                    >
+                                        <option value="month">Monthly</option>
+                                        <option value="year">Yearly</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <Textarea label="Description" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} required />
+                        
+                        <div className="space-y-1.5">
+                            <label className="text-xs text-gray-400 uppercase font-bold tracking-wider">Features (Comma separated)</label>
+                            <Textarea 
+                                value={Array.isArray(formData.features) ? formData.features.join(', ') : formData.features} 
+                                onChange={e => setFormData({...formData, features: e.target.value.split(',').map(f => f.trim()) as any})} 
+                                placeholder="Feature 1, Feature 2, Feature 3"
+                            />
+                        </div>
+
+                        <div className="flex items-center gap-6 pt-2">
+                            <label className="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" checked={formData.is_active} onChange={e => setFormData({...formData, is_active: e.target.checked})} className="accent-vision-primary w-4 h-4" />
+                                <span className="text-sm text-white">Active</span>
+                            </label>
+                            <label className="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" checked={formData.show_on_home} onChange={e => setFormData({...formData, show_on_home: e.target.checked})} className="accent-vision-primary w-4 h-4" />
+                                <span className="text-sm text-white">Show on Home Preview</span>
+                            </label>
+                        </div>
+
+                        <div className="flex justify-end pt-2">
+                            <Button type="submit" className="min-w-[150px]">{editing ? 'Update Plan' : 'Create Plan'}</Button>
+                        </div>
+                    </form>
+                </Card>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                {subscriptions.map(s => (
+                    <div key={s.id} className="bg-[#0f172a]/60 border border-white/5 rounded-xl p-6 hover:border-vision-primary/30 transition-all group relative overflow-hidden flex flex-col">
+                        <div className="flex justify-between items-start mb-4">
+                            <Badge variant={s.is_active ? 'success' : 'danger'}>{s.is_active ? 'Active' : 'Inactive'}</Badge>
+                            <div className="flex gap-1">
+                                <button onClick={() => handleEdit(s)} className="p-2 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white transition-colors"><Edit size={14}/></button>
+                                <button onClick={() => handleDelete(s.id)} className="p-2 hover:bg-red-500/10 rounded-lg text-gray-400 hover:text-red-400 transition-colors"><Trash2 size={14}/></button>
+                            </div>
+                        </div>
+                        
+                        <h4 className="font-bold text-white text-xl mb-1">{s.title}</h4>
+                        <div className="flex items-baseline gap-1 mb-4">
+                            <span className="text-2xl font-bold text-vision-primary">${s.price}</span>
+                            <span className="text-sm text-gray-500">/{s.interval}</span>
+                        </div>
+                        
+                        <p className="text-sm text-gray-400 mb-6 flex-1">{s.description}</p>
+                        
+                        {s.show_on_home && (
+                            <div className="mt-auto pt-4 border-t border-white/5">
+                                <span className="text-[10px] uppercase font-bold text-vision-secondary flex items-center gap-1">
+                                    <CheckCircle size={10} /> Featured on Home
+                                </span>
+                            </div>
+                        )}
+                    </div>
+                ))}
+                {subscriptions.length === 0 && <div className="col-span-full text-center py-12 text-gray-500">No subscription plans configured.</div>}
+            </div>
+        </div>
+    );
+};
+
 // --- Main Admin Layout ---
 
 const Admin: React.FC<{ user: User }> = ({ user }) => {
@@ -1125,6 +1276,7 @@ const Admin: React.FC<{ user: User }> = ({ user }) => {
       { id: 'orders', label: 'Client Orders', icon: ClipboardList },
       { id: 'requests', label: 'Feature Backlog', icon: Lightbulb },
       { id: 'services', label: 'Services', icon: Layers },
+      { id: 'subscriptions', label: 'Subscriptions', icon: RefreshCw },
       { id: 'marketplace', label: 'Marketplace', icon: ShoppingBag },
       { id: 'offers', label: 'Offers', icon: TicketPercent },
       { id: 'tasks', label: 'Tasks', icon: CheckCircle },
@@ -1137,6 +1289,7 @@ const Admin: React.FC<{ user: User }> = ({ user }) => {
           case 'orders': return <AdminOrders user={user} />;
           case 'requests': return <AdminRequests />;
           case 'services': return <AdminServices />;
+          case 'subscriptions': return <AdminSubscriptions />;
           case 'marketplace': return <AdminMarketplace user={user} />;
           case 'offers': return <AdminOffers />;
           case 'tasks': return <AdminTasks user={user} />;

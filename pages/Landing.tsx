@@ -11,12 +11,16 @@ import { MarketplaceItem } from '../types';
 const Landing: React.FC = () => {
   const [stats, setStats] = useState<{ totalDelivered: number, averageRating: number }>({ totalDelivered: 0, averageRating: 0 });
   const [projects, setProjects] = useState<MarketplaceItem[]>([]);
+  const [subscriptions, setSubscriptions] = useState<any[]>([]);
   const [activePreviewTab, setActivePreviewTab] = useState('Websites');
 
   useEffect(() => {
       api.getPlatformStats().then(setStats);
       api.getMarketplaceItems().then(items => {
           setProjects(items);
+      });
+      api.getRecurringServices().then(subs => {
+          setSubscriptions(subs.filter(s => s.is_active && s.show_on_home));
       });
   }, []);
 
@@ -171,6 +175,59 @@ const Landing: React.FC = () => {
           </div>
           <LogoLoop items={techLogos} />
       </section>
+
+      {/* Subscription Preview Section */}
+      {subscriptions.length > 0 && (
+        <section className="py-24 relative z-10 bg-gradient-to-b from-[#020617] to-[#0f172a]/50">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="text-center mb-16">
+                    <span className="text-xs font-semibold text-vision-primary uppercase tracking-widest mb-2 block">Recurring Value</span>
+                    <h2 className="text-3xl font-display font-bold text-white mb-4">
+                        <ScrollFloat>Monthly Plans</ScrollFloat>
+                    </h2>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 justify-center">
+                    {subscriptions.map((sub, index) => (
+                        <motion.div
+                            key={sub.id}
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: index * 0.1 }}
+                            className="relative group"
+                        >
+                            <div className="absolute inset-0 bg-gradient-to-r from-vision-primary/20 to-purple-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                            <div className="relative h-full bg-[#0B1121] border border-white/10 rounded-2xl p-8 hover:border-vision-primary/50 transition-all flex flex-col">
+                                <h3 className="text-xl font-bold text-white mb-2">{sub.title}</h3>
+                                <div className="flex items-baseline gap-1 mb-4">
+                                    <span className="text-3xl font-bold text-vision-primary">${sub.price}</span>
+                                    <span className="text-sm text-gray-500">/{sub.interval}</span>
+                                </div>
+                                <p className="text-gray-400 text-sm mb-6 flex-1">{sub.description}</p>
+                                <ul className="space-y-3 mb-8">
+                                    {sub.features.slice(0, 4).map((f: string, i: number) => (
+                                        <li key={i} className="flex items-start text-xs text-gray-300">
+                                            <CheckCircle size={14} className="text-vision-secondary mr-2 mt-0.5 shrink-0" />
+                                            {f}
+                                        </li>
+                                    ))}
+                                    {sub.features.length > 4 && (
+                                        <li className="text-xs text-gray-500 italic pl-6">And more...</li>
+                                    )}
+                                </ul>
+                                <Link to="/services" className="mt-auto">
+                                    <Button variant="outline" className="w-full border-white/10 hover:bg-white/5 group-hover:border-vision-primary/50">
+                                        View Details
+                                    </Button>
+                                </Link>
+                            </div>
+                        </motion.div>
+                    ))}
+                </div>
+            </div>
+        </section>
+      )}
 
       {/* Magic Bento Features (Unchanged) */}
       <section className="py-24 relative z-10">
