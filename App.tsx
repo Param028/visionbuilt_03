@@ -174,7 +174,7 @@ const App: React.FC = () => {
                     {/* Auth Logic with Recovery Handling */}
                     <Route path="/auth" element={
                         isRecoveryMode 
-                        ? <Auth setUser={setUser} /> 
+                        ? <Auth setUser={setUser} isRecovery={true} /> 
                         : !user 
                             ? <Auth setUser={setUser} /> 
                             : <Navigate to={user.role === 'admin' || user.role === 'super_admin' ? '/admin' : '/dashboard'} />

@@ -11,9 +11,10 @@ import { useToast } from '../components/ui/Toast';
 
 type AuthMode = 'login' | 'signup' | 'forgot_email' | 'forgot_otp' | 'reset_password' | 'verification_sent';
 
-const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
+const Auth: React.FC<{ setUser: (u: User) => void, isRecovery?: boolean }> = ({ setUser, isRecovery }) => {
   const [searchParams] = useSearchParams();
   const [authMode, setAuthMode] = useState<AuthMode>(() => {
+    if (isRecovery) return 'reset_password';
     const mode = searchParams.get('mode');
     if (mode === 'signup' || mode === 'forgot_email' || mode === 'forgot_otp' || mode === 'reset_password') {
       return mode as AuthMode;
@@ -113,8 +114,8 @@ const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
       setLoading(true);
       try {
           await api.sendPasswordResetOtp(email);
-          setAuthMode('forgot_otp');
-          toast.success("Reset code sent.");
+          setAuthMode('verification_sent');
+          toast.success("Reset link sent.");
       } catch (err: any) {
           toast.error(err.message);
       } finally {
@@ -314,21 +315,27 @@ const Auth: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
                 </div>
                 <div className="bg-white/5 rounded-xl p-4 border border-white/10">
                     <p className="text-sm text-gray-300">
-                        We have sent a secure verification link to:
+                        {isRecovery ? 'We have sent a secure password reset link to:' : 'We have sent a secure verification link to:'}
                         <br/>
                         <span className="text-white font-bold">{email}</span>
                     </p>
                 </div>
                 <p className="text-xs text-gray-500">
-                    Please check your inbox (and spam folder) and click the link to activate your dashboard.
+                    Please check your inbox (and spam folder) and click the link to {isRecovery ? 'reset your password' : 'activate your dashboard'}.
                 </p>
                 <div className="flex flex-col gap-2">
                     <Button onClick={() => setAuthMode('login')} variant="outline" className="w-full">
                         Return to Login
                     </Button>
-                    <button onClick={handleResendConfirmation} className="text-xs text-vision-primary hover:underline">
-                        Resend Confirmation Link
-                    </button>
+                    {isRecovery ? (
+                        <button onClick={() => setAuthMode('forgot_otp')} className="text-xs text-gray-500 hover:text-vision-primary">
+                            I received a code instead of a link
+                        </button>
+                    ) : (
+                        <button onClick={handleResendConfirmation} className="text-xs text-vision-primary hover:underline">
+                            Resend Confirmation Link
+                        </button>
+                    )}
                 </div>
             </div>
         )}
