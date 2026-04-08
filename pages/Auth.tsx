@@ -22,6 +22,8 @@ const Auth: React.FC<{ setUser: (u: User) => void, isRecovery?: boolean }> = ({ 
     return 'login';
   });
 
+  console.log("Auth component mounted/rendered with mode:", authMode);
+
   const toast = useToast();
 
   const [email, setEmail] = useState('');

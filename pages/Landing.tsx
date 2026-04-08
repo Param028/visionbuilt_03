@@ -12,9 +12,11 @@ const Landing: React.FC = () => {
   const [stats, setStats] = useState<{ totalDelivered: number, averageRating: number }>({ totalDelivered: 0, averageRating: 0 });
   const [projects, setProjects] = useState<MarketplaceItem[]>([]);
   const [subscriptions, setSubscriptions] = useState<any[]>([]);
+  const [siteSettings, setSiteSettings] = useState<any>(null);
   const [activePreviewTab, setActivePreviewTab] = useState('Websites');
 
   useEffect(() => {
+      api.getSiteSettings().then(setSiteSettings);
       api.getPlatformStats().then(setStats);
       api.getMarketplaceItems().then(items => {
           setProjects(items);
@@ -76,17 +78,30 @@ const Landing: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="mb-6"
           >
-             <h1 className="text-5xl md:text-7xl font-display font-bold tracking-tight text-white">
-                <ScrollFloat animationDuration={0.8} stagger={0.05}>Build the</ScrollFloat> <br/>
-                <GradientText className="text-6xl md:text-8xl mt-2" colors={["#06b6d4", "#8b5cf6", "#ec4899", "#06b6d4"]}>
-                   FUTURE
-                </GradientText>
+             <h1 className="text-5xl md:text-7xl font-display font-bold tracking-tight text-white flex flex-col items-center justify-center">
+                {siteSettings ? (
+                    <>
+                       <ScrollFloat animationDuration={0.8} stagger={0.05}>
+                          {siteSettings.hero_title.split(' ').slice(0, -1).join(' ')}
+                       </ScrollFloat>
+                       <GradientText className="text-6xl md:text-8xl mt-2 block" colors={["#06b6d4", "#8b5cf6", "#ec4899", "#06b6d4"]}>
+                          {siteSettings.hero_title.split(' ').slice(-1).join('')}
+                       </GradientText>
+                    </>
+                ) : (
+                    <>
+                       <ScrollFloat animationDuration={0.8} stagger={0.05}>Build the</ScrollFloat>
+                       <GradientText className="text-6xl md:text-8xl mt-2 block" colors={["#06b6d4", "#8b5cf6", "#ec4899", "#06b6d4"]}>
+                          FUTURE
+                       </GradientText>
+                    </>
+                )}
              </h1>
           </motion.div>
 
           <div className="max-w-2xl text-lg md:text-xl text-gray-400 mb-10 leading-relaxed mx-auto">
              <ScrollFloat animationDuration={0.5} stagger={0.01} className="justify-center">
-                Vision Built transforms ideas into digital reality. From high-scale software to futuristic web experiences, we engineer success.
+                {siteSettings ? siteSettings.hero_subtitle : "Vision Built transforms ideas into digital reality. From high-scale software to futuristic web experiences, we engineer success."}
              </ScrollFloat>
           </div>
 

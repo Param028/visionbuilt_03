@@ -1,6 +1,6 @@
 
 import { supabase } from '../lib/supabase';
-import { User, Service, Order, Message, ContactInfo, Offer, MarketplaceItem, AdminActivity, Task, AnalyticsData, Role, ProjectSuggestion, Payment, RecurringService } from '../types';
+import { User, Service, Order, Message, ContactInfo, Offer, MarketplaceItem, AdminActivity, Task, AnalyticsData, Role, ProjectSuggestion, Payment, RecurringService, SiteSettings } from '../types';
 import { INITIAL_CONTACT_INFO, CURRENCY_CONFIG } from '../constants';
 
 // Helper to open Razorpay
@@ -694,6 +694,41 @@ export class ApiService {
       } catch (err: any) {
         throw err;
       }
+  }
+
+  // --- Site Settings ---
+  async getSiteSettings(): Promise<SiteSettings> {
+      try {
+          const { data, error } = await withTimeout(
+              supabase.from('site_settings').select('*').eq('id', 'global').single(),
+              5000,
+              { data: null, error: new Error('Timeout') } as any
+          );
+          if (error) {
+              return { 
+                  id: 'global', 
+                  hero_title: 'Build the FUTURE', 
+                  hero_subtitle: 'Vision Built transforms ideas into digital reality. From high-scale software to futuristic web experiences, we engineer success.', 
+                  contact_email: 'hello@visionbuilt.com', 
+                  contact_phone: '+1 (555) 123-4567' 
+              };
+          }
+          return data;
+      } catch (e) {
+          return { 
+              id: 'global', 
+              hero_title: 'Build the FUTURE', 
+              hero_subtitle: 'Vision Built transforms ideas into digital reality. From high-scale software to futuristic web experiences, we engineer success.', 
+              contact_email: 'hello@visionbuilt.com', 
+              contact_phone: '+1 (555) 123-4567' 
+          };
+      }
+  }
+
+  async updateSiteSettings(settings: Partial<SiteSettings>): Promise<SiteSettings> {
+      const { data, error } = await supabase.from('site_settings').update(settings).eq('id', 'global').select().single();
+      if (error) throw error;
+      return data;
   }
 }
 

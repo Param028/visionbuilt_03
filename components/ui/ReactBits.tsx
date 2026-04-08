@@ -329,6 +329,23 @@ interface ProjectLoopItem {
 }
 
 export const ProjectLoop: React.FC<{ items: ProjectLoopItem[] }> = ({ items }) => {
+   if (items.length <= 4) {
+       return (
+        <div className="py-10 bg-black/20 flex flex-wrap justify-center gap-6 px-4">
+           {items.map((item, idx) => (
+             <Link key={`${item.id}-${idx}`} to={item.url || '#'} className="group">
+                <div className="w-[280px] h-[160px] md:w-[400px] md:h-[225px] rounded-xl overflow-hidden border border-white/10 relative shadow-lg bg-vision-900 group-hover:border-vision-primary/50 transition-all duration-300">
+                    <img src={item.image} alt={item.title} loading="lazy" className="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500 filter grayscale group-hover:grayscale-0" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                         <span className="text-white font-bold truncate w-full">{item.title}</span>
+                    </div>
+                 </div>
+             </Link>
+           ))}
+        </div>
+       );
+   }
+
    return (
     <div className="relative w-full overflow-hidden py-10 bg-black/20">
       <div className="absolute left-0 top-0 bottom-0 w-32 z-10 bg-gradient-to-r from-vision-900 to-transparent pointer-events-none" />

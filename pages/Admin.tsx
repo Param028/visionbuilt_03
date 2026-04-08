@@ -7,7 +7,7 @@ import {
   ImageIcon, Users, ClipboardList, 
   BarChart3, TicketPercent, Layers, 
   Lightbulb, Bell, DollarSign,
-  User as UserIcon, LogOut, Shield, Zap, RefreshCw, X, Calendar, Search, Wallet, Mail, Phone
+  User as UserIcon, LogOut, Shield, Zap, RefreshCw, X, Calendar, Search, Wallet, Mail, Phone, Globe
 } from 'lucide-react';
 import { api } from '../services/api';
 import { User, MarketplaceItem, ProjectCategory, Order, Service, Offer, Task, ProjectSuggestion, AnalyticsData, AdminActivity } from '../types';
@@ -1259,6 +1259,55 @@ const AdminSubscriptions: React.FC = () => {
     );
 };
 
+// 8. Site Settings
+const AdminSettings: React.FC = () => {
+    const [settings, setSettings] = useState<any>(null);
+    const toast = useToast();
+
+    useEffect(() => {
+        api.getSiteSettings().then(setSettings);
+    }, []);
+
+    const handleSave = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            await api.updateSiteSettings(settings);
+            toast.success("Site settings updated!");
+        } catch (err: any) {
+            toast.error(err.message || "Failed to update settings");
+        }
+    };
+
+    if (!settings) return null;
+
+    return (
+        <div className="space-y-6">
+            <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                <Globe className="text-vision-primary" /> Global Content Settings
+            </h3>
+            <Card className="border-vision-primary/30">
+                <form onSubmit={handleSave} className="space-y-5">
+                    <h4 className="font-bold text-white text-lg border-b border-white/5 pb-2 mb-4">Hero Section</h4>
+                    <div className="grid grid-cols-1 gap-5">
+                        <Input label="Hero Title" value={settings.hero_title} onChange={e => setSettings({...settings, hero_title: e.target.value})} required />
+                        <Textarea label="Hero Subtitle" value={settings.hero_subtitle} onChange={e => setSettings({...settings, hero_subtitle: e.target.value})} required className="min-h-[80px]" />
+                    </div>
+                    
+                    <h4 className="font-bold text-white text-lg border-b border-white/5 pb-2 mb-4 mt-8">Contact Information</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <Input label="Support Email" type="email" value={settings.contact_email} onChange={e => setSettings({...settings, contact_email: e.target.value})} required />
+                        <Input label="Support Phone" value={settings.contact_phone} onChange={e => setSettings({...settings, contact_phone: e.target.value})} required />
+                    </div>
+
+                    <div className="flex justify-end pt-4">
+                        <Button type="submit">Save Changes</Button>
+                    </div>
+                </form>
+            </Card>
+        </div>
+    );
+};
+
 // --- Main Admin Layout ---
 
 const Admin: React.FC<{ user: User }> = ({ user }) => {
@@ -1280,6 +1329,7 @@ const Admin: React.FC<{ user: User }> = ({ user }) => {
       { id: 'marketplace', label: 'Marketplace', icon: ShoppingBag },
       { id: 'offers', label: 'Offers', icon: TicketPercent },
       { id: 'tasks', label: 'Tasks', icon: CheckCircle },
+      { id: 'settings', label: 'Site Content', icon: Globe, role: ['super_admin', 'admin'] },
       { id: 'team', label: 'Team', icon: Users, role: ['super_admin'] },
   ];
 
@@ -1293,6 +1343,7 @@ const Admin: React.FC<{ user: User }> = ({ user }) => {
           case 'marketplace': return <AdminMarketplace user={user} />;
           case 'offers': return <AdminOffers />;
           case 'tasks': return <AdminTasks user={user} />;
+          case 'settings': return <AdminSettings />;
           case 'team': return <AdminTeam user={user} />;
           default: return <div className="p-10 text-center">Select a module</div>;
       }

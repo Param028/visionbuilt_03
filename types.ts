@@ -201,3 +201,12 @@ export interface AnalyticsData {
   sales_trend: { label: string; value: number; date: string }[]; 
   top_developer: User | null;
 }
+
+export interface SiteSettings {
+  id: string;
+  hero_title: string;
+  hero_subtitle: string;
+  contact_email: string;
+  contact_phone: string;
+}
+
