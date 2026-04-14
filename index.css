@@ -26,14 +26,21 @@ h1, h2, h3, h4, h5, h6 {
   -moz-osx-font-smoothing: grayscale;
 }
 
-.glass-panel {
-  background: rgba(40, 40, 40, 0.1) !important; /* Extremely translucent greyish tint */
+.glass-panel,
+.bg-white\/5,
+.bg-white\/10,
+.bg-black\/40,
+.bg-black\/20,
+.bg-vision-900\/40,
+.bg-vision-900\/50,
+.bg-vision-900\/60,
+.bg-\[\#0B1121\] {
+  background: rgba(40, 40, 40, 0.1) !important; 
   backdrop-filter: blur(32px) saturate(150%) !important;
   -webkit-backdrop-filter: blur(32px) saturate(150%) !important;
   border: 1px solid rgba(0, 0, 0, 0.05) !important;
   border-top: 1px solid rgba(255, 255, 255, 0.5) !important;
   border-left: 1px solid rgba(255, 255, 255, 0.2) !important;
-  border-radius: 1.5rem !important;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.05) !important;
   color: #0F172A !important; 
 }
@@ -66,7 +73,15 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Mobile Fixes */
 @media (max-width: 768px) {
-  .glass-panel {
+  .glass-panel,
+  .bg-white\/5,
+  .bg-white\/10,
+  .bg-black\/40,
+  .bg-black\/20,
+  .bg-vision-900\/40,
+  .bg-vision-900\/50,
+  .bg-vision-900\/60,
+  .bg-\[\#0B1121\] {
     background: rgba(40, 40, 40, 0.15) !important; 
     backdrop-filter: blur(24px) saturate(150%) !important;
     -webkit-backdrop-filter: blur(24px) saturate(150%) !important;
