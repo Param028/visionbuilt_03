@@ -8,8 +8,8 @@
 }
 
 body {
-  background-color: #F8FAFC; /* Premium subtle cool white */
-  color: #0F172A; /* Slate 900 for great readability */
+  background-color: #F8FAFC; 
+  color: #0F172A; 
   font-family: 'Inter', sans-serif;
   overflow-x: hidden;
   min-height: 100vh;
@@ -27,24 +27,25 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .glass-panel {
-  background: rgba(20, 20, 20, 0.6) !important;
-  backdrop-filter: blur(24px) saturate(160%) !important;
-  -webkit-backdrop-filter: blur(24px) saturate(160%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.25) !important;
+  background: rgba(40, 40, 40, 0.1) !important; /* Extremely translucent greyish tint */
+  backdrop-filter: blur(32px) saturate(150%) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(150%) !important;
+  border: 1px solid rgba(0, 0, 0, 0.05) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.5) !important;
+  border-left: 1px solid rgba(255, 255, 255, 0.2) !important;
   border-radius: 1.5rem !important;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
-  color: #FFFFFF !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.05) !important;
+  color: #0F172A !important; 
 }
 
-/* Fix text contrast hacks for elements stranded on white background */
-.text-white:not(.glass-panel .text-white) {
+/* Because the cards are so translucent, the white background shows through completely. All text must be dark! */
+.text-white {
   color: #0F172A !important;
 }
-.text-gray-400:not(.glass-panel .text-gray-400) {
+.text-gray-400 {
   color: #475569 !important;
 }
-.text-gray-300:not(.glass-panel .text-gray-300) {
+.text-gray-300 {
   color: #334155 !important;
 }
 
@@ -66,10 +67,10 @@ h1, h2, h3, h4, h5, h6 {
 /* Mobile Fixes */
 @media (max-width: 768px) {
   .glass-panel {
-    background: rgba(20, 20, 20, 0.75) !important;
-    backdrop-filter: blur(20px) saturate(150%) !important;
-    -webkit-backdrop-filter: blur(20px) saturate(150%) !important;
-    color: #FFFFFF !important;
+    background: rgba(40, 40, 40, 0.15) !important; 
+    backdrop-filter: blur(24px) saturate(150%) !important;
+    -webkit-backdrop-filter: blur(24px) saturate(150%) !important;
+    color: #0F172A !important;
   }
   .neon-text {
     text-shadow: none !important;
