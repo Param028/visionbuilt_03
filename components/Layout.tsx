@@ -61,7 +61,7 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-vision-900 text-gray-100 font-sans selection:bg-vision-primary selection:text-white relative overflow-x-hidden">
+    <div className="min-h-screen flex flex-col bg-white text-black font-sans selection:bg-vision-primary selection:text-white relative overflow-x-hidden">
       {/* Optimized Particles: Staticity increased to reduce movement noise, lower quantity */}
       <Particles 
         className="fixed inset-0 z-0 pointer-events-none" 
@@ -148,7 +148,7 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
           {children}
       </main>
 
-      <footer className="border-t border-white/5 bg-vision-900 relative z-10">
+      <footer className="border-t border-black/10 bg-white relative z-10">
         <div className="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="col-span-1 md:col-span-1">

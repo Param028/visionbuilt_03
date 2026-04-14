@@ -193,7 +193,7 @@ const Landing: React.FC = () => {
 
       {/* Subscription Preview Section */}
       {subscriptions.length > 0 && (
-        <section className="py-24 relative z-10 bg-gradient-to-b from-[#020617] to-[#0f172a]/50">
+        <section className="py-24 relative z-10 bg-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center mb-16">
                     <span className="text-xs font-semibold text-vision-primary uppercase tracking-widest mb-2 block">Recurring Value</span>

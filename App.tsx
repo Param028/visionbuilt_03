@@ -109,7 +109,7 @@ const App: React.FC = () => {
   // --- 1. Setup Required Screen (Missing Env Vars) ---
   if (!isConfigured) {
       return (
-          <div className="min-h-screen bg-vision-900 flex items-center justify-center p-4">
+          <div className="min-h-screen bg-white text-black flex items-center justify-center p-4">
               <Card className="max-w-2xl w-full p-8 border-vision-primary/30 relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-vision-primary via-vision-secondary to-vision-primary animate-gradient-x"></div>
                   
