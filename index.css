@@ -8,13 +8,17 @@
 }
 
 body {
-  background-color: #FFFFFF;
-  color: #0D0D0D;
+  background-color: #F8FAFC; /* Premium subtle cool white */
+  color: #0F172A; /* Slate 900 for great readability */
   font-family: 'Inter', sans-serif;
   overflow-x: hidden;
   min-height: 100vh;
   width: 100%;
   -webkit-overflow-scrolling: touch;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  letter-spacing: -0.02em;
 }
 
 * {
@@ -23,13 +27,25 @@ body {
 }
 
 .glass-panel {
-  background: rgba(64, 64, 64, 0.7) !important;
-  backdrop-filter: blur(16px) !important;
-  -webkit-backdrop-filter: blur(16px) !important;
-  border: 1px solid rgba(13, 13, 13, 0.3) !important;
-  border-radius: 1rem;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-  color: #FFFFFF !important; /* Keep text white inside dark glass cards */
+  background: rgba(20, 20, 20, 0.6) !important;
+  backdrop-filter: blur(24px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(160%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.25) !important;
+  border-radius: 1.5rem !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  color: #FFFFFF !important;
+}
+
+/* Fix text contrast hacks for elements stranded on white background */
+.text-white:not(.glass-panel .text-white) {
+  color: #0F172A !important;
+}
+.text-gray-400:not(.glass-panel .text-gray-400) {
+  color: #475569 !important;
+}
+.text-gray-300:not(.glass-panel .text-gray-300) {
+  color: #334155 !important;
 }
 
 /* Custom Scrollbar */
@@ -50,9 +66,9 @@ body {
 /* Mobile Fixes */
 @media (max-width: 768px) {
   .glass-panel {
-    background: rgba(64, 64, 64, 0.8) !important;
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
+    background: rgba(20, 20, 20, 0.75) !important;
+    backdrop-filter: blur(20px) saturate(150%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(150%) !important;
     color: #FFFFFF !important;
   }
   .neon-text {
