@@ -8,8 +8,8 @@
 }
 
 body {
-  background-color: #0D0D0D;
-  color: #FFFFFF;
+  background-color: #FFFFFF;
+  color: #0D0D0D;
   font-family: 'Inter', sans-serif;
   overflow-x: hidden;
   min-height: 100vh;
@@ -23,12 +23,13 @@ body {
 }
 
 .glass-panel {
-  background: rgba(64, 64, 64, 0.2) !important;
+  background: rgba(64, 64, 64, 0.7) !important;
   backdrop-filter: blur(16px) !important;
   -webkit-backdrop-filter: blur(16px) !important;
-  border: 1px solid rgba(191, 191, 191, 0.2) !important;
+  border: 1px solid rgba(13, 13, 13, 0.3) !important;
   border-radius: 1rem;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  color: #FFFFFF !important; /* Keep text white inside dark glass cards */
 }
 
 /* Custom Scrollbar */
@@ -36,22 +37,23 @@ body {
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0D0D0D; 
+  background: #FFFFFF; 
 }
 ::-webkit-scrollbar-thumb {
-  background: #404040; 
+  background: #808080; 
   border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #808080; 
+  background: #404040; 
 }
 
 /* Mobile Fixes */
 @media (max-width: 768px) {
   .glass-panel {
-    background: rgba(64, 64, 64, 0.4);
+    background: rgba(64, 64, 64, 0.8) !important;
     backdrop-filter: blur(12px) !important;
     -webkit-backdrop-filter: blur(12px) !important;
+    color: #FFFFFF !important;
   }
   .neon-text {
     text-shadow: none !important;
