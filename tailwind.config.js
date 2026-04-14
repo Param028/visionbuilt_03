@@ -16,14 +16,21 @@ export default {
         sora: ['Sora', 'sans-serif'],
       },
       colors: {
+        palette: {
+          900: '#0D0D0D',
+          800: '#404040',
+          500: '#808080',
+          300: '#BFBFBF',
+          50: '#FFFFFF',
+        },
         vision: {
-          900: '#020617',
-          800: '#0f172a',
-          primary: '#06b6d4',
-          secondary: '#8b5cf6',
-          accent: '#3b82f6',
-          glass: 'rgba(255, 255, 255, 0.05)',
-          glassBorder: 'rgba(255, 255, 255, 0.1)',
+          900: '#0D0D0D',
+          800: '#404040',
+          primary: '#FFFFFF',
+          secondary: '#BFBFBF',
+          accent: '#808080',
+          glass: 'rgba(64, 64, 64, 0.2)',
+          glassBorder: 'rgba(191, 191, 191, 0.2)',
         }
       },
       animation: {
