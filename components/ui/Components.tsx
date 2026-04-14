@@ -39,10 +39,10 @@ export const Button: React.FC<ButtonProps> = ({
   const baseStyles = "relative inline-flex items-center justify-center rounded-lg font-medium transition-all duration-300 focus:outline-none disabled:opacity-50 disabled:pointer-events-none overflow-hidden group";
   
   const variants = {
-    primary: "bg-vision-primary text-vision-900 border border-transparent shadow-[0_0_10px_rgba(6,182,212,0.2)] hover:shadow-[0_0_20px_rgba(6,182,212,0.4)]",
-    secondary: "bg-vision-secondary text-white border border-transparent shadow-[0_0_10px_rgba(139,92,246,0.2)] hover:shadow-[0_0_20px_rgba(139,92,246,0.4)]",
-    outline: "bg-transparent border border-vision-primary text-vision-primary hover:bg-vision-primary/10",
-    ghost: "bg-transparent hover:bg-white/5 text-gray-300 hover:text-white"
+    primary: "glass-panel !bg-[rgba(6,182,212,0.15)] border-vision-primary/30 !text-vision-primary shadow-[0_0_10px_rgba(6,182,212,0.2)] hover:shadow-[0_0_20px_rgba(6,182,212,0.4)]",
+    secondary: "glass-panel !bg-[rgba(139,92,246,0.15)] border-vision-secondary/30 !text-vision-secondary shadow-[0_0_10px_rgba(139,92,246,0.2)] hover:shadow-[0_0_20px_rgba(139,92,246,0.4)]",
+    outline: "glass-panel border-vision-primary !text-vision-primary hover:!bg-vision-primary/10",
+    ghost: "glass-panel !border-transparent hover:!bg-gray-200/50"
   };
   
   const sizes = {

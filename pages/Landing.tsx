@@ -128,7 +128,7 @@ const Landing: React.FC = () => {
              initial={{ opacity: 0, y: 20 }}
              animate={{ opacity: 1, y: 0 }}
              transition={{ duration: 0.6, delay: 0.5 }}
-             className="grid grid-cols-2 md:grid-cols-2 gap-8 md:gap-24 p-6 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-md max-w-2xl w-full"
+             className="grid grid-cols-2 md:grid-cols-2 gap-8 md:gap-24 p-6 glass-panel max-w-2xl w-full"
           >
               <div className="flex flex-col items-center">
                   <div className="flex items-center text-4xl font-bold font-display text-transparent bg-clip-text bg-gradient-to-r from-vision-primary to-vision-secondary">
@@ -213,7 +213,7 @@ const Landing: React.FC = () => {
                             className="relative group"
                         >
                             <div className="absolute inset-0 bg-gradient-to-r from-vision-primary/20 to-purple-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                            <div className="relative h-full bg-[#0B1121] border border-white/10 rounded-2xl p-8 hover:border-vision-primary/50 transition-all flex flex-col">
+                            <div className="relative h-full glass-panel p-8 hover:border-vision-primary/50 transition-all flex flex-col">
                                 <h3 className="text-xl font-bold text-white mb-2">{sub.title}</h3>
                                 <div className="flex items-baseline gap-1 mb-4">
                                     <span className="text-3xl font-bold text-vision-primary">${sub.price}</span>
