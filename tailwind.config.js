@@ -1,37 +1,22 @@
 
+import { heroui } from "@heroui/theme";
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
     "./index.html",
     "./**/*.{js,ts,jsx,tsx}",
     "!./supabase/**",
-    "!./node_modules/**"
+    "!./node_modules/**",
+    "./node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}"
   ],
   darkMode: 'class',
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-        display: ['Space Grotesk', 'sans-serif'],
+        sans: ['var(--font-sans)', 'sans-serif'],
+        display: ['var(--font-heading)', 'sans-serif'],
         sora: ['Sora', 'sans-serif'],
-      },
-      colors: {
-        palette: {
-          900: '#0D0D0D',
-          800: '#404040',
-          500: '#808080',
-          300: '#BFBFBF',
-          50: '#FFFFFF',
-        },
-        vision: {
-          900: '#0D0D0D',
-          800: '#404040',
-          primary: '#FFFFFF',
-          secondary: '#BFBFBF',
-          accent: '#808080',
-          glass: 'rgba(64, 64, 64, 0.2)',
-          glassBorder: 'rgba(191, 191, 191, 0.2)',
-        }
       },
       animation: {
         'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
@@ -56,5 +41,45 @@ export default {
       }
     }
   },
-  plugins: [],
+  plugins: [
+    heroui({
+      themes: {
+        light: {
+          colors: {
+            background: "#F8F9FA", // Rich off-white page background
+            content1: "#FFFFFF", // Pure white for elevated cards
+            foreground: "#212529", // Deep slate for primary text
+            primary: {
+              DEFAULT: "#000000", // Pure black for stark CTA buttons
+              foreground: "#FFFFFF", 
+            },
+            secondary: {
+              DEFAULT: "#E9ECEF", // Secondary subtle buttons
+              foreground: "#212529",
+            },
+            divider: "#DEE2E6", // Subtle 1px borders
+            focus: "#6C757D",
+          },
+        },
+        dark: {
+          colors: {
+            background: "#212529", // Dark slate background (anti-eyestrain)
+            content1: "#343A40", // Elevated dark cards
+            foreground: "#F8F9FA", // Crisp off-white primary text
+            primary: {
+              DEFAULT: "#FFFFFF", // Pure white CTA buttons
+              foreground: "#212529", 
+            },
+            secondary: {
+              DEFAULT: "#495057", // Secondary dark buttons
+              foreground: "#F8F9FA",
+            },
+            divider: "#495057", // Subtle dark borders
+            focus: "#ADB5BD",
+          },
+        }
+      }
+    })
+  ],
 }
+

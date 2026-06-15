@@ -59,52 +59,52 @@ const Offers: React.FC<{ user: User | null }> = ({ user }) => {
 
     return {
       id: offer.id,
-      className: isExpired ? "grayscale opacity-75 border-red-500/20 bg-red-950/10" : "",
+      className: isExpired ? "grayscale opacity-75 border-rose-500/20 bg-rose-950/10" : "",
       content: (
         <div className="text-center h-full flex flex-col items-center justify-between relative w-full">
-           <div className={`mt-4 p-4 rounded-full ${isExpired ? 'bg-gray-800 text-gray-500' : 'bg-vision-primary/10 text-vision-primary'}`}>
+           <div className={`mt-4 p-4 rounded-full ${isExpired ? 'bg-secondary text-foreground/40' : 'bg-foreground/10 text-foreground'}`}>
               <Sparkles size={32} />
            </div>
            
            {isExpired && (
                <div className="absolute top-0 right-0 z-20">
-                    <div className="bg-red-500/20 border border-red-500/50 text-red-400 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider backdrop-blur-md">
+                    <div className="bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider backdrop-blur-md">
                         Expired
                     </div>
                </div>
            )}
-
+ 
             {/* Percentage Badge */}
             {!isExpired && (
                 <div className="absolute top-0 left-0 z-20">
-                    <div className="flex items-center gap-1 bg-green-500/20 border border-green-500/50 text-green-400 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider backdrop-blur-md">
+                    <div className="flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider backdrop-blur-md">
                         <Percent size={10} /> {offer.discountPercentage}% OFF
                     </div>
                 </div>
             )}
-
-           <div>
-              <h3 className="text-2xl font-display font-bold text-white mb-2">{offer.title}</h3>
-              <p className="text-gray-400 text-sm leading-relaxed mb-4 line-clamp-2">{offer.description}</p>
-           </div>
+ 
+            <div>
+              <h3 className="text-2xl font-display font-bold text-foreground mb-2">{offer.title}</h3>
+              <p className="text-foreground/75 text-sm leading-relaxed mb-4 line-clamp-2">{offer.description}</p>
+            </div>
            
-           <div className={`w-full rounded-lg p-3 border flex items-center justify-between mb-2 ${isExpired ? 'bg-black/20 border-white/5' : 'bg-black/40 border-white/10'}`}>
-               <code className={`font-mono text-lg font-bold tracking-wider ${isExpired ? 'text-gray-500' : 'text-vision-primary'}`}>{offer.code}</code>
-               <button 
-                 onClick={(e) => { e.stopPropagation(); if (!isExpired) handleCopy(offer.code, offer.id); }}
-                 className={`transition-colors ${isExpired ? 'text-gray-600 cursor-not-allowed' : 'text-gray-400 hover:text-white'}`}
-                 disabled={isExpired}
-               >
-                  {copiedId === offer.id ? <Check size={18} className="text-green-400" /> : <Copy size={18} />}
-               </button>
-           </div>
-  
-           {offer.validUntil && (
-               <div className={`flex items-center text-xs mb-4 px-3 py-1 rounded-full border ${isExpired ? 'text-gray-500 border-gray-700 bg-gray-800/20' : 'text-yellow-500/80 bg-yellow-500/5 border-yellow-500/20'}`}>
-                   <Calendar size={12} className="mr-1.5" />
-                   <span>{isExpired ? 'Expired on ' : 'Valid until '}{new Date(offer.validUntil).toLocaleDateString()}</span>
-               </div>
-           )}
+            <div className={`w-full rounded-lg p-3 border flex items-center justify-between mb-2 ${isExpired ? 'bg-secondary/40 border-divider' : 'bg-content1 border-divider shadow-sm'}`}>
+                <code className={`font-mono text-lg font-bold tracking-wider ${isExpired ? 'text-foreground/40' : 'text-foreground'}`}>{offer.code}</code>
+                <button 
+                  onClick={(e) => { e.stopPropagation(); if (!isExpired) handleCopy(offer.code, offer.id); }}
+                  className={`transition-colors ${isExpired ? 'text-foreground/30 cursor-not-allowed' : 'text-foreground/60 hover:text-foreground'}`}
+                  disabled={isExpired}
+                >
+                   {copiedId === offer.id ? <Check size={18} className="text-emerald-500" /> : <Copy size={18} />}
+                </button>
+            </div>
+   
+            {offer.validUntil && (
+                <div className={`flex items-center text-xs mb-4 px-3 py-1 rounded-full border ${isExpired ? 'text-foreground/40 border-divider bg-secondary/10' : 'text-amber-600 dark:text-amber-400 bg-amber-500/10 border-amber-500/20'}`}>
+                    <Calendar size={12} className="mr-1.5" />
+                    <span>{isExpired ? 'Expired on ' : 'Valid until '}{new Date(offer.validUntil).toLocaleDateString()}</span>
+                </div>
+            )}
   
            {(!user || user.role === 'client') && (
                <Button 
@@ -124,7 +124,7 @@ const Offers: React.FC<{ user: User | null }> = ({ user }) => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-vision-primary border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-8 h-8 border-4 border-foreground border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -132,11 +132,11 @@ const Offers: React.FC<{ user: User | null }> = ({ user }) => {
   return (
     <div className="min-h-screen py-20 px-4 relative overflow-hidden">
       <div className="text-center mb-12 relative z-10">
-        <h1 className="text-4xl md:text-5xl font-display font-bold text-white mb-4">
+        <h1 className="text-4xl md:text-5xl font-display font-bold text-foreground mb-4">
             <ScrollFloat>Exclusive Offers</ScrollFloat>
         </h1>
-        <div className="inline-flex items-center space-x-2 bg-white/5 border border-white/10 rounded-full px-4 py-1.5 backdrop-blur-md">
-            <ShinyText className="text-sm font-medium tracking-wide" shimmerColor="#38bdf8">
+        <div className="inline-flex items-center space-x-2 bg-content1 border border-divider rounded-full px-4 py-1.5 backdrop-blur-md shadow-sm">
+            <ShinyText className="text-sm font-semibold tracking-wide text-foreground" shimmerColor="#ffffff">
                 Limited Time Deals
             </ShinyText>
         </div>
@@ -146,18 +146,18 @@ const Offers: React.FC<{ user: User | null }> = ({ user }) => {
          {offers.length > 0 ? (
              <Carousel items={carouselItems} />
          ) : (
-             <div className="text-center py-20">
-                 <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <AlertCircle className="w-8 h-8 text-gray-500" />
-                 </div>
-                 <h3 className="text-xl font-bold text-white mb-2">No Active Offers</h3>
-                 <p className="text-gray-400">Check back later for new deals and discounts.</p>
+             <div className="text-center py-20 bg-content1 border border-divider rounded-2xl p-8 max-w-md mx-auto shadow-sm">
+                  <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-6">
+                     <AlertCircle className="w-8 h-8 text-foreground/45" />
+                  </div>
+                  <h3 className="text-xl font-bold text-foreground mb-2">No Active Offers</h3>
+                  <p className="text-foreground/70 text-sm">Check back later for new deals and discounts.</p>
              </div>
          )}
       </div>
       
       {offers.length > 0 && (
-          <div className="text-center mt-12 text-sm text-gray-500 max-w-lg mx-auto">
+          <div className="text-center mt-12 text-sm text-foreground/50 max-w-lg mx-auto">
              <p>Swipe or click arrows to explore offers. Click on a card to view details or copy the code to apply discount at checkout.</p>
           </div>
       )}

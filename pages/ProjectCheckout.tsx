@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
@@ -6,7 +5,7 @@ import { MarketplaceItem, User, Offer } from '../types';
 import { formatPrice } from '../constants';
 import { Button, Card, Input, Badge } from '../components/ui/Components';
 import { Stepper, ScrollFloat } from '../components/ui/ReactBits';
-import { TicketPercent, X, Loader2, Shield, Eye, Image as ImageIcon, User as UserIcon, Gift, Rocket } from 'lucide-react';
+import { TicketPercent, X, Loader2, Shield, Eye, ImageIcon, User as UserIcon, Gift, Rocket } from 'lucide-react';
 import { useToast } from '../components/ui/Toast';
 
 const ProjectCheckout: React.FC<{ user: User }> = ({ user }) => {
@@ -133,12 +132,12 @@ const ProjectCheckout: React.FC<{ user: User }> = ({ user }) => {
      return (
         <div className="min-h-[80vh] flex items-center justify-center px-4">
             <Card className="w-full max-w-2xl p-12 text-center relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-vision-primary via-vision-secondary to-vision-primary animate-gradient-x"></div>
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-foreground/20 via-foreground/60 to-foreground/20 animate-gradient-x"></div>
                 
-                <h2 className="text-3xl font-display font-bold text-white mb-2">
+                <h2 className="text-3xl font-display font-bold text-foreground mb-2">
                     <ScrollFloat>{isZeroCost ? 'Preparing Download' : 'Processing Purchase'}</ScrollFloat>
                 </h2>
-                <p className="text-gray-400 mb-12">Generating secure download link...</p>
+                <p className="text-foreground/50 mb-12">Generating secure download link...</p>
                 
                 <div className="max-w-xl mx-auto px-4">
                      <Stepper 
@@ -149,14 +148,14 @@ const ProjectCheckout: React.FC<{ user: User }> = ({ user }) => {
                             { id: 3, label: "Generating" },
                             { id: 4, label: "Complete" }
                         ]}
-                    />
+                     />
                 </div>
             </Card>
         </div>
      )
   }
 
-  if (!item) return <div className="p-20 text-center">Loading Project...</div>;
+  if (!item) return <div className="p-20 text-center text-foreground/50">Loading Project...</div>;
 
   const { total, discount, final } = calculateTotal();
   const allImages = item.image_url ? [item.image_url, ...(item.preview_images || [])] : (item.preview_images || []);
@@ -169,47 +168,47 @@ const ProjectCheckout: React.FC<{ user: User }> = ({ user }) => {
         {/* Project Visuals & Details */}
         <div>
             <div className="mb-6">
-                 <Button variant="ghost" className="pl-0 mb-4 text-gray-400 hover:text-white" onClick={() => navigate('/marketplace')}>
+                 <Button variant="ghost" className="pl-0 mb-4 text-foreground/50 hover:text-foreground" onClick={() => navigate('/marketplace')}>
                      <span className="flex items-center gap-2"><X className="w-4 h-4" /> Cancel</span>
                  </Button>
                  
                  {/* Main Preview Image */}
-                 <div className="rounded-xl overflow-hidden border border-white/10 bg-black/40 aspect-video mb-4 relative shadow-2xl">
+                 <div className="rounded-xl overflow-hidden border border-divider bg-content2 aspect-video mb-4 relative shadow-md">
                      {selectedImage ? (
-                         <img src={selectedImage} alt="Preview" className="w-full h-full object-cover" />
+                          <img src={selectedImage} alt="Preview" className="w-full h-full object-cover" />
                      ) : (
-                         <div className="w-full h-full flex items-center justify-center text-gray-600">
-                             <ImageIcon size={48} />
-                         </div>
+                          <div className="w-full h-full flex items-center justify-center text-foreground/30">
+                              <ImageIcon size={48} />
+                          </div>
                      )}
                  </div>
 
                  {/* Thumbnails */}
                  {allImages.length > 1 && (
                      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                         {allImages.map((img, idx) => (
-                             <button 
-                                key={idx} 
-                                onClick={() => setSelectedImage(img)}
-                                className={`w-20 h-14 flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all ${selectedImage === img ? 'border-vision-primary' : 'border-transparent opacity-60 hover:opacity-100'}`}
-                             >
-                                 <img src={img} alt={`Thumb ${idx}`} className="w-full h-full object-cover" />
-                             </button>
-                         ))}
+                          {allImages.map((img, idx) => (
+                              <button 
+                                 key={idx} 
+                                 onClick={() => setSelectedImage(img)}
+                                 className={`w-20 h-14 flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all ${selectedImage === img ? 'border-foreground' : 'border-transparent opacity-60 hover:opacity-100'}`}
+                              >
+                                  <img src={img} alt={`Thumb ${idx}`} className="w-full h-full object-cover" />
+                              </button>
+                          ))}
                      </div>
                  )}
             </div>
             
             <div className="flex justify-between items-start">
                 <div>
-                     <h1 className="text-3xl font-display font-bold text-white mb-2">{item.title}</h1>
+                     <h1 className="text-3xl font-display font-bold text-foreground mb-2">{item.title}</h1>
                      <div className="flex items-center gap-2 mb-4">
-                         <Badge variant="info">
-                             <UserIcon size={12} className="mr-1 inline-block" />
-                             {item.developer_name}
-                         </Badge>
-                         {isFreeLimitedTime && <Badge variant="success">FREE LIMITED TIME</Badge>}
-                         {isFreeProject && <Badge variant="success">FREE PROJECT</Badge>}
+                          <Badge variant="default">
+                              <UserIcon size={12} className="mr-1 inline-block text-foreground/75" />
+                              {item.developer_name}
+                          </Badge>
+                          {isFreeLimitedTime && <Badge variant="success">FREE LIMITED TIME</Badge>}
+                          {isFreeProject && <Badge variant="success">FREE PROJECT</Badge>}
                      </div>
                 </div>
                 {item.demo_url && (
@@ -219,41 +218,41 @@ const ProjectCheckout: React.FC<{ user: User }> = ({ user }) => {
                 )}
             </div>
 
-            <div className="prose prose-invert max-w-none text-gray-300 text-sm mb-8 border-t border-white/10 pt-6">
-                <h3 className="text-white font-bold mb-2">Project Details</h3>
+            <div className="prose prose-invert max-w-none text-foreground/70 text-sm mb-8 border-t border-divider pt-6">
+                <h3 className="text-foreground font-bold mb-2">Project Details</h3>
                 <p className="leading-relaxed">{item.full_description}</p>
             </div>
         </div>
 
         {/* Checkout Card */}
         <div>
-            <Card className="sticky top-24 border-vision-primary/30 shadow-[0_0_50px_rgba(6,182,212,0.05)]">
+            <Card className="sticky top-24 border-divider shadow-md">
                 <div className="mb-6">
-                    <h2 className="text-xl font-bold text-white mb-1">
+                    <h2 className="text-xl font-bold text-foreground mb-1">
                         {isZeroCost ? 'Instant Access' : 'Purchase License'}
                     </h2>
-                    <p className="text-gray-400 text-sm">{isZeroCost ? 'Download source code immediately.' : 'Unlock full source code & documentation.'}</p>
+                    <p className="text-foreground/50 text-sm">{isZeroCost ? 'Download source code immediately.' : 'Unlock full source code & documentation.'}</p>
                 </div>
 
                  <form onSubmit={handleSubmit} className="space-y-6">
-                     <div className="bg-white/5 rounded-lg p-6 mb-4 text-left space-y-3">
-                         <div className="flex justify-between text-gray-300">
-                             <span className="font-medium">Standard License</span>
-                             <span className={isZeroCost ? "font-bold text-gray-500 line-through" : "font-bold text-white"}>
-                                 {formatPrice(item.price, country)}
-                             </span>
-                         </div>
+                     <div className="bg-content2/50 rounded-lg p-6 mb-4 text-left space-y-3 border border-divider/50">
+                          <div className="flex justify-between text-foreground/85">
+                              <span className="font-medium">Standard License</span>
+                              <span className={isZeroCost ? "font-bold text-foreground/40 line-through" : "font-bold text-foreground"}>
+                                  {formatPrice(item.price, country)}
+                              </span>
+                          </div>
 
-                         {/* Coupon Section (Only if not free) */}
-                         {!isZeroCost && (
+                          {/* Coupon Section (Only if not free) */}
+                          {!isZeroCost && (
                             <div className="pt-3">
                                 {appliedOffer ? (
-                                    <div className="flex justify-between items-center bg-green-500/10 border border-green-500/20 p-2 rounded-lg">
+                                    <div className="flex justify-between items-center bg-success/10 border border-success/20 p-2 rounded-lg">
                                         <div className="flex items-center gap-2">
-                                            <TicketPercent size={16} className="text-green-400" />
-                                            <span className="text-green-400 text-sm font-medium">{appliedOffer.code} ({appliedOffer.discountPercentage}% OFF)</span>
+                                            <TicketPercent size={16} className="text-success" />
+                                            <span className="text-success text-sm font-medium">{appliedOffer.code} ({appliedOffer.discountPercentage}% OFF)</span>
                                         </div>
-                                        <button type="button" onClick={removeCoupon} className="text-gray-400 hover:text-white">
+                                        <button type="button" onClick={removeCoupon} className="text-foreground/50 hover:text-foreground">
                                             <X size={14} />
                                         </button>
                                     </div>
@@ -271,51 +270,51 @@ const ProjectCheckout: React.FC<{ user: User }> = ({ user }) => {
                                             disabled={isValidatingOffer || !couponCode}
                                             variant="secondary"
                                             size="sm"
-                                            className="h-auto"
+                                            className="h-auto font-semibold px-4 border-divider"
                                         >
                                             {isValidatingOffer ? <Loader2 size={14} className="animate-spin" /> : 'Apply'}
                                         </Button>
                                     </div>
                                 )}
-                                {offerError && <p className="text-xs text-red-400 mt-1">{offerError}</p>}
+                                {offerError && <p className="text-xs text-danger mt-1">{offerError}</p>}
                             </div>
-                         )}
-                         
-                         {/* Discount Line */}
-                         {isZeroCost ? (
-                             <div className="flex justify-between text-green-400 text-sm font-medium animate-in fade-in slide-in-from-top-1">
-                                 <span className="flex items-center gap-1"><Gift size={12}/> Free Access</span>
-                                 <span>-{formatPrice(item.price, country)}</span>
-                             </div>
-                         ) : appliedOffer && (
-                             <div className="flex justify-between text-green-400 text-sm font-medium animate-in fade-in slide-in-from-top-1">
-                                 <span>Discount Applied</span>
-                                 <span>-{formatPrice(discount, country)}</span>
-                             </div>
-                         )}
+                          )}
+                          
+                          {/* Discount Line */}
+                          {isZeroCost ? (
+                              <div className="flex justify-between text-success text-sm font-medium animate-in fade-in slide-in-from-top-1">
+                                  <span className="flex items-center gap-1"><Gift size={12}/> Free Access</span>
+                                  <span>-{formatPrice(item.price, country)}</span>
+                              </div>
+                          ) : appliedOffer && (
+                              <div className="flex justify-between text-success text-sm font-medium animate-in fade-in slide-in-from-top-1">
+                                  <span>Discount Applied</span>
+                                  <span>-{formatPrice(discount, country)}</span>
+                              </div>
+                          )}
 
-                         <div className="border-t border-white/10 pt-3 flex justify-between text-xl font-bold text-vision-primary items-center mt-2">
-                             <span>Total</span>
-                             <div className="text-right">
-                                 {isZeroCost ? (
-                                     <span className="text-green-400">FREE</span>
-                                 ) : (
-                                     <>
-                                        {appliedOffer && <span className="block text-xs text-gray-500 font-normal line-through mb-1">{formatPrice(total, country)}</span>}
-                                        <span>{formatPrice(final, country)}</span>
-                                     </>
-                                 )}
-                             </div>
-                         </div>
+                          <div className="border-t border-divider pt-3 flex justify-between text-xl font-bold text-foreground items-center mt-2">
+                              <span>Total</span>
+                              <div className="text-right">
+                                  {isZeroCost ? (
+                                      <span className="text-success">FREE</span>
+                                  ) : (
+                                      <>
+                                         {appliedOffer && <span className="block text-xs text-foreground/45 font-normal line-through mb-1">{formatPrice(total, country)}</span>}
+                                         <span>{formatPrice(final, country)}</span>
+                                      </>
+                                  )}
+                              </div>
+                          </div>
                      </div>
                      
-                     <Button type="submit" isLoading={isProcessing} className={`w-full h-12 text-base shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_30px_rgba(6,182,212,0.5)] ${isZeroCost ? 'bg-green-500 text-black hover:bg-green-400 border-none' : ''}`}>
-                         {isZeroCost ? <><Rocket size={18} className="mr-2"/> Launch Project</> : 'Complete Purchase & Download'}
+                     <Button type="submit" isLoading={isProcessing} className="w-full h-12 text-base font-semibold" variant="primary">
+                          {isZeroCost ? <><Rocket size={18} className="mr-2"/> Launch Project</> : 'Complete Purchase & Download'}
                      </Button>
                      
-                     <div className="flex items-center justify-center gap-2 text-xs text-gray-500 mt-4">
-                         <Shield size={12} className="text-green-500" />
-                         <span>Secure SSL Encrypted {isZeroCost ? 'Connection' : 'Payment'}</span>
+                     <div className="flex items-center justify-center gap-2 text-xs text-foreground/45 mt-4">
+                          <Shield size={12} className="text-success" />
+                          <span>Secure SSL Encrypted {isZeroCost ? 'Connection' : 'Transaction'}</span>
                      </div>
                  </form>
             </Card>

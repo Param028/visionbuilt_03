@@ -84,7 +84,7 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-vision-primary border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-8 h-8 border-4 border-foreground border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -92,33 +92,33 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
       <div className="text-center mb-10">
-        <h1 className="text-4xl md:text-5xl font-display font-bold text-white mb-4">
+        <h1 className="text-4xl md:text-5xl font-display font-bold text-foreground mb-4">
             <ScrollFloat>Marketplace</ScrollFloat>
         </h1>
-        <div className="text-gray-400 max-w-2xl mx-auto mb-8">
+        <div className="text-foreground/75 max-w-2xl mx-auto mb-8">
           <ScrollFloat animationDuration={0.4} stagger={0.01} className="justify-center">
             Premium templates and free resources for your next build.
           </ScrollFloat>
         </div>
-
+ 
         {/* Strictly Defined Tabs */}
         <div className="flex justify-center mb-8 overflow-x-auto pb-2 scrollbar-hide">
-            <div className="bg-white/5 border border-white/10 p-1 rounded-full flex space-x-2">
+            <div className="bg-content1 border border-divider p-1 rounded-full flex space-x-2 shadow-sm">
                 <button 
                     onClick={() => setActiveTab('Premium Projects')}
-                    className={`px-6 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 whitespace-nowrap ${activeTab === 'Premium Projects' ? 'bg-vision-primary text-black shadow-[0_0_15px_rgba(6,182,212,0.4)]' : 'text-gray-400 hover:text-white'}`}
+                    className={`px-6 py-2 rounded-full text-sm font-semibold transition-all flex items-center gap-2 whitespace-nowrap ${activeTab === 'Premium Projects' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-foreground/60 hover:text-foreground'}`}
                 >
                     <Layout size={16} /> Premium Projects
                 </button>
                 <button 
                     onClick={() => setActiveTab('UI/UX Design')}
-                    className={`px-6 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 whitespace-nowrap ${activeTab === 'UI/UX Design' ? 'bg-vision-secondary text-white shadow-[0_0_15px_rgba(139,92,246,0.4)]' : 'text-gray-400 hover:text-white'}`}
+                    className={`px-6 py-2 rounded-full text-sm font-semibold transition-all flex items-center gap-2 whitespace-nowrap ${activeTab === 'UI/UX Design' ? 'bg-secondary text-secondary-foreground shadow-sm border border-divider' : 'text-foreground/60 hover:text-foreground'}`}
                 >
                     <Sparkles size={16} /> UI/UX Design
                 </button>
                 <button 
                     onClick={() => setActiveTab('Free Projects')}
-                    className={`px-6 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 whitespace-nowrap ${activeTab === 'Free Projects' ? 'bg-green-500 text-black shadow-[0_0_15px_rgba(34,197,94,0.4)]' : 'text-gray-400 hover:text-white'}`}
+                    className={`px-6 py-2 rounded-full text-sm font-semibold transition-all flex items-center gap-2 whitespace-nowrap ${activeTab === 'Free Projects' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-foreground/60 hover:text-foreground'}`}
                 >
                     <Rocket size={16} /> Free Projects
                 </button>
@@ -127,38 +127,38 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
       </div>
 
       {/* Sorting Controls */}
-      <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4 border-b border-white/5 pb-4">
-          <p className="text-sm text-gray-400">
-              Showing <span className="text-white font-bold">{displayedItems.length}</span> {activeTab}
+      <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4 border-b border-divider pb-4">
+          <p className="text-sm text-foreground/70">
+              Showing <span className="text-foreground font-bold">{displayedItems.length}</span> {activeTab}
           </p>
           <div className="flex items-center gap-3">
-              <span className="text-sm text-gray-500">Sort by:</span>
+              <span className="text-sm text-foreground/50">Sort by:</span>
               <div className="relative group">
                   <select 
                       value={sortBy} 
                       onChange={(e) => setSortBy(e.target.value)}
-                      className="appearance-none bg-black/40 border border-white/10 text-sm text-white pl-4 pr-10 py-2 rounded-lg cursor-pointer hover:border-vision-primary/50 focus:outline-none focus:border-vision-primary transition-all"
+                      className="appearance-none bg-content1 border border-divider text-sm text-foreground pl-4 pr-10 py-2 rounded-lg cursor-pointer hover:border-focus/30 focus:outline-none focus:ring-2 focus:ring-focus/30 focus:border-focus transition-all duration-300"
                   >
-                      <option value="newest" className="bg-vision-900">Newest Arrivals</option>
-                      <option value="popularity" className="bg-vision-900">Popularity</option>
-                      <option value="rating" className="bg-vision-900">Top Rated</option>
+                      <option value="newest" className="bg-content1 text-foreground">Newest Arrivals</option>
+                      <option value="popularity" className="bg-content1 text-foreground">Popularity</option>
+                      <option value="rating" className="bg-content1 text-foreground">Top Rated</option>
                       {activeTab !== 'Free Projects' && (
                           <>
-                            <option value="price_asc" className="bg-vision-900">Price: Low to High</option>
-                            <option value="price_desc" className="bg-vision-900">Price: High to Low</option>
+                            <option value="price_asc" className="bg-content1 text-foreground">Price: Low to High</option>
+                            <option value="price_desc" className="bg-content1 text-foreground">Price: High to Low</option>
                           </>
                       )}
                   </select>
-                  <ArrowUpDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none group-hover:text-vision-primary transition-colors" />
+                  <ArrowUpDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/50 pointer-events-none group-hover:text-foreground transition-colors" />
               </div>
           </div>
       </div>
 
       {displayedItems.length === 0 ? (
-          <div className="text-center py-20 border border-dashed border-white/10 rounded-xl bg-white/5">
-              <ShoppingBag className="w-12 h-12 text-gray-600 mx-auto mb-4" />
-              <h3 className="text-xl font-bold text-white mb-2">No Projects Found</h3>
-              <p className="text-gray-400">
+          <div className="text-center py-20 border border-dashed border-divider rounded-xl bg-content1 shadow-sm">
+              <ShoppingBag className="w-12 h-12 text-foreground/40 mx-auto mb-4" />
+              <h3 className="text-xl font-bold text-foreground mb-2">No Projects Found</h3>
+              <p className="text-foreground/70">
                   New items for {activeTab} coming soon.
               </p>
           </div>
@@ -178,7 +178,7 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
                         {item.image_url ? (
                             <img src={item.image_url} alt={item.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                         ) : (
-                            <div className="w-full h-full bg-vision-900 flex items-center justify-center text-gray-600">
+                            <div className="w-full h-full bg-secondary flex items-center justify-center text-foreground/40">
                                 <ShoppingBag size={32} />
                             </div>
                         )}
@@ -191,10 +191,10 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
                         </div>
                         
                         {/* Rating Badge */}
-                        <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm px-2 py-1 rounded-full border border-white/10 flex items-center gap-1 text-xs text-yellow-400">
+                        <div className="absolute top-2 right-2 bg-content1/80 backdrop-blur-sm px-2 py-1 rounded-full border border-divider flex items-center gap-1 text-xs text-amber-500 shadow-sm">
                             <Star size={10} fill="currentColor" />
                             <span className="font-bold">{item.rating}</span>
-                            <span className="text-gray-400">({item.review_count})</span>
+                            <span className="text-foreground/50">({item.review_count})</span>
                         </div>
                     </div>
 
@@ -202,23 +202,23 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
                         <div className="flex justify-between items-start mb-2">
                             <div className="flex flex-wrap gap-2 mb-2">
                                 {item.tags.slice(0, 2).map(tag => (
-                                    <span key={tag} className="text-[10px] uppercase tracking-wider px-2 py-0.5 bg-vision-primary/10 rounded text-vision-primary font-bold">
+                                    <span key={tag} className="text-[10px] uppercase tracking-wider px-2 py-0.5 bg-secondary border border-divider rounded text-foreground font-bold">
                                         {tag}
                                     </span>
                                 ))}
                             </div>
                         </div>
-
-                        <h3 className="text-xl font-bold font-display text-white mb-1">{item.title}</h3>
-                        <div className="flex items-center text-xs text-gray-500 mb-2">
+ 
+                        <h3 className="text-xl font-bold font-display text-foreground mb-1">{item.title}</h3>
+                        <div className="flex items-center text-xs text-foreground/50 mb-2">
                             <UserIcon size={12} className="mr-1" />
-                            by <span className="text-gray-400 ml-1">{item.developer_name}</span>
+                            by <span className="text-foreground/80 ml-1">{item.developer_name}</span>
                         </div>
-
-                        <p className="text-gray-400 text-sm mb-4 line-clamp-2 flex-grow">{item.short_description}</p>
+ 
+                        <p className="text-foreground/70 text-sm mb-4 line-clamp-2 flex-grow">{item.short_description}</p>
                         
                         {/* Stats */}
-                        <div className="flex justify-between items-center text-xs text-gray-500 border-t border-white/10 pt-4 mb-4">
+                        <div className="flex justify-between items-center text-xs text-foreground/50 border-t border-divider pt-4 mb-4">
                             <div className="flex items-center gap-1">
                                 <TrendingUp size={14} />
                                 <span>{item.views} views</span>
@@ -231,21 +231,21 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
 
                         {/* Footer */}
                         <div className="flex items-center justify-between gap-4 mt-auto">
-                            <div className="text-2xl font-bold text-white font-sora">
+                            <div className="text-2xl font-bold text-foreground font-sora">
                                 {activeTab === 'Free Projects' ? (
-                                    <span className="text-green-400">FREE</span>
+                                    <span className="text-emerald-600 dark:text-emerald-400">FREE</span>
                                 ) : (
                                     formatPrice(item.price, user?.country)
                                 )}
                             </div>
                             {(!user || user.role === 'client') ? (
-                                <Button onClick={() => handleBuy(item.id)} className={`flex-1 ${activeTab === 'Free Projects' ? 'bg-green-500 text-black hover:bg-green-400' : ''}`}>
+                                <Button onClick={() => handleBuy(item.id)} className="flex-1">
                                     {activeTab === 'Free Projects' ? (
                                         <span className="flex items-center justify-center gap-2"><Download size={16}/> Launch</span>
                                     ) : 'Buy Now'}
                                 </Button>
                             ) : (
-                                <div className="flex-1 py-2 text-center text-xs text-gray-500 border border-white/5 rounded-lg bg-white/5 uppercase tracking-wider">
+                                <div className="flex-1 py-2 text-center text-xs text-foreground/50 border border-divider rounded-lg bg-secondary uppercase tracking-wider">
                                     Admin Mode
                                 </div>
                             )}

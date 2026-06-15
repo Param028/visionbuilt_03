@@ -476,6 +476,7 @@ interface ParticlesProps {
   refresh?: boolean;
   vx?: number;
   vy?: number;
+  color?: string;
 }
 
 export const Particles: React.FC<ParticlesProps> = ({
@@ -486,6 +487,7 @@ export const Particles: React.FC<ParticlesProps> = ({
   refresh = false,
   vx = 0.1,
   vy = 0.1,
+  color = "",
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const canvasContainerRef = useRef<HTMLDivElement>(null);
@@ -586,13 +588,21 @@ export const Particles: React.FC<ParticlesProps> = ({
     }
   };
 
+  const hexToRgb = (hex: string) => {
+    const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+    const fullHex = hex.replace(shorthandRegex, (_, r, g, b) => r + r + g + g + b + b);
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(fullHex);
+    return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : "255, 255, 255";
+  };
+
   const drawCircle = (circle: any, update = false) => {
     if (context.current) {
       const { x, y, translateX, translateY, size, alpha } = circle;
+      const rgbColor = color ? (color.startsWith('#') ? hexToRgb(color) : color) : "150, 150, 150";
       context.current.translate(translateX, translateY);
       context.current.beginPath();
       context.current.arc(x, y, size, 0, 2 * Math.PI);
-      context.current.fillStyle = `rgba(6, 182, 212, ${alpha})`;
+      context.current.fillStyle = `rgba(${rgbColor}, ${alpha})`;
       context.current.fill();
       context.current.setTransform(dpr, 0, 0, dpr, 0, 0);
 
@@ -752,7 +762,7 @@ export const PillNav: React.FC<{ items: PillNavItem[], className?: string }> = (
   }, [location.pathname, items]);
 
   return (
-    <div className={cn("flex space-x-1 p-1 bg-white/5 backdrop-blur-sm rounded-full border border-white/10", className)}>
+    <div className={cn("flex space-x-1 p-1 bg-content1/50 backdrop-blur-sm rounded-full border border-divider shadow-sm", className)}>
       {items.map((item) => (
         <Link
           key={item.name}
@@ -762,8 +772,8 @@ export const PillNav: React.FC<{ items: PillNavItem[], className?: string }> = (
             item.onClick && item.onClick();
           }}
           className={cn(
-            "relative cursor-pointer px-4 py-1.5 text-sm font-medium rounded-full outline-sky-400 transition focus-visible:outline-2",
-            "text-gray-400 hover:text-white"
+            "relative cursor-pointer px-4 py-1.5 text-sm font-medium rounded-full outline-none transition focus-visible:outline-2",
+            "text-foreground/60 hover:text-foreground"
           )}
           style={{
             WebkitTapHighlightColor: "transparent",
@@ -772,7 +782,7 @@ export const PillNav: React.FC<{ items: PillNavItem[], className?: string }> = (
           {activeTab === item.name && (
             <motion.div
               layoutId="pill-nav-indicator"
-              className="absolute inset-0 z-10 bg-white/10 rounded-full border border-white/10 shadow-[0_0_10px_rgba(6,182,212,0.2)]"
+              className="absolute inset-0 z-10 bg-primary/10 rounded-full border border-primary/20 shadow-sm"
               transition={{
                 type: "spring",
                 stiffness: 500,
@@ -780,7 +790,7 @@ export const PillNav: React.FC<{ items: PillNavItem[], className?: string }> = (
               }}
             />
           )}
-          <span className={cn("relative z-20 transition-colors", activeTab === item.name ? "text-white" : "")}>
+          <span className={cn("relative z-20 transition-colors", activeTab === item.name ? "text-foreground font-semibold" : "")}>
             {item.name}
           </span>
         </Link>
@@ -811,26 +821,26 @@ export const MagicBentoItem: React.FC<{
     <motion.div
       whileHover={isMobile ? {} : { scale: 1.02 }}
       className={cn(
-        "group relative overflow-hidden p-6 glass-panel hover:border-vision-primary/30 hover:shadow-[0_0_20px_rgba(6,182,212,0.15)] transition-all duration-300",
+        "group relative overflow-hidden p-6 glass-panel hover:border-focus/30 hover:shadow-md transition-all duration-300",
         colSpan === 2 ? "md:col-span-2" : "md:col-span-1",
         className
       )}
     >
-      {!isMobile && <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-gradient-to-br from-vision-primary/20 to-vision-secondary/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />}
+      {!isMobile && <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-gradient-to-br from-foreground/5 to-transparent blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />}
       
       <div className="relative z-10 h-full flex flex-col justify-between">
         <div>
-           <div className="mb-4 w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-vision-primary group-hover:scale-110 transition-transform duration-300">
+           <div className="mb-4 w-10 h-10 rounded-lg bg-content1 flex items-center justify-center text-foreground border border-divider group-hover:scale-110 transition-transform duration-300">
              {icon}
            </div>
-           <h3 className="text-lg font-display font-bold text-white mb-2 group-hover:text-vision-primary transition-colors">
+           <h3 className="text-lg font-display font-bold text-foreground mb-2 group-hover:text-foreground/80 transition-colors">
              <ScrollFloat animationDuration={0.4} delay={0.1}>{title}</ScrollFloat>
            </h3>
-           <p className="text-sm text-gray-400 leading-relaxed">
+           <p className="text-sm text-foreground/75 leading-relaxed">
              {description}
            </p>
         </div>
-        <div className="mt-4 pt-4 border-t border-white/5 flex items-center text-xs text-gray-500 font-medium group-hover:text-vision-primary transition-colors">
+        <div className="mt-4 pt-4 border-t border-divider flex items-center text-xs text-foreground/50 font-medium group-hover:text-foreground transition-colors">
             {children}
         </div>
       </div>
@@ -935,7 +945,7 @@ export const StaggeredMenu: React.FC<{
       <motion.button
         whileTap={{ scale: 0.97 }}
         onClick={toggleMenu}
-        className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-vision-primary to-vision-secondary text-white rounded-lg font-medium shadow-lg hover:shadow-cyan-500/20 transition-all border border-white/10"
+        className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium shadow hover:opacity-90 transition-all"
       >
         <Tag size={16} />
         {triggerLabel}
@@ -951,11 +961,11 @@ export const StaggeredMenu: React.FC<{
         initial={false}
         animate={isOpen ? "open" : "closed"}
         variants={menuVariants}
-        className="absolute top-full mt-2 right-0 w-72 bg-vision-900/95 backdrop-blur-xl border border-white/10 rounded-xl p-4 shadow-2xl z-50 origin-top-right flex flex-col gap-2"
+        className="absolute top-full mt-2 right-0 w-72 bg-content1 border border-divider rounded-xl p-4 shadow-xl z-50 origin-top-right flex flex-col gap-2"
         style={{ pointerEvents: isOpen ? "auto" : "none" }}
       >
         {items.length === 0 && (
-             <motion.li variants={itemVariants} className="text-gray-400 text-center text-sm py-2">
+             <motion.li variants={itemVariants} className="text-foreground/50 text-center text-sm py-2">
                  No active offers at the moment.
              </motion.li>
         )}
@@ -963,13 +973,13 @@ export const StaggeredMenu: React.FC<{
           <motion.li
             key={item.id}
             variants={itemVariants}
-            className="p-3 rounded-lg bg-white/5 hover:bg-white/10 cursor-pointer border border-white/5 hover:border-vision-primary/30 transition-colors"
+            className="p-3 rounded-lg bg-content1 hover:bg-secondary cursor-pointer border border-divider transition-colors"
             onClick={item.onClick}
           >
-             <div className="font-bold text-vision-primary flex justify-between items-center">
+            <div className="font-bold text-foreground flex justify-between items-center">
                  <ScrollFloat animationDuration={0.3} delay={0.1}>{item.title}</ScrollFloat>
              </div>
-             {item.subtitle && <div className="text-xs text-gray-400 mt-1">{item.subtitle}</div>}
+             {item.subtitle && <div className="text-xs text-foreground/60 mt-1">{item.subtitle}</div>}
           </motion.li>
         ))}
       </motion.ul>
@@ -985,9 +995,9 @@ export const Stepper: React.FC<{
   return (
     <div className="w-full flex flex-col items-center py-6">
       <div className="relative w-full flex justify-between items-center z-0">
-        <div className="absolute top-1/2 left-0 w-full h-[2px] bg-white/10 -translate-y-1/2 rounded-full" />
+        <div className="absolute top-1/2 left-0 w-full h-[2px] bg-divider -translate-y-1/2 rounded-full" />
         <motion.div 
-            className="absolute top-1/2 left-0 h-[2px] bg-vision-primary -translate-y-1/2 rounded-full origin-left"
+            className="absolute top-1/2 left-0 h-[2px] bg-primary -translate-y-1/2 rounded-full origin-left"
             initial={{ scaleX: 0 }}
             animate={{ scaleX: Math.max(0, Math.min(1, (currentStep - 1) / (steps.length - 1))) }}
             transition={{ duration: 0.5, ease: "easeInOut" }}
@@ -1000,28 +1010,27 @@ export const Stepper: React.FC<{
            
            return (
              <div key={step.id} className="relative z-10 flex flex-col items-center">
-                <motion.div
-                   className={cn(
-                     "w-10 h-10 rounded-full border-2 flex items-center justify-center bg-vision-900 transition-colors duration-300",
-                     isActive || isCompleted ? "border-vision-primary text-vision-primary shadow-[0_0_15px_rgba(6,182,212,0.5)]" : "border-white/10 text-gray-500",
-                     isCompleted ? "bg-vision-primary text-vision-900" : ""
-                   )}
-                   animate={{
-                      scale: isActive ? 1.2 : 1,
-                      backgroundColor: isCompleted ? "#06b6d4" : "#020617",
-                   }}
-                >
-                   {isCompleted ? <Check size={20} /> : <span className="text-sm font-bold">{step.id}</span>}
-                </motion.div>
-                <div className="absolute top-14 left-1/2 -translate-x-1/2 w-20 md:w-32 text-center">
-                    <span className={cn(
-                        "text-[10px] md:text-xs font-semibold uppercase tracking-wider transition-colors duration-300 block",
-                        isActive ? "text-vision-primary" : isCompleted ? "text-white" : "text-gray-600"
-                    )}>
-                        <ScrollFloat>{step.label}</ScrollFloat>
-                    </span>
-                </div>
-             </div>
+                 <motion.div
+                    className={cn(
+                      "w-10 h-10 rounded-full border-2 flex items-center justify-center bg-content1 transition-colors duration-300",
+                      isActive || isCompleted ? "border-primary text-foreground shadow-sm" : "border-divider text-foreground/40",
+                      isCompleted ? "bg-primary text-primary-foreground" : ""
+                    )}
+                    animate={{
+                       scale: isActive ? 1.2 : 1,
+                    }}
+                 >
+                    {isCompleted ? <Check size={20} /> : <span className="text-sm font-bold">{step.id}</span>}
+                 </motion.div>
+                 <div className="absolute top-14 left-1/2 -translate-x-1/2 w-20 md:w-32 text-center">
+                     <span className={cn(
+                         "text-[10px] md:text-xs font-semibold uppercase tracking-wider transition-colors duration-300 block",
+                         isActive ? "text-foreground font-bold" : isCompleted ? "text-foreground" : "text-foreground/40"
+                     )}>
+                         <ScrollFloat>{step.label}</ScrollFloat>
+                     </span>
+                 </div>
+              </div>
            );
         })}
       </div>

@@ -5,20 +5,22 @@
 
 :root {
   scroll-behavior: smooth;
+  --font-sans: 'Inter', sans-serif;
+  --font-heading: 'Space Grotesk', sans-serif;
 }
 
 body {
-  background-color: #F8FAFC; 
-  color: #0F172A; 
-  font-family: 'Inter', sans-serif;
+  @apply bg-background text-foreground transition-colors duration-300;
+  font-family: var(--font-sans);
   overflow-x: hidden;
   min-height: 100vh;
   width: 100%;
   -webkit-overflow-scrolling: touch;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  letter-spacing: -0.02em;
+h1, h2, h3, h4, h5, h6, .font-display {
+  font-family: var(--font-heading);
+  @apply tracking-tight;
 }
 
 * {
@@ -26,71 +28,34 @@ h1, h2, h3, h4, h5, h6 {
   -moz-osx-font-smoothing: grayscale;
 }
 
-.glass-panel,
-.bg-white\/5,
-.bg-white\/10,
-.bg-black\/40,
-.bg-black\/20,
-.bg-vision-900\/40,
-.bg-vision-900\/50,
-.bg-vision-900\/60,
-.bg-\[\#0B1121\] {
-  background: rgba(40, 40, 40, 0.1) !important; 
-  backdrop-filter: blur(32px) saturate(150%) !important;
-  -webkit-backdrop-filter: blur(32px) saturate(150%) !important;
-  border: 1px solid rgba(0, 0, 0, 0.05) !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.5) !important;
-  border-left: 1px solid rgba(255, 255, 255, 0.2) !important;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.05) !important;
-  color: #0F172A !important; 
+/* Premium Minimalist Glass Panel */
+.glass-panel {
+  @apply bg-content1/60 backdrop-blur-xl border border-divider shadow-md transition-all duration-300;
 }
 
-/* Because the cards are so translucent, the white background shows through completely. All text must be dark! */
-.text-white {
-  color: #0F172A !important;
-}
-.text-gray-400 {
-  color: #475569 !important;
-}
-.text-gray-300 {
-  color: #334155 !important;
+.glass-panel:hover {
+  @apply border-focus/30 shadow-lg;
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #FFFFFF; 
+  @apply bg-transparent; 
 }
 ::-webkit-scrollbar-thumb {
-  background: #808080; 
-  border-radius: 10px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #404040; 
+  @apply bg-focus/30 rounded-full hover:bg-focus/60 transition-colors;
 }
 
 /* Mobile Fixes */
 @media (max-width: 768px) {
-  .glass-panel,
-  .bg-white\/5,
-  .bg-white\/10,
-  .bg-black\/40,
-  .bg-black\/20,
-  .bg-vision-900\/40,
-  .bg-vision-900\/50,
-  .bg-vision-900\/60,
-  .bg-\[\#0B1121\] {
-    background: rgba(40, 40, 40, 0.15) !important; 
-    backdrop-filter: blur(24px) saturate(150%) !important;
-    -webkit-backdrop-filter: blur(24px) saturate(150%) !important;
-    color: #0F172A !important;
-  }
-  .neon-text {
-    text-shadow: none !important;
+  .glass-panel {
+    @apply bg-content1/80 backdrop-blur-lg;
   }
   input, textarea, select {
     font-size: 16px !important; 
   }
 }
+

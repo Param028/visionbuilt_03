@@ -168,16 +168,16 @@ const Auth: React.FC<{ setUser: (u: User) => void, isRecovery?: boolean }> = ({ 
   if (loading) {
     return (
       <div className="min-h-[80vh] flex items-center justify-center px-4">
-        <Card className="w-full max-w-md p-6 sm:p-12 flex flex-col items-center justify-center min-h-[400px] relative">
+        <Card className="w-full max-w-md p-6 sm:p-12 flex flex-col items-center justify-center min-h-[400px] relative border border-divider shadow-lg">
           <button 
             onClick={() => setLoading(false)} 
-            className="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors"
+            className="absolute top-4 right-4 text-foreground/50 hover:text-foreground transition-colors"
             title="Cancel Operation"
           >
               <XCircle size={20} />
           </button>
 
-          <h2 className="text-2xl font-display font-bold text-white mb-8 animate-pulse text-center">
+          <h2 className="text-2xl font-display font-bold text-foreground mb-8 animate-pulse text-center">
              <ScrollFloat>Processing...</ScrollFloat>
           </h2>
           <div className="w-full px-2 sm:px-4 mb-8">
@@ -191,7 +191,7 @@ const Auth: React.FC<{ setUser: (u: User) => void, isRecovery?: boolean }> = ({ 
               ]}
             />
           </div>
-          <p className="text-gray-400 text-sm mt-8 animate-pulse">Establishing secure handshake protocol...</p>
+          <p className="text-foreground/60 text-sm mt-8 animate-pulse">Establishing secure handshake protocol...</p>
         </Card>
       </div>
     );
@@ -212,18 +212,18 @@ const Auth: React.FC<{ setUser: (u: User) => void, isRecovery?: boolean }> = ({ 
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
-      <Card className="w-full max-w-md p-8 relative">
+      <Card className="w-full max-w-md p-8 relative border border-divider shadow-lg">
         {(authMode === 'forgot_email' || authMode === 'forgot_otp' || authMode === 'reset_password') && (
-            <button onClick={() => setAuthMode('login')} className="absolute top-8 left-8 text-gray-400 hover:text-white transition-colors">
+            <button onClick={() => setAuthMode('login')} className="absolute top-8 left-8 text-foreground/60 hover:text-foreground transition-colors">
                 <ArrowLeft size={20} />
             </button>
         )}
 
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-display font-bold text-white mb-2">
+          <h2 className="text-3xl font-display font-bold text-foreground mb-2">
               <ScrollFloat>{title}</ScrollFloat>
           </h2>
-          <div className="text-gray-400 text-sm">
+          <div className="text-foreground/70 text-sm">
             <ScrollFloat className="justify-center" animationDuration={0.4}>{sub}</ScrollFloat>
           </div>
         </div>
@@ -248,7 +248,7 @@ const Auth: React.FC<{ setUser: (u: User) => void, isRecovery?: boolean }> = ({ 
                     <button 
                         type="button"
                         onClick={() => setAuthMode('forgot_email')}
-                        className="absolute right-0 -bottom-6 text-xs text-gray-500 hover:text-vision-primary transition-colors"
+                        className="absolute right-0 -bottom-6 text-xs text-foreground/60 hover:text-foreground transition-colors"
                     >
                         Forgot Password?
                     </button>
@@ -289,17 +289,17 @@ const Auth: React.FC<{ setUser: (u: User) => void, isRecovery?: boolean }> = ({ 
                 />
                 
                 <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-gray-400 uppercase tracking-wider flex items-center gap-1">
+                    <label className="text-xs font-semibold text-foreground/70 uppercase tracking-wider flex items-center gap-1">
                         <Globe size={12} /> Country / Currency
                     </label>
                     <select
-                        className="flex h-10 w-full rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-vision-primary/50"
+                        className="flex h-10 w-full rounded-lg border border-divider bg-content1 px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-focus/30 focus:border-focus transition-all duration-300"
                         value={country}
                         onChange={(e) => setCountry(e.target.value)}
                         required
                     >
                         {SUPPORTED_COUNTRIES.map((c) => (
-                            <option key={c} value={c} className="bg-vision-900 text-white">
+                            <option key={c} value={c} className="bg-content1 text-foreground">
                                 {c}
                             </option>
                         ))}
@@ -312,17 +312,17 @@ const Auth: React.FC<{ setUser: (u: User) => void, isRecovery?: boolean }> = ({ 
 
         {authMode === 'verification_sent' && (
             <div className="text-center space-y-6">
-                <div className="w-20 h-20 bg-vision-primary/10 rounded-full flex items-center justify-center mx-auto text-vision-primary animate-pulse">
+                <div className="w-20 h-20 bg-foreground/10 rounded-full flex items-center justify-center mx-auto text-foreground animate-pulse">
                     <CheckCircle2 size={40} />
                 </div>
-                <div className="bg-white/5 rounded-xl p-4 border border-white/10">
-                    <p className="text-sm text-gray-300">
+                <div className="bg-content1 rounded-xl p-4 border border-divider shadow-sm">
+                    <p className="text-sm text-foreground/80">
                         {isRecovery ? 'We have sent a secure password reset link to:' : 'We have sent a secure verification link to:'}
                         <br/>
-                        <span className="text-white font-bold">{email}</span>
+                        <span className="text-foreground font-bold">{email}</span>
                     </p>
                 </div>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-foreground/50">
                     Please check your inbox (and spam folder) and click the link to {isRecovery ? 'reset your password' : 'activate your dashboard'}.
                 </p>
                 <div className="flex flex-col gap-2">
@@ -330,11 +330,11 @@ const Auth: React.FC<{ setUser: (u: User) => void, isRecovery?: boolean }> = ({ 
                         Return to Login
                     </Button>
                     {isRecovery ? (
-                        <button onClick={() => setAuthMode('forgot_otp')} className="text-xs text-gray-500 hover:text-vision-primary">
+                        <button onClick={() => setAuthMode('forgot_otp')} className="text-xs text-foreground/60 hover:text-foreground">
                             I received a code instead of a link
                         </button>
                     ) : (
-                        <button onClick={handleResendConfirmation} className="text-xs text-vision-primary hover:underline">
+                        <button onClick={handleResendConfirmation} className="text-xs text-foreground font-semibold hover:underline">
                             Resend Confirmation Link
                         </button>
                     )}
@@ -344,8 +344,8 @@ const Auth: React.FC<{ setUser: (u: User) => void, isRecovery?: boolean }> = ({ 
 
         {authMode === 'forgot_email' && (
             <form onSubmit={handleForgotEmail} className="space-y-5">
-                <div className="bg-white/5 p-4 rounded-lg flex items-center justify-center mb-4">
-                    <Mail size={48} className="text-vision-primary opacity-80" />
+                <div className="bg-content1 p-4 rounded-lg flex items-center justify-center mb-4 border border-divider shadow-sm">
+                    <Mail size={48} className="text-foreground/80" />
                 </div>
                 <Input 
                     type="email" 
@@ -360,8 +360,8 @@ const Auth: React.FC<{ setUser: (u: User) => void, isRecovery?: boolean }> = ({ 
 
         {authMode === 'forgot_otp' && (
             <form onSubmit={handleVerifyOtp} className="space-y-5">
-                <div className="bg-white/5 p-4 rounded-lg flex items-center justify-center mb-4">
-                    <KeyRound size={48} className="text-vision-primary opacity-80" />
+                <div className="bg-content1 p-4 rounded-lg flex items-center justify-center mb-4 border border-divider shadow-sm">
+                    <KeyRound size={48} className="text-foreground/80" />
                 </div>
                 <Input 
                     type="text" 
@@ -373,15 +373,15 @@ const Auth: React.FC<{ setUser: (u: User) => void, isRecovery?: boolean }> = ({ 
                 />
                 <Button type="submit" className="w-full">Verify Code</Button>
                 <div className="text-center text-xs">
-                    <button type="button" onClick={handleForgotEmail} className="text-gray-500 hover:text-white">Resend Code</button>
+                    <button type="button" onClick={handleForgotEmail} className="text-foreground/50 hover:text-foreground">Resend Code</button>
                 </div>
             </form>
         )}
 
         {authMode === 'reset_password' && (
             <form onSubmit={handleResetPassword} className="space-y-5">
-                <div className="bg-white/5 p-4 rounded-lg flex items-center justify-center mb-4">
-                    <Lock size={48} className="text-vision-primary opacity-80" />
+                <div className="bg-content1 p-4 rounded-lg flex items-center justify-center mb-4 border border-divider shadow-sm">
+                    <Lock size={48} className="text-foreground/80" />
                 </div>
                 <Input 
                     type="password" 
@@ -396,24 +396,24 @@ const Auth: React.FC<{ setUser: (u: User) => void, isRecovery?: boolean }> = ({ 
         )}
 
         {authMode !== 'verification_sent' && (
-            <div className="mt-8 pt-6 border-t border-white/10 text-center">
+            <div className="mt-8 pt-6 border-t border-divider text-center">
             {authMode === 'login' && (
-                <p className="text-sm text-gray-400">
+                <p className="text-sm text-foreground/60">
                 Don't have an account?{' '}
                 <button 
                     onClick={() => setAuthMode('signup')}
-                    className="text-vision-primary hover:underline font-bold"
+                    className="text-foreground hover:underline font-bold"
                 >
                     Sign Up
                 </button>
                 </p>
             )}
             {authMode === 'signup' && (
-                <p className="text-sm text-gray-400">
+                <p className="text-sm text-foreground/60">
                 Already have an account?{' '}
                 <button 
                     onClick={() => setAuthMode('login')}
-                    className="text-vision-primary hover:underline font-bold"
+                    className="text-foreground hover:underline font-bold"
                 >
                     Log In
                 </button>
@@ -422,7 +422,7 @@ const Auth: React.FC<{ setUser: (u: User) => void, isRecovery?: boolean }> = ({ 
             {(authMode === 'forgot_email' || authMode === 'forgot_otp' || authMode === 'reset_password') && (
                 <button 
                 onClick={() => setAuthMode('login')}
-                className="text-sm text-vision-primary hover:underline font-bold"
+                className="text-sm text-foreground hover:underline font-bold"
                 >
                 Back to Login
                 </button>

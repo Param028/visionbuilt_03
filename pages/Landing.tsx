@@ -64,9 +64,9 @@ const Landing: React.FC = () => {
             transition={{ duration: 0.6 }}
             className="mb-8"
           >
-             <div className="inline-flex items-center space-x-2 bg-white/5 border border-white/10 rounded-full px-4 py-1.5 backdrop-blur-md">
-                <span className="flex h-2 w-2 rounded-full bg-vision-primary animate-pulse"></span>
-                <ShinyText className="text-xs font-medium tracking-wide uppercase" shimmerColor="#ffffff">
+             <div className="inline-flex items-center space-x-2 bg-content1/80 border border-divider rounded-full px-4 py-1.5 backdrop-blur-md shadow-sm">
+                <span className="flex h-2 w-2 rounded-full bg-foreground animate-pulse"></span>
+                <ShinyText className="text-xs font-semibold tracking-wide uppercase text-foreground" shimmerColor="#ffffff">
                    Next Gen Development
                 </ShinyText>
              </div>
@@ -78,20 +78,20 @@ const Landing: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="mb-6"
           >
-             <h1 className="text-5xl md:text-7xl font-display font-bold tracking-tight text-white flex flex-col items-center justify-center">
+             <h1 className="text-5xl md:text-7xl font-display font-bold tracking-tight text-foreground flex flex-col items-center justify-center">
                 {siteSettings ? (
                     <>
                        <ScrollFloat animationDuration={0.8} stagger={0.05}>
                           {siteSettings.hero_title.split(' ').slice(0, -1).join(' ')}
                        </ScrollFloat>
-                       <GradientText className="text-6xl md:text-8xl mt-2 block" colors={["#06b6d4", "#8b5cf6", "#ec4899", "#06b6d4"]}>
+                       <GradientText className="text-6xl md:text-8xl mt-2 block" colors={["#71717A", "#A1A1AA", "#E4E4E7", "#71717A"]}>
                           {siteSettings.hero_title.split(' ').slice(-1).join('')}
                        </GradientText>
                     </>
                 ) : (
                     <>
                        <ScrollFloat animationDuration={0.8} stagger={0.05}>Build the</ScrollFloat>
-                       <GradientText className="text-6xl md:text-8xl mt-2 block" colors={["#06b6d4", "#8b5cf6", "#ec4899", "#06b6d4"]}>
+                       <GradientText className="text-6xl md:text-8xl mt-2 block" colors={["#71717A", "#A1A1AA", "#E4E4E7", "#71717A"]}>
                           FUTURE
                        </GradientText>
                     </>
@@ -99,7 +99,7 @@ const Landing: React.FC = () => {
              </h1>
           </motion.div>
 
-          <div className="max-w-2xl text-lg md:text-xl text-gray-400 mb-10 leading-relaxed mx-auto">
+          <div className="max-w-2xl text-lg md:text-xl text-foreground/70 mb-10 leading-relaxed mx-auto">
              <ScrollFloat animationDuration={0.5} stagger={0.01} className="justify-center">
                 {siteSettings ? siteSettings.hero_subtitle : "Vision Built transforms ideas into digital reality. From high-scale software to futuristic web experiences, we engineer success."}
              </ScrollFloat>
@@ -128,25 +128,25 @@ const Landing: React.FC = () => {
              initial={{ opacity: 0, y: 20 }}
              animate={{ opacity: 1, y: 0 }}
              transition={{ duration: 0.6, delay: 0.5 }}
-             className="grid grid-cols-2 md:grid-cols-2 gap-8 md:gap-24 p-6 glass-panel max-w-2xl w-full"
+             className="grid grid-cols-2 md:grid-cols-2 gap-8 md:gap-24 p-6 glass-panel max-w-2xl w-full border border-divider shadow-sm"
           >
               <div className="flex flex-col items-center">
-                  <div className="flex items-center text-4xl font-bold font-display text-transparent bg-clip-text bg-gradient-to-r from-vision-primary to-vision-secondary">
+                  <div className="flex items-center text-4xl font-bold font-display text-foreground">
                       <CountUp to={stats.totalDelivered} duration={2.5} />
                       <span>+</span>
                   </div>
-                  <span className="text-sm text-gray-400 uppercase tracking-widest mt-2 flex items-center gap-2">
-                      <CheckCircle size={14} className="text-vision-primary" /> Delivered Projects
+                  <span className="text-sm text-foreground/70 uppercase tracking-widest mt-2 flex items-center gap-2">
+                      <CheckCircle size={14} className="text-foreground/85" /> Delivered Projects
                   </span>
               </div>
               
               <div className="flex flex-col items-center">
-                  <div className="flex items-center text-4xl font-bold font-display text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">
+                  <div className="flex items-center text-4xl font-bold font-display text-foreground">
                       <CountUp to={stats.averageRating} duration={2} decimals={1} />
                       <span className="ml-2 text-2xl">/ 5</span>
                   </div>
-                  <span className="text-sm text-gray-400 uppercase tracking-widest mt-2 flex items-center gap-2">
-                      <Star size={14} fill="currentColor" className="text-yellow-500" /> Average Rating
+                  <span className="text-sm text-foreground/70 uppercase tracking-widest mt-2 flex items-center gap-2">
+                      <Star size={14} fill="currentColor" className="text-amber-500" /> Average Rating
                   </span>
               </div>
           </motion.div>
@@ -154,22 +154,22 @@ const Landing: React.FC = () => {
       </section>
 
       {/* Project Preview Loop Section */}
-      <section className="py-20 bg-black/40 border-y border-white/5 relative overflow-hidden z-20">
+      <section className="py-20 bg-background/50 border-y border-divider relative overflow-hidden z-20">
          <div className="max-w-7xl mx-auto px-4 mb-8 text-center relative z-10">
-              <span className="text-xs font-semibold text-vision-primary uppercase tracking-widest mb-2 block">Our Work</span>
-              <h2 className="text-2xl font-display font-bold text-white mb-6"><ScrollFloat>Featured Deployments</ScrollFloat></h2>
+              <span className="text-xs font-semibold text-foreground/70 uppercase tracking-widest mb-2 block">Our Work</span>
+              <h2 className="text-2xl font-display font-bold text-foreground mb-6"><ScrollFloat>Featured Deployments</ScrollFloat></h2>
               
               {/* Category Tabs */}
               <div className="flex justify-center mb-8 gap-4">
                   {['Websites', 'UI/UX Design', 'Free Projects'].map((tab) => (
                       <button
-                        key={tab}
-                        onClick={() => setActivePreviewTab(tab)}
-                        className={`text-sm px-4 py-2 rounded-full border transition-all ${
-                            activePreviewTab === tab 
-                            ? 'bg-vision-primary/10 border-vision-primary text-vision-primary font-bold' 
-                            : 'border-transparent text-gray-500 hover:text-white'
-                        }`}
+                         key={tab}
+                         onClick={() => setActivePreviewTab(tab)}
+                         className={`text-sm px-4 py-2 rounded-full border transition-all ${
+                             activePreviewTab === tab 
+                             ? 'bg-primary text-primary-foreground border-transparent font-semibold shadow-sm' 
+                             : 'border-divider text-foreground/60 hover:text-foreground'
+                         }`}
                       >
                           {tab}
                       </button>
@@ -184,24 +184,24 @@ const Landing: React.FC = () => {
       </section>
 
       {/* Trusted Tech Stack Logo Loop */}
-      <section className="py-10 border-b border-white/5 bg-black/20 backdrop-blur-sm relative z-20">
+      <section className="py-10 border-b border-divider bg-background/30 backdrop-blur-sm relative z-20">
           <div className="max-w-7xl mx-auto px-4 mb-6 text-center">
-              <span className="text-xs font-semibold text-gray-500 uppercase tracking-widest">Powered By Modern Technology</span>
+              <span className="text-xs font-semibold text-foreground/50 uppercase tracking-widest">Powered By Modern Technology</span>
           </div>
           <LogoLoop items={techLogos} />
       </section>
 
       {/* Subscription Preview Section */}
       {subscriptions.length > 0 && (
-        <section className="py-24 relative z-10 bg-white">
+        <section className="py-24 relative z-10 bg-background border-b border-divider">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center mb-16">
-                    <span className="text-xs font-semibold text-vision-primary uppercase tracking-widest mb-2 block">Recurring Value</span>
-                    <h2 className="text-3xl font-display font-bold text-white mb-4">
+                    <span className="text-xs font-semibold text-foreground/70 uppercase tracking-widest mb-2 block">Recurring Value</span>
+                    <h2 className="text-3xl font-display font-bold text-foreground mb-4">
                         <ScrollFloat>Monthly Plans</ScrollFloat>
                     </h2>
                 </div>
-
+ 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 justify-center">
                     {subscriptions.map((sub, index) => (
                         <motion.div
@@ -212,27 +212,27 @@ const Landing: React.FC = () => {
                             transition={{ delay: index * 0.1 }}
                             className="relative group"
                         >
-                            <div className="absolute inset-0 bg-gradient-to-r from-vision-primary/20 to-purple-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                            <div className="relative h-full glass-panel p-8 hover:border-vision-primary/50 transition-all flex flex-col">
-                                <h3 className="text-xl font-bold text-white mb-2">{sub.title}</h3>
+                            <div className="absolute inset-0 bg-gradient-to-r from-foreground/5 to-transparent rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                            <div className="relative h-full glass-panel p-8 hover:border-focus/30 transition-all flex flex-col">
+                                <h3 className="text-xl font-bold text-foreground mb-2">{sub.title}</h3>
                                 <div className="flex items-baseline gap-1 mb-4">
-                                    <span className="text-3xl font-bold text-vision-primary">${sub.price}</span>
-                                    <span className="text-sm text-gray-500">/{sub.interval}</span>
+                                    <span className="text-3xl font-bold text-foreground">${sub.price}</span>
+                                    <span className="text-sm text-foreground/50">/{sub.interval}</span>
                                 </div>
-                                <p className="text-gray-400 text-sm mb-6 flex-1">{sub.description}</p>
+                                <p className="text-foreground/70 text-sm mb-6 flex-1">{sub.description}</p>
                                 <ul className="space-y-3 mb-8">
                                     {sub.features.slice(0, 4).map((f: string, i: number) => (
-                                        <li key={i} className="flex items-start text-xs text-gray-300">
-                                            <CheckCircle size={14} className="text-vision-secondary mr-2 mt-0.5 shrink-0" />
+                                        <li key={i} className="flex items-start text-xs text-foreground/80">
+                                            <CheckCircle size={14} className="text-foreground/60 mr-2 mt-0.5 shrink-0" />
                                             {f}
                                         </li>
                                     ))}
                                     {sub.features.length > 4 && (
-                                        <li className="text-xs text-gray-500 italic pl-6">And more...</li>
+                                        <li className="text-xs text-foreground/40 italic pl-6">And more...</li>
                                     )}
                                 </ul>
                                 <Link to="/services" className="mt-auto">
-                                    <Button variant="outline" className="w-full border-white/10 hover:bg-white/5 group-hover:border-vision-primary/50">
+                                    <Button variant="outline" className="w-full">
                                         View Details
                                     </Button>
                                 </Link>
@@ -248,10 +248,10 @@ const Landing: React.FC = () => {
       <section className="py-24 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
            <div className="text-center mb-16">
-              <h2 className="text-3xl font-display font-bold text-white mb-4">
+              <h2 className="text-3xl font-display font-bold text-foreground mb-4">
                   <ScrollFloat>Why Vision Built?</ScrollFloat>
               </h2>
-              <div className="text-gray-400">
+              <div className="text-foreground/70">
                   <ScrollFloat animationDuration={0.6} stagger={0.02} className="justify-center">
                     Engineering excellence meets futuristic design.
                   </ScrollFloat>

@@ -109,7 +109,7 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-vision-primary border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-8 h-8 border-4 border-foreground border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -117,10 +117,10 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
       <div className="text-center mb-16">
-        <h1 className="text-4xl md:text-5xl font-display font-bold text-white mb-4">
+        <h1 className="text-4xl md:text-5xl font-display font-bold text-foreground mb-4">
             <ScrollFloat>Our Services</ScrollFloat>
         </h1>
-        <div className="text-gray-400 max-w-2xl mx-auto">
+        <div className="text-foreground/75 max-w-2xl mx-auto">
           <ScrollFloat animationDuration={0.4} stagger={0.01} className="justify-center">
             Choose from our premium catalog of digital solutions. Contact us for a tailored quote.
           </ScrollFloat>
@@ -128,10 +128,10 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
       </div>
 
       {services.length === 0 ? (
-          <div className="flex flex-col items-center justify-center p-12 border border-white/10 rounded-2xl bg-white/5">
-              <AlertCircle className="w-12 h-12 text-vision-primary mb-4 opacity-50" />
-              <h3 className="text-xl font-bold text-white mb-2">Service Catalog Unavailable</h3>
-              <p className="text-gray-400 text-center max-w-md">
+          <div className="flex flex-col items-center justify-center p-12 border border-divider rounded-2xl bg-content1 shadow-sm">
+              <AlertCircle className="w-12 h-12 text-foreground mb-4 opacity-50" />
+              <h3 className="text-xl font-bold text-foreground mb-2">Service Catalog Unavailable</h3>
+              <p className="text-foreground/70 text-center max-w-md">
                   Unable to load services at this moment. Please check your connection or contact support for a custom quote.
               </p>
               <Button onClick={() => window.location.reload()} variant="outline" className="mt-6">
@@ -147,34 +147,34 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
             >
-                <Card className="h-full flex flex-col hover:border-vision-primary/50 transition-all duration-300 group">
+                <Card className="h-full flex flex-col hover:border-focus/30 transition-all duration-300 group shadow-sm bg-content1">
                 <div className="mb-6">
                     <div className="flex justify-between items-start mb-4">
-                    <div className="p-3 rounded-lg bg-white/5 text-vision-primary border border-white/10 group-hover:bg-vision-primary group-hover:text-black transition-colors duration-300 shadow-[0_0_15px_rgba(6,182,212,0.1)] group-hover:shadow-[0_0_20px_rgba(6,182,212,0.4)]">
+                    <div className="p-3 rounded-lg bg-secondary text-foreground border border-divider group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-300 shadow-sm">
                         {getIcon(service.icon)}
                     </div>
                     </div>
                     
-                    <h3 className="text-xl font-bold font-display text-white mb-2 group-hover:text-vision-primary transition-colors">
+                    <h3 className="text-xl font-bold font-display text-foreground mb-2 group-hover:text-foreground/80 transition-colors">
                         {service.title}
                     </h3>
                     
-                    <p className="text-gray-400 text-sm h-12 mb-4 line-clamp-2">{service.description}</p>
+                    <p className="text-foreground/75 text-sm h-12 mb-4 line-clamp-2">{service.description}</p>
                     
-                    <div className="text-lg font-bold text-vision-primary font-sora">
+                    <div className="text-lg font-bold text-foreground font-sora">
                        Request Custom Quote
                     </div>
                 </div>
 
-                <div className="flex-grow space-y-3 mb-8 border-t border-white/5 pt-6">
+                <div className="flex-grow space-y-3 mb-8 border-t border-divider pt-6">
                     {service.features.map((feature, i) => {
                     const description = getFeatureDescription(feature);
                     return (
-                        <div key={i} className="flex items-center text-sm text-gray-300 group/feature w-fit">
-                        <Check className="w-4 h-4 text-vision-secondary mr-2 flex-shrink-0" />
+                        <div key={i} className="flex items-center text-sm text-foreground/80 group/feature w-fit">
+                        <Check className="w-4 h-4 text-foreground/60 mr-2 flex-shrink-0" />
                         {description ? (
                             <Tooltip content={description} className="cursor-help">
-                            <span className="border-b border-dashed border-gray-600 group-hover/feature:border-vision-primary transition-colors">
+                            <span className="border-b border-dashed border-divider group-hover/feature:border-foreground transition-colors">
                                 {feature}
                             </span>
                             </Tooltip>
@@ -191,7 +191,7 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
                         Get Quote <MessageSquare className="ml-2 w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
                     </Button>
                 ) : (
-                    <div className="w-full py-2 text-center text-xs text-gray-500 border border-white/5 rounded-lg bg-white/5 uppercase tracking-wider">
+                    <div className="w-full py-2 text-center text-xs text-foreground/50 border border-divider rounded-lg bg-secondary uppercase tracking-wider">
                         Admin Mode: Purchasing Disabled
                     </div>
                 )}
@@ -205,10 +205,10 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
       {recurringServices.length > 0 && (
         <div className="mt-24">
             <div className="text-center mb-12">
-                <h2 className="text-3xl font-display font-bold text-white mb-4">
+                <h2 className="text-3xl font-display font-bold text-foreground mb-4">
                     <ScrollFloat>Monthly Subscriptions</ScrollFloat>
                 </h2>
-                <p className="text-gray-400 max-w-2xl mx-auto">
+                <p className="text-foreground/70 max-w-2xl mx-auto">
                     Ongoing support and development packages to keep your business running smoothly.
                 </p>
             </div>
@@ -222,28 +222,28 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
                         viewport={{ once: true }}
                         transition={{ delay: index * 0.1 }}
                     >
-                        <Card className="h-full flex flex-col border-vision-primary/20 hover:border-vision-primary/50 transition-all duration-300 relative overflow-hidden group">
-                            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity text-vision-primary">
+                        <Card className="h-full flex flex-col border-divider hover:border-focus/30 transition-all duration-300 relative overflow-hidden group shadow-sm bg-content1">
+                            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity text-foreground">
                                 <Sparkles size={64} />
                             </div>
                             
                             <div className="mb-6 relative z-10">
-                                <h3 className="text-xl font-bold font-display text-white mb-2">{plan.title}</h3>
+                                <h3 className="text-xl font-bold font-display text-foreground mb-2">{plan.title}</h3>
                                 <div className="flex items-baseline gap-1 mb-4">
-                                    <span className="text-4xl font-bold text-vision-primary">${plan.price}</span>
-                                    <span className="text-sm text-gray-400">/{plan.interval}</span>
+                                    <span className="text-4xl font-bold text-foreground">${plan.price}</span>
+                                    <span className="text-sm text-foreground/50">/{plan.interval}</span>
                                 </div>
-                                <p className="text-gray-400 text-sm mb-6 min-h-[40px]">{plan.description}</p>
+                                <p className="text-foreground/70 text-sm mb-6 min-h-[40px]">{plan.description}</p>
                                 
-                                <Button onClick={() => handleOrder(plan.id)} variant="outline" className="w-full border-vision-primary/30 hover:bg-vision-primary/10">
+                                <Button onClick={() => handleOrder(plan.id)} variant="outline" className="w-full">
                                     Subscribe Now
                                 </Button>
                             </div>
 
-                            <div className="space-y-3 pt-6 border-t border-white/5 relative z-10 flex-1">
+                            <div className="space-y-3 pt-6 border-t border-divider relative z-10 flex-1">
                                 {plan.features?.map((feature: string, i: number) => (
-                                    <div key={i} className="flex items-start text-sm text-gray-300">
-                                        <Check className="w-4 h-4 text-vision-secondary mr-2 flex-shrink-0 mt-0.5" />
+                                    <div key={i} className="flex items-start text-sm text-foreground/85">
+                                        <Check className="w-4 h-4 text-foreground/60 mr-2 flex-shrink-0 mt-0.5" />
                                         <span>{feature}</span>
                                     </div>
                                 ))}
