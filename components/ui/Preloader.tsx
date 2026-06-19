@@ -17,81 +17,139 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
           clearInterval(timer);
           return 100;
         }
-        // Random increment for organic feel
-        return prev + Math.random() * 5;
+        // Organic easing: fast start, slow finish
+        const remaining = 100 - prev;
+        const increment = Math.max(0.5, Math.random() * (remaining * 0.08));
+        return Math.min(prev + increment, 100);
       });
-    }, 50);
-
+    }, 40);
     return () => clearInterval(timer);
   }, []);
 
   useEffect(() => {
     if (progress >= 100) {
-      setTimeout(onComplete, 800);
+      const timeout = setTimeout(onComplete, 700);
+      return () => clearTimeout(timeout);
     }
   }, [progress, onComplete]);
 
   return (
     <motion.div
-      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#090A0B] text-white overflow-hidden h-[100dvh] w-full"
+      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center overflow-hidden"
+      style={{ backgroundColor: '#212529' }}
       initial={{ opacity: 1 }}
-      exit={{ opacity: 0, scale: 1.05, filter: "blur(10px)" }}
-      transition={{ duration: 0.6, ease: "easeInOut" }}
+      exit={{ opacity: 0, scale: 1.03, filter: 'blur(8px)' }}
+      transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
     >
-      {/* Ambient Glow */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle,rgba(255,255,255,0.03),transparent)] opacity-60" />
-      
-      {/* Grid Background */}
-      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10" />
-      <div className="absolute inset-0" style={{ backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px)', backgroundSize: '50px 50px', maskImage: 'radial-gradient(circle, black 30%, transparent 70%)' }}></div>
+      {/* Atmospheric background glow */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: 'radial-gradient(ellipse 60% 50% at 50% 50%, rgba(124,143,161,0.06) 0%, transparent 70%)',
+        }}
+      />
 
-      <div className="relative z-10 flex flex-col items-center p-4">
-        {/* Animated Logo Container */}
+      {/* Subtle grid */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.025]"
+        style={{
+          backgroundImage:
+            'linear-gradient(rgba(255,255,255,0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.8) 1px, transparent 1px)',
+          backgroundSize: '60px 60px',
+          maskImage: 'radial-gradient(circle, black 30%, transparent 70%)',
+          WebkitMaskImage: 'radial-gradient(circle, black 30%, transparent 70%)',
+        }}
+      />
+
+      {/* ── Center content ── */}
+      <div className="relative z-10 flex flex-col items-center gap-0">
+
+        {/* Logo area — replace Logo with actual image when ready */}
         <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.8, type: "spring" }}
-          className="relative mb-8"
+          initial={{ opacity: 0, scale: 0.85 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
+          className="mb-10 relative"
         >
-          {/* Spinning Rings */}
-          <motion.div 
+          {/* Outer accent ring */}
+          <motion.div
             animate={{ rotate: 360 }}
-            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-            className="absolute -inset-8 rounded-full border border-white/10 border-t-white border-l-transparent"
+            transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+            className="absolute -inset-6 rounded-full"
+            style={{ border: '1px solid rgba(124,143,161,0.12)' }}
           />
-          <motion.div 
+          {/* Inner ring */}
+          <motion.div
             animate={{ rotate: -360 }}
-            transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
-            className="absolute -inset-12 rounded-full border border-white/5 border-b-white/40 border-r-transparent"
+            transition={{ duration: 35, repeat: Infinity, ease: 'linear' }}
+            className="absolute -inset-10 rounded-full"
+            style={{ border: '1px solid rgba(255,255,255,0.04)' }}
           />
 
-          <Logo className="w-24 h-24 drop-shadow-[0_0_15px_rgba(255,255,255,0.15)]" />
+          {/* Logo icon placeholder — replace with: <img src="/logo.svg" ... /> */}
+          <div
+            className="relative w-16 h-16 flex items-center justify-center"
+            style={{
+              border: '1px solid rgba(255,255,255,0.1)',
+              background: 'rgba(255,255,255,0.03)',
+            }}
+          >
+            <Logo className="w-9 h-9 text-foreground/50" />
+          </div>
         </motion.div>
 
-        {/* Text Reveal */}
+        {/* Wordmark */}
         <div className="overflow-hidden mb-2">
-            <motion.h1 
-                initial={{ y: 50 }}
-                animate={{ y: 0 }}
-                transition={{ delay: 0.3, duration: 0.5 }}
-                className="text-3xl font-display font-bold tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-300 to-white"
-            >
-                VISION BUILT
-            </motion.h1>
+          <motion.h1
+            initial={{ y: 40, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+            className="font-display font-bold text-foreground tracking-[0.35em] text-lg uppercase"
+          >
+            Vision Built
+          </motion.h1>
         </div>
 
-        {/* Loading Bar */}
-        <div className="w-64 h-1 bg-white/10 rounded-full overflow-hidden mt-8 relative">
-            <motion.div 
-                className="h-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.5)]"
-                style={{ width: `${Math.min(100, progress)}%` }}
-            />
+        {/* Tagline */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6, duration: 0.6 }}
+          className="text-label mb-12"
+          style={{ color: 'rgba(124,143,161,0.6)' }}
+        >
+          Premium Digital Engineering
+        </motion.p>
+
+        {/* Progress bar container */}
+        <div className="w-48 relative">
+          {/* Track */}
+          <div
+            className="h-px w-full"
+            style={{ background: 'rgba(255,255,255,0.07)' }}
+          />
+          {/* Fill */}
+          <motion.div
+            className="absolute top-0 left-0 h-px"
+            style={{
+              width: `${Math.min(100, progress)}%`,
+              background: 'rgba(248,249,250,0.6)',
+              boxShadow: '0 0 8px rgba(248,249,250,0.3)',
+            }}
+            transition={{ duration: 0.1 }}
+          />
         </div>
-        
-        <div className="mt-2 font-mono text-xs text-white/50 flex justify-between w-64">
-            <span>INITIALIZING SYSTEM...</span>
-            <span>{Math.floor(progress)}%</span>
-        </div>
+
+        {/* Progress number */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="mt-4 font-satoshi text-xs tracking-widest"
+          style={{ color: 'rgba(248,249,250,0.2)' }}
+        >
+          {Math.floor(Math.min(100, progress))}
+        </motion.p>
       </div>
     </motion.div>
   );

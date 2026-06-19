@@ -3,19 +3,119 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ────────────────────────────────────────────────────
+   SELF-HOSTED FONTS
+   Weight → file mapping:
+   Clash Display 400 → BSY64LPTT3OPLVKAZKL3AHKRWZ3D74AC.woff2
+   Clash Display 500 → JTSL5QESUXATU47LCPUNHZQBDDIWDOSW.woff2
+   Clash Display 600 → Z3MGHFHX6DCTLQ55LJYRJ5MDCZPMFZU6.woff2
+   Clash Display 700 → 53RZKGODFYDW3QHTIL7IPOWTBCSUEZK7.woff2
+   Satoshi       300 → WNDVG7O66ENLOD43GS7FBUCC4KMT5OM2.woff2
+   Satoshi       400 → KFIAZD4RUMEZIYV6FQ3T3GP5PDBDB6JY.woff2
+   Satoshi       500 → 7AHDUZ4A7LFLVFUIFSARGIWCRQJHISQP.woff2
+   Satoshi       700 → GHM6WVH6MILNYOOCXHXB5GTSGNTMGXZR.woff2
+───────────────────────────────────────────────────── */
+
+/* Clash Display */
+@font-face {
+  font-family: 'Clash Display';
+  src: url('/fonts/BSY64LPTT3OPLVKAZKL3AHKRWZ3D74AC.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Clash Display';
+  src: url('/fonts/JTSL5QESUXATU47LCPUNHZQBDDIWDOSW.woff2') format('woff2');
+  font-weight: 500;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Clash Display';
+  src: url('/fonts/Z3MGHFHX6DCTLQ55LJYRJ5MDCZPMFZU6.woff2') format('woff2');
+  font-weight: 600;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Clash Display';
+  src: url('/fonts/53RZKGODFYDW3QHTIL7IPOWTBCSUEZK7.woff2') format('woff2');
+  font-weight: 700;
+  font-display: swap;
+  font-style: normal;
+}
+
+/* Satoshi */
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/WNDVG7O66ENLOD43GS7FBUCC4KMT5OM2.woff2') format('woff2');
+  font-weight: 300;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/KFIAZD4RUMEZIYV6FQ3T3GP5PDBDB6JY.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/7AHDUZ4A7LFLVFUIFSARGIWCRQJHISQP.woff2') format('woff2');
+  font-weight: 500;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/GHM6WVH6MILNYOOCXHXB5GTSGNTMGXZR.woff2') format('woff2');
+  font-weight: 700;
+  font-display: swap;
+  font-style: normal;
+}
+
+/* ────────────────────────────────────────────────────
+   DESIGN TOKENS — CSS CUSTOM PROPERTIES
+───────────────────────────────────────────────────── */
 :root {
+  /* Typography */
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-heading: 'Clash Display', 'Inter', sans-serif;
+  --font-satoshi: 'Satoshi', 'Inter', sans-serif;
+
+  /* Color palette */
+  --vb-bg:          #212529;
+  --vb-bg2:         #343A40;
+  --vb-surface:     #495057;
+  --vb-text:        #F8F9FA;
+  --vb-text2:       #CED4DA;
+  --vb-muted:       #ADB5BD;
+  --vb-border:      rgba(255, 255, 255, 0.08);
+  --vb-glass:       rgba(73, 80, 87, 0.35);
+  --vb-accent:      #7C8FA1;
+  --vb-accent-glow: rgba(124, 143, 161, 0.12);
+
   scroll-behavior: smooth;
-  --font-sans: 'Inter', sans-serif;
-  --font-heading: 'Space Grotesk', sans-serif;
+}
+
+/* ────────────────────────────────────────────────────
+   BASE
+───────────────────────────────────────────────────── */
+html {
+  color-scheme: dark;
 }
 
 body {
-  @apply bg-background text-foreground transition-colors duration-300;
+  @apply bg-background text-foreground;
   font-family: var(--font-sans);
   overflow-x: hidden;
   min-height: 100vh;
   width: 100%;
   -webkit-overflow-scrolling: touch;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 h1, h2, h3, h4, h5, h6, .font-display {
@@ -28,34 +128,357 @@ h1, h2, h3, h4, h5, h6, .font-display {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Premium Minimalist Glass Panel */
+/* ────────────────────────────────────────────────────
+   GLASS SYSTEM
+───────────────────────────────────────────────────── */
+
+/* Premium glass panel (cards, surfaces) */
 .glass-panel {
-  @apply bg-content1/60 backdrop-blur-xl border border-divider shadow-md transition-all duration-300;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
-
 .glass-panel:hover {
-  @apply border-focus/30 shadow-lg;
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.13);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35);
 }
 
-/* Custom Scrollbar */
+/* Premium glass card (bento items) */
+.glass-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+.glass-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+  border-radius: inherit;
+}
+.glass-card:hover {
+  background: rgba(255, 255, 255, 0.055);
+  border-color: rgba(255, 255, 255, 0.13);
+  transform: translateY(-2px);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255,255,255,0.05);
+}
+.glass-card:hover::before {
+  opacity: 1;
+}
+
+/* Navbar glass */
+.glass-nav {
+  background: rgba(33, 37, 41, 0.88);
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* ────────────────────────────────────────────────────
+   TYPOGRAPHY UTILITIES
+───────────────────────────────────────────────────── */
+
+/* Cinematic hero heading */
+.text-hero {
+  font-family: var(--font-heading);
+  font-size: clamp(2.8rem, 8vw, 7rem);
+  line-height: 0.95;
+  letter-spacing: -0.025em;
+  font-weight: 700;
+}
+
+/* Large section display heading */
+.text-display {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 5vw, 4rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+}
+
+/* Medium display heading */
+.text-display-sm {
+  font-family: var(--font-heading);
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  font-weight: 600;
+}
+
+/* Technical label / eyebrow text */
+.text-label {
+  font-family: var(--font-satoshi);
+  font-size: 0.65rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--vb-accent);
+  font-weight: 500;
+}
+
+/* Satoshi font utility */
+.font-satoshi {
+  font-family: var(--font-satoshi);
+}
+
+/* ────────────────────────────────────────────────────
+   SECTION SPACING
+───────────────────────────────────────────────────── */
+.section-y {
+  padding-top: clamp(5rem, 10vw, 9rem);
+  padding-bottom: clamp(5rem, 10vw, 9rem);
+}
+.section-y-sm {
+  padding-top: clamp(3rem, 6vw, 5rem);
+  padding-bottom: clamp(3rem, 6vw, 5rem);
+}
+.container-vb {
+  max-width: 88rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+@media (min-width: 768px) {
+  .container-vb {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+/* ────────────────────────────────────────────────────
+   CTA BUTTONS
+───────────────────────────────────────────────────── */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 2rem;
+  background: var(--vb-text);
+  color: var(--vb-bg);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-family: var(--font-satoshi);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.btn-primary:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 12px 40px rgba(248, 249, 250, 0.15);
+}
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 2rem;
+  background: transparent;
+  color: rgba(248, 249, 250, 0.6);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-family: var(--font-satoshi);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.btn-ghost:hover {
+  color: var(--vb-text);
+  border-color: rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.btn-accent {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 2rem;
+  background: var(--vb-accent);
+  color: var(--vb-text);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-family: var(--font-satoshi);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+.btn-accent:hover {
+  opacity: 0.85;
+  transform: translateY(-1px);
+}
+
+/* ────────────────────────────────────────────────────
+   SELECTION
+───────────────────────────────────────────────────── */
+::selection {
+  background: rgba(124, 143, 161, 0.28);
+  color: #F8F9FA;
+}
+
+/* ────────────────────────────────────────────────────
+   PREMIUM SCROLLBAR
+───────────────────────────────────────────────────── */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 3px;
+  height: 3px;
 }
 ::-webkit-scrollbar-track {
-  @apply bg-transparent; 
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  @apply bg-focus/30 rounded-full hover:bg-focus/60 transition-colors;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.22);
 }
 
-/* Mobile Fixes */
+/* ────────────────────────────────────────────────────
+   DIVIDER
+───────────────────────────────────────────────────── */
+.vb-divider {
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+/* ────────────────────────────────────────────────────
+   LOGO PLACEHOLDER
+   Replace inner content with actual logo image when ready
+───────────────────────────────────────────────────── */
+.logo-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.04);
+  transition: border-color 0.3s ease;
+}
+.logo-placeholder:hover {
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+/* ────────────────────────────────────────────────────
+   ATMOSPHERIC GLOW UTILITY
+───────────────────────────────────────────────────── */
+.atm-glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  pointer-events: none;
+  background: var(--vb-accent-glow);
+}
+
+/* ────────────────────────────────────────────────────
+   INPUT STYLING (for forms)
+───────────────────────────────────────────────────── */
+.vb-input {
+  width: 100%;
+  height: 2.75rem;
+  padding: 0 1rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--vb-text);
+  font-size: 0.875rem;
+  font-family: var(--font-sans);
+  border-radius: 6px;
+  outline: none;
+  transition: all 0.25s ease;
+}
+.vb-input::placeholder {
+  color: rgba(248, 249, 250, 0.3);
+}
+.vb-input:focus {
+  border-color: var(--vb-accent);
+  background: rgba(124, 143, 161, 0.06);
+  box-shadow: 0 0 0 3px rgba(124, 143, 161, 0.1);
+}
+
+/* ────────────────────────────────────────────────────
+   REDUCED MOTION
+───────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .glass-card:hover {
+    transform: none;
+  }
+  .btn-primary:hover,
+  .btn-ghost:hover,
+  .btn-accent:hover {
+    transform: none;
+  }
+}
+
+/* ────────────────────────────────────────────────────
+   MOBILE OPTIMIZATIONS
+───────────────────────────────────────────────────── */
 @media (max-width: 768px) {
-  .glass-panel {
-    @apply bg-content1/80 backdrop-blur-lg;
+  .glass-panel,
+  .glass-card {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
+  .glass-nav {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+  /* Prevent iOS zoom on input focus */
   input, textarea, select {
-    font-size: 16px !important; 
+    font-size: 16px !important;
+  }
+  /* Remove hover transforms on touch */
+  .glass-card:hover {
+    transform: none;
   }
 }
 
+/* ────────────────────────────────────────────────────
+   MISC UTILITIES
+───────────────────────────────────────────────────── */
+.text-gradient-muted {
+  background: linear-gradient(to right, #F8F9FA, rgba(248,249,250,0.4));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Subtle noise texture overlay */
+.noise-overlay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  opacity: 0.4;
+  pointer-events: none;
+  z-index: 0;
+}

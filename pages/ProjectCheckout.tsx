@@ -3,10 +3,11 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
 import { MarketplaceItem, User, Offer } from '../types';
 import { formatPrice } from '../constants';
-import { Button, Card, Input, Badge } from '../components/ui/Components';
-import { Stepper, ScrollFloat } from '../components/ui/ReactBits';
-import { TicketPercent, X, Loader2, Shield, Eye, ImageIcon, User as UserIcon, Gift, Rocket } from 'lucide-react';
+import { Badge } from '../components/ui/Components';
+import { Stepper } from '../components/ui/ReactBits';
+import { TicketPercent, X, Loader2, Shield, Eye, ImageIcon, User as UserIcon, Gift, Rocket, ChevronLeft } from 'lucide-react';
 import { useToast } from '../components/ui/Toast';
+import { motion } from 'framer-motion';
 
 const ProjectCheckout: React.FC<{ user: User }> = ({ user }) => {
   const { id } = useParams<{ id: string }>();
@@ -130,14 +131,28 @@ const ProjectCheckout: React.FC<{ user: User }> = ({ user }) => {
 
   if (isProcessing) {
      return (
-        <div className="min-h-[80vh] flex items-center justify-center px-4">
-            <Card className="w-full max-w-2xl p-12 text-center relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-foreground/20 via-foreground/60 to-foreground/20 animate-gradient-x"></div>
+        <div className="min-h-[85vh] flex items-center justify-center px-4 relative overflow-hidden">
+            {/* Ambient Glow */}
+            <div
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+              aria-hidden="true"
+              style={{
+                width: '600px', height: '600px', borderRadius: '50%',
+                background: 'radial-gradient(circle, rgba(124,143,161,0.08) 0%, transparent 70%)',
+                filter: 'blur(60px)',
+              }}
+            />
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="w-full max-w-2xl p-12 text-center glass-card relative overflow-hidden"
+            >
+                <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[var(--vb-accent)] to-transparent animate-pulse" />
                 
                 <h2 className="text-3xl font-display font-bold text-foreground mb-2">
-                    <ScrollFloat>{isZeroCost ? 'Preparing Download' : 'Processing Purchase'}</ScrollFloat>
+                  {isZeroCost ? 'Preparing Access' : 'Processing Order'}
                 </h2>
-                <p className="text-foreground/50 mb-12">Generating secure download link...</p>
+                <p className="text-foreground/45 text-sm mb-12">Generating secure assets & configuration...</p>
                 
                 <div className="max-w-xl mx-auto px-4">
                      <Stepper 
@@ -150,174 +165,233 @@ const ProjectCheckout: React.FC<{ user: User }> = ({ user }) => {
                         ]}
                      />
                 </div>
-            </Card>
+            </motion.div>
         </div>
      )
   }
 
-  if (!item) return <div className="p-20 text-center text-foreground/50">Loading Project...</div>;
+  if (!item) return <div className="p-20 text-center text-foreground/30 font-satoshi">Loading Project Details...</div>;
 
   const { total, discount, final } = calculateTotal();
   const allImages = item.image_url ? [item.image_url, ...(item.preview_images || [])] : (item.preview_images || []);
   const country = user.country;
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-10">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-        
-        {/* Project Visuals & Details */}
-        <div>
-            <div className="mb-6">
-                 <Button variant="ghost" className="pl-0 mb-4 text-foreground/50 hover:text-foreground" onClick={() => navigate('/marketplace')}>
-                     <span className="flex items-center gap-2"><X className="w-4 h-4" /> Cancel</span>
-                 </Button>
-                 
-                 {/* Main Preview Image */}
-                 <div className="rounded-xl overflow-hidden border border-divider bg-content2 aspect-video mb-4 relative shadow-md">
-                     {selectedImage ? (
-                          <img src={selectedImage} alt="Preview" className="w-full h-full object-cover" />
-                     ) : (
-                          <div className="w-full h-full flex items-center justify-center text-foreground/30">
-                              <ImageIcon size={48} />
-                          </div>
-                     )}
-                 </div>
+    <div className="min-h-screen relative overflow-hidden py-12">
+      {/* Ambient background glow */}
+      <div
+        className="absolute top-0 right-1/4 pointer-events-none"
+        aria-hidden="true"
+        style={{
+          width: '500px', height: '500px', borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(124,143,161,0.03) 0%, transparent 70%)',
+          filter: 'blur(80px)',
+        }}
+      />
 
-                 {/* Thumbnails */}
-                 {allImages.length > 1 && (
-                     <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                          {allImages.map((img, idx) => (
-                              <button 
-                                 key={idx} 
-                                 onClick={() => setSelectedImage(img)}
-                                 className={`w-20 h-14 flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all ${selectedImage === img ? 'border-foreground' : 'border-transparent opacity-60 hover:opacity-100'}`}
-                              >
-                                  <img src={img} alt={`Thumb ${idx}`} className="w-full h-full object-cover" />
-                              </button>
-                          ))}
-                     </div>
-                 )}
-            </div>
-            
-            <div className="flex justify-between items-start">
-                <div>
-                     <h1 className="text-3xl font-display font-bold text-foreground mb-2">{item.title}</h1>
-                     <div className="flex items-center gap-2 mb-4">
-                          <Badge variant="default">
-                              <UserIcon size={12} className="mr-1 inline-block text-foreground/75" />
-                              {item.developer_name}
-                          </Badge>
-                          {isFreeLimitedTime && <Badge variant="success">FREE LIMITED TIME</Badge>}
-                          {isFreeProject && <Badge variant="success">FREE PROJECT</Badge>}
-                     </div>
-                </div>
-                {item.demo_url && (
-                    <Button variant="outline" onClick={() => window.open(item.demo_url, '_blank')}>
-                        <Eye size={16} className="mr-2" /> Live Preview
-                    </Button>
-                )}
-            </div>
-
-            <div className="prose prose-invert max-w-none text-foreground/70 text-sm mb-8 border-t border-divider pt-6">
-                <h3 className="text-foreground font-bold mb-2">Project Details</h3>
-                <p className="leading-relaxed">{item.full_description}</p>
-            </div>
+      <div className="container-vb relative z-10">
+        {/* Back Link */}
+        <div className="mb-8">
+          <button 
+            onClick={() => navigate('/marketplace')}
+            className="flex items-center gap-2 text-foreground/40 hover:text-foreground transition-colors font-satoshi text-sm group"
+          >
+            <ChevronLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
+            <span>Back to Marketplace</span>
+          </button>
         </div>
 
-        {/* Checkout Card */}
-        <div>
-            <Card className="sticky top-24 border-divider shadow-md">
-                <div className="mb-6">
-                    <h2 className="text-xl font-bold text-foreground mb-1">
-                        {isZeroCost ? 'Instant Access' : 'Purchase License'}
-                    </h2>
-                    <p className="text-foreground/50 text-sm">{isZeroCost ? 'Download source code immediately.' : 'Unlock full source code & documentation.'}</p>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+          {/* LEFT: Project Details & Visuals */}
+          <div className="lg:col-span-7 space-y-8">
+            <div>
+              <div className="flex items-center gap-2.5 mb-4">
+                <Badge variant="default" className="border-white/5 bg-white/2">
+                  <UserIcon size={12} className="mr-1 inline-block text-foreground/45" />
+                  <span className="text-foreground/75 font-satoshi">{item.developer_name}</span>
+                </Badge>
+                {isFreeLimitedTime && <Badge variant="success">FREE LIMITED TIME</Badge>}
+                {isFreeProject && <Badge variant="success">FREE PROJECT</Badge>}
+              </div>
+              <h1 className="text-4xl font-display font-bold text-foreground mb-4 leading-tight">
+                {item.title}
+              </h1>
+            </div>
+
+            {/* Main Preview Image */}
+            <div className="relative rounded-xl overflow-hidden border border-white/5 bg-[#171717] aspect-video group shadow-2xl">
+              {selectedImage ? (
+                <img 
+                  src={selectedImage} 
+                  alt="Preview" 
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-foreground/20">
+                  <ImageIcon size={48} />
+                </div>
+              )}
+            </div>
+
+            {/* Thumbnails */}
+            {allImages.length > 1 && (
+              <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                {allImages.map((img, idx) => (
+                  <button 
+                    key={idx} 
+                    onClick={() => setSelectedImage(img)}
+                    className={`w-24 h-16 flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all relative ${
+                      selectedImage === img 
+                        ? 'border-[var(--vb-accent)] opacity-100 scale-95' 
+                        : 'border-transparent opacity-45 hover:opacity-100'
+                    }`}
+                  >
+                    <img src={img} alt={`Thumbnail ${idx}`} className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Demo Link button for quick preview */}
+            {item.demo_url && (
+              <button 
+                onClick={() => window.open(item.demo_url, '_blank')}
+                className="w-full flex items-center justify-center gap-2 py-4 border border-white/5 bg-white/[0.01] hover:bg-white/[0.03] text-foreground/80 hover:text-foreground font-satoshi text-sm transition-all"
+              >
+                <Eye size={16} />
+                <span>Open Live Project Demo</span>
+              </button>
+            )}
+
+            {/* Detailed Description */}
+            <div className="border-t border-white/5 pt-8 space-y-4">
+              <h3 className="font-display font-semibold text-foreground text-lg">Project Details</h3>
+              <p className="text-foreground/45 leading-relaxed text-sm font-satoshi">
+                {item.full_description}
+              </p>
+            </div>
+          </div>
+
+          {/* RIGHT: Checkout Summary Card */}
+          <div className="lg:col-span-5 lg:sticky lg:top-24">
+            <div className="glass-card p-8 md:p-10 space-y-8">
+              <div>
+                <h2 className="text-xl font-display font-bold text-foreground mb-1.5">
+                  {isZeroCost ? 'Instant Access' : 'License Selection'}
+                </h2>
+                <p className="text-foreground/40 text-xs font-satoshi">
+                  {isZeroCost ? 'Download full source files instantly.' : 'Complete your transaction to unlock project repository.'}
+                </p>
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div 
+                  className="p-5 border space-y-4"
+                  style={{ borderColor: 'rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.01)' }}
+                >
+                  <div className="flex justify-between items-center text-sm font-satoshi text-foreground/80">
+                    <span>Standard Developer License</span>
+                    <span className={isZeroCost ? "text-foreground/30 line-through" : "font-bold text-foreground"}>
+                      {formatPrice(item.price, country)}
+                    </span>
+                  </div>
+
+                  {/* Coupon Input Area */}
+                  {!isZeroCost && (
+                    <div className="border-t border-white/5 pt-4">
+                      {appliedOffer ? (
+                        <div className="flex justify-between items-center bg-emerald-500/5 border border-emerald-500/10 p-2.5 rounded-lg">
+                          <div className="flex items-center gap-2">
+                            <TicketPercent size={16} className="text-emerald-400" />
+                            <span className="text-emerald-400 text-xs font-medium font-satoshi">
+                              {appliedOffer.code} ({appliedOffer.discountPercentage}% OFF)
+                            </span>
+                          </div>
+                          <button 
+                            type="button" 
+                            onClick={removeCoupon} 
+                            className="text-foreground/40 hover:text-foreground transition-colors"
+                          >
+                            <X size={14} />
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex gap-2">
+                          <input 
+                            placeholder="Discount code" 
+                            value={couponCode} 
+                            onChange={(e) => setCouponCode(e.target.value)}
+                            className="vb-input h-9 text-xs"
+                          />
+                          <button 
+                            type="button" 
+                            onClick={handleApplyCoupon} 
+                            disabled={isValidatingOffer || !couponCode}
+                            className="btn-ghost px-4 h-9 py-0 border-white/10 hover:border-white/20 text-xs flex items-center justify-center"
+                          >
+                            {isValidatingOffer ? <Loader2 size={12} className="animate-spin" /> : 'Apply'}
+                          </button>
+                        </div>
+                      )}
+                      {offerError && <p className="text-[10px] text-red-400 mt-1 font-satoshi">{offerError}</p>}
+                    </div>
+                  )}
+                  
+                  {/* Discounts Info */}
+                  {isZeroCost ? (
+                    <div className="flex justify-between text-emerald-400 text-xs font-satoshi font-medium pt-1">
+                      <span className="flex items-center gap-1"><Gift size={12}/> Complimentary access</span>
+                      <span>-{formatPrice(item.price, country)}</span>
+                    </div>
+                  ) : appliedOffer && (
+                    <div className="flex justify-between text-emerald-400 text-xs font-satoshi font-medium pt-1">
+                      <span>Discount applied</span>
+                      <span>-{formatPrice(discount, country)}</span>
+                    </div>
+                  )}
+
+                  {/* Total Line */}
+                  <div className="border-t border-white/5 pt-4 flex justify-between items-center text-foreground font-display font-semibold">
+                    <span className="text-sm">Final Amount</span>
+                    <div className="text-right">
+                      {isZeroCost ? (
+                        <span className="text-emerald-400 text-lg">FREE</span>
+                      ) : (
+                        <div className="flex flex-col items-end">
+                          {appliedOffer && (
+                            <span className="text-xs text-foreground/35 font-normal line-through mb-0.5">
+                              {formatPrice(total, country)}
+                            </span>
+                          )}
+                          <span className="text-xl font-bold">{formatPrice(final, country)}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
 
-                 <form onSubmit={handleSubmit} className="space-y-6">
-                     <div className="bg-content2/50 rounded-lg p-6 mb-4 text-left space-y-3 border border-divider/50">
-                          <div className="flex justify-between text-foreground/85">
-                              <span className="font-medium">Standard License</span>
-                              <span className={isZeroCost ? "font-bold text-foreground/40 line-through" : "font-bold text-foreground"}>
-                                  {formatPrice(item.price, country)}
-                              </span>
-                          </div>
-
-                          {/* Coupon Section (Only if not free) */}
-                          {!isZeroCost && (
-                            <div className="pt-3">
-                                {appliedOffer ? (
-                                    <div className="flex justify-between items-center bg-success/10 border border-success/20 p-2 rounded-lg">
-                                        <div className="flex items-center gap-2">
-                                            <TicketPercent size={16} className="text-success" />
-                                            <span className="text-success text-sm font-medium">{appliedOffer.code} ({appliedOffer.discountPercentage}% OFF)</span>
-                                        </div>
-                                        <button type="button" onClick={removeCoupon} className="text-foreground/50 hover:text-foreground">
-                                            <X size={14} />
-                                        </button>
-                                    </div>
-                                ) : (
-                                    <div className="flex gap-2">
-                                        <Input 
-                                            placeholder="Discount Code" 
-                                            value={couponCode} 
-                                            onChange={(e) => setCouponCode(e.target.value)}
-                                            className="h-9 text-sm"
-                                        />
-                                        <Button 
-                                            type="button" 
-                                            onClick={handleApplyCoupon} 
-                                            disabled={isValidatingOffer || !couponCode}
-                                            variant="secondary"
-                                            size="sm"
-                                            className="h-auto font-semibold px-4 border-divider"
-                                        >
-                                            {isValidatingOffer ? <Loader2 size={14} className="animate-spin" /> : 'Apply'}
-                                        </Button>
-                                    </div>
-                                )}
-                                {offerError && <p className="text-xs text-danger mt-1">{offerError}</p>}
-                            </div>
-                          )}
-                          
-                          {/* Discount Line */}
-                          {isZeroCost ? (
-                              <div className="flex justify-between text-success text-sm font-medium animate-in fade-in slide-in-from-top-1">
-                                  <span className="flex items-center gap-1"><Gift size={12}/> Free Access</span>
-                                  <span>-{formatPrice(item.price, country)}</span>
-                              </div>
-                          ) : appliedOffer && (
-                              <div className="flex justify-between text-success text-sm font-medium animate-in fade-in slide-in-from-top-1">
-                                  <span>Discount Applied</span>
-                                  <span>-{formatPrice(discount, country)}</span>
-                              </div>
-                          )}
-
-                          <div className="border-t border-divider pt-3 flex justify-between text-xl font-bold text-foreground items-center mt-2">
-                              <span>Total</span>
-                              <div className="text-right">
-                                  {isZeroCost ? (
-                                      <span className="text-success">FREE</span>
-                                  ) : (
-                                      <>
-                                         {appliedOffer && <span className="block text-xs text-foreground/45 font-normal line-through mb-1">{formatPrice(total, country)}</span>}
-                                         <span>{formatPrice(final, country)}</span>
-                                      </>
-                                  )}
-                              </div>
-                          </div>
-                     </div>
-                     
-                     <Button type="submit" isLoading={isProcessing} className="w-full h-12 text-base font-semibold" variant="primary">
-                          {isZeroCost ? <><Rocket size={18} className="mr-2"/> Launch Project</> : 'Complete Purchase & Download'}
-                     </Button>
-                     
-                     <div className="flex items-center justify-center gap-2 text-xs text-foreground/45 mt-4">
-                          <Shield size={12} className="text-success" />
-                          <span>Secure SSL Encrypted {isZeroCost ? 'Connection' : 'Transaction'}</span>
-                     </div>
-                 </form>
-            </Card>
+                <button 
+                  type="submit" 
+                  disabled={isProcessing}
+                  className="w-full btn-primary h-12 flex items-center justify-center gap-2 font-display text-sm tracking-widest font-semibold"
+                >
+                  {isZeroCost ? (
+                    <>
+                      <Rocket size={16} />
+                      <span>Unlock Instant Download</span>
+                    </>
+                  ) : (
+                    <span>Complete Order Purchase</span>
+                  )}
+                </button>
+                
+                <div className="flex items-center justify-center gap-2 text-[10px] text-foreground/30 font-satoshi">
+                  <Shield size={12} className="text-emerald-500/70" />
+                  <span>Secure SSL Encryption Enabled</span>
+                </div>
+              </form>
+            </div>
+          </div>
         </div>
       </div>
     </div>

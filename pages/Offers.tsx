@@ -1,11 +1,11 @@
 
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Sparkles, Copy, Check, Calendar, AlertCircle, Percent } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Sparkles, Copy, Check, Calendar, Percent, Tag } from 'lucide-react';
 import { api } from '../services/api';
 import { Offer, User } from '../types';
-import { Button } from '../components/ui/Components';
-import { Carousel, ScrollFloat, ShinyText } from '../components/ui/ReactBits';
+import { Carousel } from '../components/ui/ReactBits';
 
 const Offers: React.FC<{ user: User | null }> = ({ user }) => {
   const [offers, setOffers] = useState<Offer[]>([]);
@@ -15,12 +15,8 @@ const Offers: React.FC<{ user: User | null }> = ({ user }) => {
 
   useEffect(() => {
     let isMounted = true;
-    
-    // Failsafe timeout increased to 15s
     const timeoutId = setTimeout(() => {
-        if (isMounted && loading) {
-            setLoading(false);
-        }
+      if (isMounted && loading) setLoading(false);
     }, 15000);
 
     const fetchOffers = async () => {
@@ -28,139 +24,232 @@ const Offers: React.FC<{ user: User | null }> = ({ user }) => {
         const data = await api.getOffers();
         if (isMounted) setOffers(data);
       } catch (error) {
-        console.error("Failed to fetch offers", error);
+        console.error('Failed to fetch offers', error);
       } finally {
         if (isMounted) setLoading(false);
       }
     };
-    
-    fetchOffers();
 
-    return () => {
-        isMounted = false;
-        clearTimeout(timeoutId);
-    };
+    fetchOffers();
+    return () => { isMounted = false; clearTimeout(timeoutId); };
   }, []);
 
   const handleCopy = (code: string, id: string) => {
     navigator.clipboard.writeText(code);
     setCopiedId(id);
-    setTimeout(() => setCopiedId(null), 2000);
+    setTimeout(() => setCopiedId(null), 2500);
   };
 
   const carouselItems = offers.map((offer) => {
     const today = new Date();
     let isExpired = false;
     if (offer.validUntil) {
-        const expiryDate = new Date(offer.validUntil);
-        expiryDate.setHours(23, 59, 59, 999);
-        isExpired = expiryDate < today;
+      const expiryDate = new Date(offer.validUntil);
+      expiryDate.setHours(23, 59, 59, 999);
+      isExpired = expiryDate < today;
     }
 
     return {
       id: offer.id,
-      className: isExpired ? "grayscale opacity-75 border-rose-500/20 bg-rose-950/10" : "",
+      className: isExpired ? 'opacity-60' : '',
       content: (
-        <div className="text-center h-full flex flex-col items-center justify-between relative w-full">
-           <div className={`mt-4 p-4 rounded-full ${isExpired ? 'bg-secondary text-foreground/40' : 'bg-foreground/10 text-foreground'}`}>
-              <Sparkles size={32} />
-           </div>
-           
-           {isExpired && (
-               <div className="absolute top-0 right-0 z-20">
-                    <div className="bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider backdrop-blur-md">
-                        Expired
-                    </div>
-               </div>
-           )}
- 
-            {/* Percentage Badge */}
-            {!isExpired && (
-                <div className="absolute top-0 left-0 z-20">
-                    <div className="flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider backdrop-blur-md">
-                        <Percent size={10} /> {offer.discountPercentage}% OFF
-                    </div>
-                </div>
-            )}
- 
-            <div>
-              <h3 className="text-2xl font-display font-bold text-foreground mb-2">{offer.title}</h3>
-              <p className="text-foreground/75 text-sm leading-relaxed mb-4 line-clamp-2">{offer.description}</p>
+        <div className="relative h-full flex flex-col items-center text-center px-2 py-2 w-full">
+
+          {/* Status badges */}
+          {isExpired && (
+            <div className="absolute top-0 right-0 z-20">
+              <span
+                className="text-[10px] font-satoshi font-bold px-2.5 py-0.5 tracking-widest uppercase border"
+                style={{
+                  color: 'rgba(239,68,68,0.7)',
+                  borderColor: 'rgba(239,68,68,0.2)',
+                  background: 'rgba(239,68,68,0.05)',
+                }}
+              >
+                Expired
+              </span>
             </div>
-           
-            <div className={`w-full rounded-lg p-3 border flex items-center justify-between mb-2 ${isExpired ? 'bg-secondary/40 border-divider' : 'bg-content1 border-divider shadow-sm'}`}>
-                <code className={`font-mono text-lg font-bold tracking-wider ${isExpired ? 'text-foreground/40' : 'text-foreground'}`}>{offer.code}</code>
-                <button 
-                  onClick={(e) => { e.stopPropagation(); if (!isExpired) handleCopy(offer.code, offer.id); }}
-                  className={`transition-colors ${isExpired ? 'text-foreground/30 cursor-not-allowed' : 'text-foreground/60 hover:text-foreground'}`}
-                  disabled={isExpired}
-                >
-                   {copiedId === offer.id ? <Check size={18} className="text-emerald-500" /> : <Copy size={18} />}
-                </button>
+          )}
+
+          {!isExpired && (
+            <div className="absolute top-0 left-0 z-20">
+              <span
+                className="flex items-center gap-1 text-[10px] font-satoshi font-bold px-2.5 py-0.5 tracking-widest uppercase border"
+                style={{
+                  color: 'rgba(52,211,153,0.8)',
+                  borderColor: 'rgba(52,211,153,0.2)',
+                  background: 'rgba(52,211,153,0.05)',
+                }}
+              >
+                <Percent size={9} /> {offer.discountPercentage}% OFF
+              </span>
             </div>
-   
-            {offer.validUntil && (
-                <div className={`flex items-center text-xs mb-4 px-3 py-1 rounded-full border ${isExpired ? 'text-foreground/40 border-divider bg-secondary/10' : 'text-amber-600 dark:text-amber-400 bg-amber-500/10 border-amber-500/20'}`}>
-                    <Calendar size={12} className="mr-1.5" />
-                    <span>{isExpired ? 'Expired on ' : 'Valid until '}{new Date(offer.validUntil).toLocaleDateString()}</span>
-                </div>
-            )}
-  
-           {(!user || user.role === 'client') && (
-               <Button 
-                  className="w-full" 
-                  onClick={(e) => { e.stopPropagation(); if(!isExpired) navigate('/services'); }}
-                  disabled={isExpired}
-                  variant={isExpired ? 'secondary' : 'primary'}
-               >
-                  {isExpired ? 'Offer Expired' : 'Use Now'}
-               </Button>
-           )}
+          )}
+
+          {/* Icon */}
+          <div
+            className="mt-4 mb-6 p-4 border"
+            style={{
+              borderColor: isExpired ? 'rgba(255,255,255,0.06)' : 'rgba(124,143,161,0.25)',
+              background: isExpired ? 'rgba(255,255,255,0.02)' : 'rgba(124,143,161,0.05)',
+              color: isExpired ? 'rgba(248,249,250,0.2)' : 'var(--vb-accent)',
+            }}
+          >
+            <Sparkles size={28} />
+          </div>
+
+          {/* Title + Description */}
+          <h3 className="font-display font-bold text-foreground text-xl mb-2">{offer.title}</h3>
+          <p className="text-foreground/45 text-sm leading-relaxed mb-5 line-clamp-2">
+            {offer.description}
+          </p>
+
+          {/* Coupon code */}
+          <div
+            className="w-full flex items-center justify-between px-4 py-3 border mb-3"
+            style={{
+              borderColor: isExpired ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.1)',
+              background: isExpired ? 'rgba(255,255,255,0.02)' : 'rgba(255,255,255,0.04)',
+            }}
+          >
+            <code
+              className="font-mono text-base font-bold tracking-[0.15em]"
+              style={{ color: isExpired ? 'rgba(248,249,250,0.25)' : '#F8F9FA' }}
+            >
+              {offer.code}
+            </code>
+            <button
+              onClick={(e) => { e.stopPropagation(); if (!isExpired) handleCopy(offer.code, offer.id); }}
+              className="transition-colors"
+              disabled={isExpired}
+              style={{ color: isExpired ? 'rgba(248,249,250,0.2)' : 'rgba(124,143,161,0.7)' }}
+              aria-label={`Copy code ${offer.code}`}
+            >
+              <AnimatePresence mode="wait">
+                {copiedId === offer.id ? (
+                  <motion.div key="check" initial={{ scale: 0.7 }} animate={{ scale: 1 }} exit={{ scale: 0.7 }}>
+                    <Check size={16} style={{ color: 'rgba(52,211,153,0.8)' }} />
+                  </motion.div>
+                ) : (
+                  <motion.div key="copy" initial={{ scale: 0.7 }} animate={{ scale: 1 }} exit={{ scale: 0.7 }}>
+                    <Copy size={16} />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </button>
+          </div>
+
+          {/* Expiry */}
+          {offer.validUntil && (
+            <div
+              className="flex items-center text-[11px] font-satoshi gap-1.5 mb-5 px-3 py-1 border"
+              style={{
+                borderColor: isExpired ? 'rgba(255,255,255,0.05)' : 'rgba(251,191,36,0.2)',
+                color: isExpired ? 'rgba(248,249,250,0.25)' : 'rgba(251,191,36,0.7)',
+                background: isExpired ? 'transparent' : 'rgba(251,191,36,0.04)',
+              }}
+            >
+              <Calendar size={10} />
+              <span>
+                {isExpired ? 'Expired' : 'Valid until'}{' '}
+                {new Date(offer.validUntil).toLocaleDateString()}
+              </span>
+            </div>
+          )}
+
+          {/* CTA */}
+          {(!user || user.role === 'client') && (
+            <button
+              onClick={(e) => { e.stopPropagation(); if (!isExpired) navigate('/services'); }}
+              disabled={isExpired}
+              className={isExpired ? 'btn-ghost !opacity-30 w-full justify-center !text-xs' : 'btn-primary w-full justify-center !text-xs'}
+            >
+              {isExpired ? 'Offer Expired' : 'Use This Offer'}
+            </button>
+          )}
         </div>
-      )
+      ),
     };
   });
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-foreground border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen py-20 px-4 relative overflow-hidden">
-      <div className="text-center mb-12 relative z-10">
-        <h1 className="text-4xl md:text-5xl font-display font-bold text-foreground mb-4">
-            <ScrollFloat>Exclusive Offers</ScrollFloat>
-        </h1>
-        <div className="inline-flex items-center space-x-2 bg-content1 border border-divider rounded-full px-4 py-1.5 backdrop-blur-md shadow-sm">
-            <ShinyText className="text-sm font-semibold tracking-wide text-foreground" shimmerColor="#ffffff">
-                Limited Time Deals
-            </ShinyText>
+    <div className="min-h-screen">
+
+      {/* ── PAGE HEADER ── */}
+      <div
+        className="relative border-b pt-20 pb-16 overflow-hidden"
+        style={{ borderColor: 'rgba(255,255,255,0.06)' }}
+      >
+        <div
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[280px] pointer-events-none"
+          aria-hidden="true"
+          style={{
+            background: 'radial-gradient(ellipse, rgba(124,143,161,0.06) 0%, transparent 70%)',
+            filter: 'blur(40px)',
+          }}
+        />
+        <div className="container-vb relative z-10 text-center">
+          <motion.p
+            className="text-label mb-5"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            Limited Time
+          </motion.p>
+          <motion.h1
+            className="text-display font-display font-bold text-foreground mb-5"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            Exclusive Offers
+          </motion.h1>
+          <motion.p
+            className="text-foreground/40 text-lg max-w-xl mx-auto leading-relaxed font-light"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            Curated deals and limited-time discounts on our premium services.
+          </motion.p>
         </div>
       </div>
 
-      <div className="relative z-10 mt-10">
-         {offers.length > 0 ? (
-             <Carousel items={carouselItems} />
-         ) : (
-             <div className="text-center py-20 bg-content1 border border-divider rounded-2xl p-8 max-w-md mx-auto shadow-sm">
-                  <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-6">
-                     <AlertCircle className="w-8 h-8 text-foreground/45" />
-                  </div>
-                  <h3 className="text-xl font-bold text-foreground mb-2">No Active Offers</h3>
-                  <p className="text-foreground/70 text-sm">Check back later for new deals and discounts.</p>
-             </div>
-         )}
-      </div>
-      
-      {offers.length > 0 && (
-          <div className="text-center mt-12 text-sm text-foreground/50 max-w-lg mx-auto">
-             <p>Swipe or click arrows to explore offers. Click on a card to view details or copy the code to apply discount at checkout.</p>
+      {/* ── CONTENT ── */}
+      <div className="section-y">
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <div
+              className="w-6 h-6 border-2 border-t-transparent rounded-full animate-spin"
+              style={{ borderColor: 'rgba(124,143,161,0.3)', borderTopColor: 'var(--vb-accent)' }}
+            />
           </div>
-      )}
+        ) : offers.length > 0 ? (
+          <>
+            <Carousel items={carouselItems} />
+            <p className="text-center mt-10 text-foreground/20 text-xs font-satoshi tracking-wider">
+              Swipe or use arrows to explore · Copy code to apply discount at checkout
+            </p>
+          </>
+        ) : (
+          <div className="container-vb">
+            <div className="glass-card flex flex-col items-center justify-center text-center p-16 max-w-md mx-auto">
+              <div
+                className="mb-6 p-5 border"
+                style={{ borderColor: 'rgba(255,255,255,0.07)', background: 'rgba(255,255,255,0.02)' }}
+              >
+                <Tag size={28} style={{ color: 'rgba(248,249,250,0.2)' }} />
+              </div>
+              <h3 className="font-display font-bold text-foreground text-xl mb-3">
+                No Active Offers
+              </h3>
+              <p className="text-foreground/35 text-sm leading-relaxed">
+                Check back later for new deals and discounts on our services.
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

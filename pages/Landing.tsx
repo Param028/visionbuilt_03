@@ -1,307 +1,596 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { ArrowRight, Code, Layout, Shield, Cpu, Globe, Star, CheckCircle } from 'lucide-react';
-import { Button } from '../components/ui/Components';
-import { GradientText, ShinyText, MagicBento, MagicBentoItem, ScrollFloat, LogoLoop, CountUp, ProjectLoop } from '../components/ui/ReactBits';
+import { motion, useInView } from 'framer-motion';
+import {
+  ArrowRight, Code2, Layers, Palette, TrendingUp,
+  Zap, Globe, CheckCircle,
+} from 'lucide-react';
+import { CountUp, LogoLoop, ProjectLoop } from '../components/ui/ReactBits';
 import { api } from '../services/api';
 import { MarketplaceItem } from '../types';
 
+// ── Inview fade-up wrapper ─────────────────────────────────────
+const FadeUp: React.FC<{
+  children: React.ReactNode;
+  delay?: number;
+  className?: string;
+}> = ({ children, delay = 0, className = '' }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: '-8%' });
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 24 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.65, delay, ease: [0.4, 0, 0.2, 1] }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+};
+
+// ── Tech logos ─────────────────────────────────────────────────
+const techLogos = [
+  { id: 'react',  name: 'React',       logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg',        url: 'https://react.dev' },
+  { id: 'ts',     name: 'TypeScript',  logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/typescript/typescript-original.svg', url: 'https://www.typescriptlang.org' },
+  { id: 'next',   name: 'Next.js',     logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nextjs/nextjs-original.svg',       url: 'https://nextjs.org' },
+  { id: 'tw',     name: 'Tailwind',    logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tailwindcss/tailwindcss-original.svg', url: 'https://tailwindcss.com' },
+  { id: 'node',   name: 'Node.js',     logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nodejs/nodejs-original.svg',       url: 'https://nodejs.org' },
+  { id: 'py',     name: 'Python',      logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg',      url: 'https://www.python.org' },
+  { id: 'docker', name: 'Docker',      logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/docker/docker-original.svg',      url: 'https://www.docker.com' },
+  { id: 'aws',    name: 'AWS',         logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/amazonwebservices/amazonwebservices-original-wordmark.svg', url: 'https://aws.amazon.com' },
+  { id: 'mongo',  name: 'MongoDB',     logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/mongodb/mongodb-original.svg',    url: 'https://www.mongodb.com' },
+  { id: 'git',    name: 'Git',         logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/git/git-original.svg',            url: 'https://git-scm.com' },
+];
+
+// ── Services data ──────────────────────────────────────────────
+const SERVICES = [
+  {
+    icon: <Code2 size={26} />,
+    title: 'Website Development',
+    desc: 'Scalable, performant web applications built with precision engineering, modern architectures, and pixel-perfect delivery.',
+    featured: true,
+  },
+  {
+    icon: <Layers size={22} />,
+    title: 'UI/UX Design',
+    desc: 'Interfaces that feel premium, convert effectively, and leave a lasting impression.',
+    featured: false,
+  },
+  {
+    icon: <Palette size={22} />,
+    title: 'Branding',
+    desc: 'Identity systems designed to endure market cycles and define categories.',
+    featured: false,
+  },
+  {
+    icon: <TrendingUp size={22} />,
+    title: 'Social Media Marketing',
+    desc: 'Strategic growth and content at the scale modern brands demand.',
+    featured: false,
+  },
+  {
+    icon: <Zap size={22} />,
+    title: 'Performance Optimization',
+    desc: 'Lighthouse 100. Core Web Vitals mastery. Every time.',
+    featured: false,
+  },
+  {
+    icon: <Globe size={22} />,
+    title: 'SEO',
+    desc: 'Organic visibility that compounds and drives qualified growth.',
+    featured: false,
+  },
+];
+
+// ── Process steps ──────────────────────────────────────────────
+const PROCESS = [
+  { num: '01', title: 'Discover',  desc: 'Deep dive into your vision, audience, and competitive landscape.' },
+  { num: '02', title: 'Strategy',  desc: 'Roadmap, architecture, and success metrics defined.' },
+  { num: '03', title: 'Design',    desc: 'Precision crafting of every visual element.' },
+  { num: '04', title: 'Develop',   desc: 'Engineering with clean code and modern best practices.' },
+  { num: '05', title: 'Launch',    desc: 'Careful deployment with zero-downtime confidence.' },
+  { num: '06', title: 'Scale',     desc: 'Ongoing optimization and growth post-launch.' },
+];
+
+// ── COMPONENT ─────────────────────────────────────────────────
 const Landing: React.FC = () => {
-  const [stats, setStats] = useState<{ totalDelivered: number, averageRating: number }>({ totalDelivered: 0, averageRating: 0 });
-  const [projects, setProjects] = useState<MarketplaceItem[]>([]);
+  const [stats, setStats] = useState<{ totalDelivered: number; averageRating: number }>({
+    totalDelivered: 0,
+    averageRating: 0,
+  });
+  const [projects, setProjects]         = useState<MarketplaceItem[]>([]);
   const [subscriptions, setSubscriptions] = useState<any[]>([]);
-  const [siteSettings, setSiteSettings] = useState<any>(null);
-  const [activePreviewTab, setActivePreviewTab] = useState('Websites');
+  const [siteSettings, setSiteSettings]   = useState<any>(null);
+  const [activeTab, setActiveTab]         = useState('Websites');
 
   useEffect(() => {
-      api.getSiteSettings().then(setSiteSettings);
-      api.getPlatformStats().then(setStats);
-      api.getMarketplaceItems().then(items => {
-          setProjects(items);
-      });
-      api.getRecurringServices().then(subs => {
-          setSubscriptions(subs.filter(s => s.is_active && s.show_on_home));
-      });
+    api.getSiteSettings().then(setSiteSettings);
+    api.getPlatformStats().then(setStats);
+    api.getMarketplaceItems().then(setProjects);
+    api.getRecurringServices().then((subs) =>
+      setSubscriptions(subs.filter((s: any) => s.is_active && s.show_on_home))
+    );
   }, []);
 
   const getFilteredProjects = () => {
-      let filtered = projects.filter(p => p.category === activePreviewTab);
-      // Fallback if no projects in category, just show what we have so section isn't empty
-      if (filtered.length === 0) filtered = projects;
-      return filtered.map(p => ({
-          id: p.id,
-          image: p.image_url!,
-          title: p.title,
-          url: `/marketplace/buy/${p.id}`
-      }));
+    let filtered = projects.filter((p) => p.category === activeTab);
+    if (filtered.length === 0) filtered = projects;
+    return filtered.map((p) => ({
+      id:    p.id,
+      image: p.image_url!,
+      title: p.title,
+      url:   `/marketplace/buy/${p.id}`,
+    }));
   };
 
-  const techLogos = [
-    { id: 'react', name: 'React', logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg', url: 'https://react.dev' },
-    { id: 'typescript', name: 'TypeScript', logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/typescript/typescript-original.svg', url: 'https://www.typescriptlang.org' },
-    { id: 'nextjs', name: 'Next.js', logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nextjs/nextjs-original.svg', url: 'https://nextjs.org' },
-    { id: 'tailwind', name: 'Tailwind CSS', logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tailwindcss/tailwindcss-original.svg', url: 'https://tailwindcss.com' },
-    { id: 'nodejs', name: 'Node.js', logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nodejs/nodejs-original.svg', url: 'https://nodejs.org' },
-    { id: 'python', name: 'Python', logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg', url: 'https://www.python.org' },
-    { id: 'docker', name: 'Docker', logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/docker/docker-original.svg', url: 'https://www.docker.com' },
-    { id: 'aws', name: 'AWS', logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/amazonwebservices/amazonwebservices-original-wordmark.svg', url: 'https://aws.amazon.com' },
-    { id: 'mongodb', name: 'MongoDB', logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/mongodb/mongodb-original.svg', url: 'https://www.mongodb.com' },
-    { id: 'git', name: 'Git', logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/git/git-original.svg', url: 'https://git-scm.com' }
-  ];
+  // ── Derive heading from siteSettings or use default
+  const heroHeadingLines = (() => {
+    if (siteSettings?.hero_title) {
+      const words = siteSettings.hero_title.split(' ');
+      const last  = words.pop();
+      return { main: words.join(' '), accent: last };
+    }
+    return { main: 'We Build Digital', accent: 'Futures.' };
+  })();
 
   return (
-    <div className="relative min-h-screen">
-      
-      {/* Hero Section */}
-      <section className="relative pt-24 pb-32 overflow-hidden z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center">
-          
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="mb-8"
-          >
-             <div className="inline-flex items-center space-x-2 bg-content1/80 border border-divider rounded-full px-4 py-1.5 backdrop-blur-md shadow-sm">
-                <span className="flex h-2 w-2 rounded-full bg-foreground animate-pulse"></span>
-                <ShinyText className="text-xs font-semibold tracking-wide uppercase text-foreground" shimmerColor="#ffffff">
-                   Next Gen Development
-                </ShinyText>
-             </div>
-          </motion.div>
+    <div className="relative min-h-screen bg-background">
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="mb-6"
-          >
-             <h1 className="text-5xl md:text-7xl font-display font-bold tracking-tight text-foreground flex flex-col items-center justify-center">
-                {siteSettings ? (
-                    <>
-                       <ScrollFloat animationDuration={0.8} stagger={0.05}>
-                          {siteSettings.hero_title.split(' ').slice(0, -1).join(' ')}
-                       </ScrollFloat>
-                       <GradientText className="text-6xl md:text-8xl mt-2 block" colors={["#71717A", "#A1A1AA", "#E4E4E7", "#71717A"]}>
-                          {siteSettings.hero_title.split(' ').slice(-1).join('')}
-                       </GradientText>
-                    </>
-                ) : (
-                    <>
-                       <ScrollFloat animationDuration={0.8} stagger={0.05}>Build the</ScrollFloat>
-                       <GradientText className="text-6xl md:text-8xl mt-2 block" colors={["#71717A", "#A1A1AA", "#E4E4E7", "#71717A"]}>
-                          FUTURE
-                       </GradientText>
-                    </>
-                )}
-             </h1>
-          </motion.div>
+      {/* ═══════════════════════════════════════════════
+          HERO — fullscreen cinematic
+      ═══════════════════════════════════════════════ */}
+      <section className="relative min-h-screen flex items-center overflow-hidden">
 
-          <div className="max-w-2xl text-lg md:text-xl text-foreground/70 mb-10 leading-relaxed mx-auto">
-             <ScrollFloat animationDuration={0.5} stagger={0.01} className="justify-center">
-                {siteSettings ? siteSettings.hero_subtitle : "Vision Built transforms ideas into digital reality. From high-scale software to futuristic web experiences, we engineer success."}
-             </ScrollFloat>
+        {/* Atmospheric background */}
+        <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+          {/* Primary glow — top right */}
+          <div
+            className="absolute top-[20%] right-[15%] w-[640px] h-[640px] rounded-full"
+            style={{
+              background: 'radial-gradient(circle, rgba(124,143,161,0.07) 0%, transparent 65%)',
+              filter: 'blur(40px)',
+            }}
+          />
+          {/* Secondary glow — bottom left */}
+          <div
+            className="absolute bottom-[20%] left-[10%] w-[400px] h-[400px] rounded-full"
+            style={{
+              background: 'radial-gradient(circle, rgba(124,143,161,0.04) 0%, transparent 65%)',
+              filter: 'blur(40px)',
+            }}
+          />
+          {/* Subtle architectural grid */}
+          <div
+            className="absolute inset-0 opacity-[0.018]"
+            style={{
+              backgroundImage:
+                'linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)',
+              backgroundSize: '80px 80px',
+            }}
+          />
+        </div>
+
+        {/* Content */}
+        <div className="container-vb relative z-10 pt-24 pb-20">
+          <div className="max-w-5xl">
+
+            {/* Eyebrow label */}
+            <motion.p
+              className="text-label mb-10"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 1 }}
+            >
+              Digital Agency · Premium Craftsmanship
+            </motion.p>
+
+            {/* Main heading — Clash Display, cinematic scale */}
+            <motion.h1
+              className="text-hero font-display font-bold text-foreground mb-10"
+              initial={{ opacity: 0, y: 32 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.1, ease: [0.4, 0, 0.2, 1] }}
+            >
+              {heroHeadingLines.main}
+              <br />
+              <span style={{ color: 'rgba(248,249,250,0.2)' }}>
+                {heroHeadingLines.accent}
+              </span>
+            </motion.h1>
+
+            {/* Subheading */}
+            <motion.p
+              className="text-foreground/45 text-lg md:text-xl max-w-lg mb-14 leading-relaxed font-light"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.25, ease: [0.4, 0, 0.2, 1] }}
+            >
+              {siteSettings?.hero_subtitle ||
+                'Premium websites, immersive digital experiences, and brand identities for companies that demand excellence.'}
+            </motion.p>
+
+            {/* CTAs */}
+            <motion.div
+              className="flex flex-col sm:flex-row gap-3"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4, ease: [0.4, 0, 0.2, 1] }}
+            >
+              <Link to="/services" className="btn-primary group">
+                Start a Project
+                <ArrowRight
+                  size={14}
+                  className="group-hover:translate-x-1 transition-transform duration-300"
+                />
+              </Link>
+              <Link to="/marketplace" className="btn-ghost">
+                View Our Work
+              </Link>
+            </motion.div>
           </div>
+        </div>
 
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mb-16"
-          >
-            <Link to="/services">
-              <Button size="lg" className="w-full sm:w-auto text-base">
-                Explore Services <ArrowRight className="ml-2 w-5 h-5" />
-              </Button>
-            </Link>
-            <Link to="/auth">
-              <Button variant="outline" size="lg" className="w-full sm:w-auto text-base">
-                Client Portal
-              </Button>
-            </Link>
-          </motion.div>
+        {/* Scroll indicator */}
+        <motion.div
+          className="absolute bottom-10 left-1/2 -translate-x-1/2"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.8 }}
+          aria-hidden="true"
+        >
+          <div
+            className="w-px h-14 mx-auto"
+            style={{
+              background: 'linear-gradient(to bottom, transparent, rgba(255,255,255,0.18), transparent)',
+            }}
+          />
+        </motion.div>
+      </section>
 
-          {/* Stats Bar */}
-          <motion.div 
-             initial={{ opacity: 0, y: 20 }}
-             animate={{ opacity: 1, y: 0 }}
-             transition={{ duration: 0.6, delay: 0.5 }}
-             className="grid grid-cols-2 md:grid-cols-2 gap-8 md:gap-24 p-6 glass-panel max-w-2xl w-full border border-divider shadow-sm"
-          >
-              <div className="flex flex-col items-center">
-                  <div className="flex items-center text-4xl font-bold font-display text-foreground">
-                      <CountUp to={stats.totalDelivered} duration={2.5} />
-                      <span>+</span>
+      {/* ═══════════════════════════════════════════════
+          STATS STRIP
+      ═══════════════════════════════════════════════ */}
+      <section
+        className="border-y py-10 md:py-12"
+        style={{ borderColor: 'rgba(255,255,255,0.06)', background: 'rgba(44,49,55,0.25)' }}
+      >
+        <div className="container-vb">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-4">
+            {[
+              { value: stats.totalDelivered, suffix: '+',    label: 'Projects Delivered', dec: 0 },
+              { value: 50,                   suffix: '+',    label: 'Brands Served',       dec: 0 },
+              { value: stats.averageRating || 4.9, suffix: '', after: '/ 5', label: 'Average Rating', dec: 1 },
+              { value: 2,                    suffix: '+',    label: 'Years of Excellence', dec: 0 },
+            ].map((s, i) => (
+              <FadeUp key={s.label} delay={i * 0.08}>
+                <div className="text-center md:text-left">
+                  <div className="flex items-baseline gap-0.5 justify-center md:justify-start mb-2">
+                    <CountUp
+                      to={s.value}
+                      decimals={s.dec}
+                      className="text-3xl md:text-4xl font-display font-bold text-foreground"
+                    />
+                    <span className="text-2xl font-display font-bold text-foreground">{s.suffix}</span>
+                    {s.after && (
+                      <span className="text-base font-satoshi ml-1" style={{ color: 'rgba(248,249,250,0.3)' }}>
+                        {s.after}
+                      </span>
+                    )}
                   </div>
-                  <span className="text-sm text-foreground/70 uppercase tracking-widest mt-2 flex items-center gap-2">
-                      <CheckCircle size={14} className="text-foreground/85" /> Delivered Projects
-                  </span>
-              </div>
-              
-              <div className="flex flex-col items-center">
-                  <div className="flex items-center text-4xl font-bold font-display text-foreground">
-                      <CountUp to={stats.averageRating} duration={2} decimals={1} />
-                      <span className="ml-2 text-2xl">/ 5</span>
-                  </div>
-                  <span className="text-sm text-foreground/70 uppercase tracking-widest mt-2 flex items-center gap-2">
-                      <Star size={14} fill="currentColor" className="text-amber-500" /> Average Rating
-                  </span>
-              </div>
-          </motion.div>
+                  <p className="text-label">{s.label}</p>
+                </div>
+              </FadeUp>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* Project Preview Loop Section */}
-      <section className="py-20 bg-background/50 border-y border-divider relative overflow-hidden z-20">
-         <div className="max-w-7xl mx-auto px-4 mb-8 text-center relative z-10">
-              <span className="text-xs font-semibold text-foreground/70 uppercase tracking-widest mb-2 block">Our Work</span>
-              <h2 className="text-2xl font-display font-bold text-foreground mb-6"><ScrollFloat>Featured Deployments</ScrollFloat></h2>
-              
-              {/* Category Tabs */}
-              <div className="flex justify-center mb-8 gap-4">
-                  {['Websites', 'UI/UX Design', 'Free Projects'].map((tab) => (
-                      <button
-                         key={tab}
-                         onClick={() => setActivePreviewTab(tab)}
-                         className={`text-sm px-4 py-2 rounded-full border transition-all ${
-                             activePreviewTab === tab 
-                             ? 'bg-primary text-primary-foreground border-transparent font-semibold shadow-sm' 
-                             : 'border-divider text-foreground/60 hover:text-foreground'
-                         }`}
-                      >
-                          {tab}
-                      </button>
-                  ))}
+      {/* ═══════════════════════════════════════════════
+          SERVICES BENTO GRID
+      ═══════════════════════════════════════════════ */}
+      <section className="section-y">
+        <div className="container-vb">
+
+          {/* Section header */}
+          <FadeUp className="mb-14 md:mb-20">
+            <p className="text-label mb-4">What We Build</p>
+            <h2 className="text-display font-display font-bold text-foreground">Services</h2>
+          </FadeUp>
+
+          {/* Bento grid — 2-col top, 3-col bottom */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+            {/* Featured card: Website Development — spans 2 columns */}
+            <FadeUp delay={0.05} className="md:col-span-2">
+              <div className="glass-card p-10 md:p-12 h-full group">
+                <div className="mb-8" style={{ color: 'var(--vb-accent)' }}>
+                  {SERVICES[0].icon}
+                </div>
+                <h3 className="text-display-sm font-display font-bold text-foreground mb-4">
+                  {SERVICES[0].title}
+                </h3>
+                <p className="text-foreground/45 leading-relaxed max-w-md">
+                  {SERVICES[0].desc}
+                </p>
+                <Link
+                  to="/services"
+                  className="inline-flex items-center gap-2 mt-10 text-xs font-satoshi tracking-widest uppercase transition-all duration-300"
+                  style={{ color: 'var(--vb-accent)' }}
+                >
+                  <span className="group-hover:tracking-[0.22em] transition-all duration-300">
+                    Explore Services
+                  </span>
+                  <ArrowRight size={12} />
+                </Link>
               </div>
-         </div>
-         
-         <ProjectLoop items={getFilteredProjects().length > 0 ? getFilteredProjects() : [
-             // Fallback if DB empty
-             { id: '1', image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f', title: 'Example Dashboard', url: '/services' }
-         ]} />
-      </section>
+            </FadeUp>
 
-      {/* Trusted Tech Stack Logo Loop */}
-      <section className="py-10 border-b border-divider bg-background/30 backdrop-blur-sm relative z-20">
-          <div className="max-w-7xl mx-auto px-4 mb-6 text-center">
-              <span className="text-xs font-semibold text-foreground/50 uppercase tracking-widest">Powered By Modern Technology</span>
+            {/* UI/UX Design — single card */}
+            <FadeUp delay={0.12}>
+              <div className="glass-card p-8 md:p-10 h-full">
+                <div className="mb-6" style={{ color: 'var(--vb-accent)' }}>
+                  {SERVICES[1].icon}
+                </div>
+                <h3 className="font-display font-bold text-foreground text-xl mb-3">
+                  {SERVICES[1].title}
+                </h3>
+                <p className="text-foreground/40 text-sm leading-relaxed">
+                  {SERVICES[1].desc}
+                </p>
+              </div>
+            </FadeUp>
+
+            {/* Bottom row — 3 equal cards */}
+            {SERVICES.slice(2).map((svc, i) => (
+              <FadeUp key={svc.title} delay={0.08 * (i + 3)}>
+                <div className="glass-card p-8 group h-full">
+                  <div className="mb-5" style={{ color: 'var(--vb-accent)' }}>
+                    {svc.icon}
+                  </div>
+                  <h3 className="font-display font-semibold text-foreground mb-2">
+                    {svc.title}
+                  </h3>
+                  <p className="text-foreground/38 text-sm leading-relaxed">
+                    {svc.desc}
+                  </p>
+                </div>
+              </FadeUp>
+            ))}
           </div>
-          <LogoLoop items={techLogos} />
+        </div>
       </section>
 
-      {/* Subscription Preview Section */}
+      {/* ═══════════════════════════════════════════════
+          FEATURED WORK / PROJECT SHOWCASE
+      ═══════════════════════════════════════════════ */}
+      <section
+        className="section-y-sm border-y"
+        style={{ borderColor: 'rgba(255,255,255,0.06)', background: 'rgba(33,37,41,0.5)' }}
+      >
+        <div className="container-vb mb-12">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+            <FadeUp>
+              <p className="text-label mb-4">Our Work</p>
+              <h2 className="text-display font-display font-bold text-foreground">Featured Projects</h2>
+            </FadeUp>
+
+            {/* Tab filters */}
+            <FadeUp delay={0.1}>
+              <div className="flex gap-2 flex-wrap">
+                {['Websites', 'UI/UX Design', 'Free Projects'].map((tab) => (
+                  <button
+                    key={tab}
+                    id={`project-tab-${tab.toLowerCase().replace(/[^a-z]/g, '-')}`}
+                    onClick={() => setActiveTab(tab)}
+                    className="text-[0.65rem] font-satoshi font-medium tracking-widest uppercase px-4 py-2 border transition-all duration-300"
+                    style={{
+                      borderColor:
+                        activeTab === tab ? 'rgba(248,249,250,0.6)' : 'rgba(255,255,255,0.1)',
+                      color:
+                        activeTab === tab ? '#F8F9FA' : 'rgba(248,249,250,0.4)',
+                      background:
+                        activeTab === tab ? 'rgba(255,255,255,0.05)' : 'transparent',
+                    }}
+                  >
+                    {tab}
+                  </button>
+                ))}
+              </div>
+            </FadeUp>
+          </div>
+        </div>
+
+        <ProjectLoop
+          items={
+            getFilteredProjects().length > 0
+              ? getFilteredProjects()
+              : [
+                  {
+                    id: '1',
+                    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800',
+                    title: 'Premium Dashboard',
+                    url: '/services',
+                  },
+                ]
+          }
+        />
+      </section>
+
+      {/* ═══════════════════════════════════════════════
+          PROCESS TIMELINE
+      ═══════════════════════════════════════════════ */}
+      <section className="section-y">
+        <div className="container-vb">
+
+          <FadeUp className="mb-16 md:mb-20">
+            <p className="text-label mb-4">How We Work</p>
+            <h2 className="text-display font-display font-bold text-foreground">Our Process</h2>
+          </FadeUp>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 md:gap-6">
+            {PROCESS.map((step, i) => (
+              <FadeUp key={step.num} delay={i * 0.07}>
+                <div className="relative">
+                  {/* Connector line (desktop only, not last item) */}
+                  {i < PROCESS.length - 1 && (
+                    <div
+                      className="hidden lg:block absolute top-3 left-full w-full h-px"
+                      style={{ background: 'rgba(255,255,255,0.05)' }}
+                      aria-hidden="true"
+                    />
+                  )}
+
+                  <p
+                    className="font-satoshi text-xs mb-4 tracking-widest"
+                    style={{ color: 'rgba(124,143,161,0.5)' }}
+                  >
+                    {step.num}
+                  </p>
+                  <div
+                    className="w-6 h-px mb-4"
+                    style={{ background: 'rgba(255,255,255,0.1)' }}
+                  />
+                  <h3 className="font-display font-semibold text-foreground mb-2 text-sm">
+                    {step.title}
+                  </h3>
+                  <p className="text-foreground/35 text-xs leading-relaxed">
+                    {step.desc}
+                  </p>
+                </div>
+              </FadeUp>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════
+          TECH STACK MARQUEE
+      ═══════════════════════════════════════════════ */}
+      <section
+        className="section-y-sm border-y"
+        style={{ borderColor: 'rgba(255,255,255,0.05)', background: 'rgba(44,49,55,0.15)' }}
+      >
+        <div className="container-vb mb-8 text-center">
+          <p className="text-label">Technology Stack</p>
+        </div>
+        <LogoLoop items={techLogos} />
+      </section>
+
+      {/* ═══════════════════════════════════════════════
+          SUBSCRIPTION PLANS (conditional)
+      ═══════════════════════════════════════════════ */}
       {subscriptions.length > 0 && (
-        <section className="py-24 relative z-10 bg-background border-b border-divider">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="text-center mb-16">
-                    <span className="text-xs font-semibold text-foreground/70 uppercase tracking-widest mb-2 block">Recurring Value</span>
-                    <h2 className="text-3xl font-display font-bold text-foreground mb-4">
-                        <ScrollFloat>Monthly Plans</ScrollFloat>
-                    </h2>
-                </div>
- 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 justify-center">
-                    {subscriptions.map((sub, index) => (
-                        <motion.div
-                            key={sub.id}
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: index * 0.1 }}
-                            className="relative group"
-                        >
-                            <div className="absolute inset-0 bg-gradient-to-r from-foreground/5 to-transparent rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                            <div className="relative h-full glass-panel p-8 hover:border-focus/30 transition-all flex flex-col">
-                                <h3 className="text-xl font-bold text-foreground mb-2">{sub.title}</h3>
-                                <div className="flex items-baseline gap-1 mb-4">
-                                    <span className="text-3xl font-bold text-foreground">${sub.price}</span>
-                                    <span className="text-sm text-foreground/50">/{sub.interval}</span>
-                                </div>
-                                <p className="text-foreground/70 text-sm mb-6 flex-1">{sub.description}</p>
-                                <ul className="space-y-3 mb-8">
-                                    {sub.features.slice(0, 4).map((f: string, i: number) => (
-                                        <li key={i} className="flex items-start text-xs text-foreground/80">
-                                            <CheckCircle size={14} className="text-foreground/60 mr-2 mt-0.5 shrink-0" />
-                                            {f}
-                                        </li>
-                                    ))}
-                                    {sub.features.length > 4 && (
-                                        <li className="text-xs text-foreground/40 italic pl-6">And more...</li>
-                                    )}
-                                </ul>
-                                <Link to="/services" className="mt-auto">
-                                    <Button variant="outline" className="w-full">
-                                        View Details
-                                    </Button>
-                                </Link>
-                            </div>
-                        </motion.div>
-                    ))}
-                </div>
+        <section className="section-y border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+          <div className="container-vb">
+            <FadeUp className="mb-14 md:mb-20">
+              <p className="text-label mb-4">Recurring Value</p>
+              <h2 className="text-display font-display font-bold text-foreground">Monthly Plans</h2>
+            </FadeUp>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {subscriptions.map((sub: any, i: number) => (
+                <FadeUp key={sub.id} delay={i * 0.1}>
+                  <div className="glass-card p-8 md:p-10 flex flex-col h-full">
+                    <h3 className="font-display font-bold text-foreground text-xl mb-3">
+                      {sub.title}
+                    </h3>
+                    <div className="flex items-baseline gap-1 mb-5">
+                      <span className="text-4xl font-display font-bold text-foreground">
+                        ₹{sub.price}
+                      </span>
+                      <span className="font-satoshi text-sm" style={{ color: 'rgba(248,249,250,0.3)' }}>
+                        /{sub.interval}
+                      </span>
+                    </div>
+                    <p className="text-foreground/40 text-sm mb-7 flex-1 leading-relaxed">
+                      {sub.description}
+                    </p>
+                    <ul className="space-y-2.5 mb-8">
+                      {sub.features.slice(0, 5).map((f: string, fi: number) => (
+                        <li key={fi} className="flex items-start gap-2.5 text-xs text-foreground/50">
+                          <CheckCircle
+                            size={12}
+                            className="shrink-0 mt-0.5"
+                            style={{ color: 'var(--vb-accent)' }}
+                          />
+                          {f}
+                        </li>
+                      ))}
+                    </ul>
+                    <Link to="/services" className="btn-ghost !text-xs text-center justify-center">
+                      View Details
+                    </Link>
+                  </div>
+                </FadeUp>
+              ))}
             </div>
+          </div>
         </section>
       )}
 
-      {/* Magic Bento Features (Unchanged) */}
-      <section className="py-24 relative z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-           <div className="text-center mb-16">
-              <h2 className="text-3xl font-display font-bold text-foreground mb-4">
-                  <ScrollFloat>Why Vision Built?</ScrollFloat>
-              </h2>
-              <div className="text-foreground/70">
-                  <ScrollFloat animationDuration={0.6} stagger={0.02} className="justify-center">
-                    Engineering excellence meets futuristic design.
-                  </ScrollFloat>
-              </div>
-           </div>
+      {/* ═══════════════════════════════════════════════
+          CTA SECTION — immersive, massive typography
+      ═══════════════════════════════════════════════ */}
+      <section className="relative section-y overflow-hidden">
+        {/* Atmospheric glow */}
+        <div
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+          aria-hidden="true"
+          style={{
+            width: '900px',
+            height: '400px',
+            borderRadius: '50%',
+            background: 'radial-gradient(ellipse, rgba(124,143,161,0.06) 0%, transparent 70%)',
+            filter: 'blur(60px)',
+          }}
+        />
 
-           <MagicBento>
-              <MagicBentoItem 
-                 title="Custom Software" 
-                 description="Scalable backends and powerful tailored applications designed for enterprise growth."
-                 icon={<Code className="w-6 h-6" />}
-                 colSpan={2}
+        <div className="container-vb relative z-10 text-center">
+          <FadeUp>
+            <p className="text-label mb-10">Ready to Begin?</p>
+            <h2
+              className="font-display font-bold text-foreground mb-8 leading-[0.98]"
+              style={{
+                fontSize: 'clamp(2.4rem, 6vw, 5.5rem)',
+                letterSpacing: '-0.025em',
+              }}
+            >
+              Let&apos;s Build Something
+              <br />
+              <span style={{ color: 'rgba(248,249,250,0.18)' }}>Extraordinary.</span>
+            </h2>
+            <p
+              className="text-foreground/38 text-lg mb-14 max-w-xl mx-auto leading-relaxed font-light"
+            >
+              Partner with Vision Built to create digital experiences that define your category and outlast trends.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Link to="/services" className="btn-primary group">
+                Start a Project
+                <ArrowRight
+                  size={14}
+                  className="group-hover:translate-x-1 transition-transform duration-300"
+                />
+              </Link>
+              <a
+                href="mailto:vbuilt20@gmail.com"
+                className="btn-ghost"
               >
-                 <span>Full Stack Architecture</span>
-              </MagicBentoItem>
-              
-              <MagicBentoItem 
-                 title="Futuristic UI/UX" 
-                 description="Interfaces that feel like they belong in 2050."
-                 icon={<Layout className="w-6 h-6" />}
-              >
-                 <span>Framer Motion</span>
-              </MagicBentoItem>
+                Say Hello
+              </a>
+            </div>
 
-              <MagicBentoItem 
-                 title="Enterprise Security" 
-                 description="Bank-grade protection for all your digital assets."
-                 icon={<Shield className="w-6 h-6" />}
-              >
-                 <span>Encrypted</span>
-              </MagicBentoItem>
-
-              <MagicBentoItem 
-                 title="AI Integration" 
-                 description="Leverage machine learning to automate your workflow."
-                 icon={<Cpu className="w-6 h-6" />}
-              >
-                 <span>LLM Support</span>
-              </MagicBentoItem>
-
-              <MagicBentoItem 
-                 title="Global Delivery" 
-                 description="Lightning fast content delivery anywhere on Earth."
-                 icon={<Globe className="w-6 h-6" />}
-              >
-                 <span>Edge Functions</span>
-              </MagicBentoItem>
-           </MagicBento>
+            {/* Trust line */}
+            <p className="mt-12 text-foreground/20 text-xs font-satoshi tracking-widest uppercase">
+              Response within 24 hours · No commitment required
+            </p>
+          </FadeUp>
         </div>
       </section>
+
     </div>
   );
 };

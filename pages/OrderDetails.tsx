@@ -1,10 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Send, Paperclip, Download, ChevronLeft, FileText, CheckCircle2, Star, Box, ExternalLink, Image as ImageIcon, X, Loader2, MessageSquarePlus, Receipt, Clock } from 'lucide-react';
+import { Send, Paperclip, Download, ChevronLeft, FileText, CheckCircle2, Star, Box, ExternalLink, X, Loader2, MessageSquarePlus, Receipt, Clock } from 'lucide-react';
 import { api } from '../services/api';
 import { Order, Message, User, MarketplaceItem, Payment } from '../types';
-import { Button, Card, Badge, Textarea } from '../components/ui/Components';
-import { ScrollFloat } from '../components/ui/ReactBits';
+import { Badge } from '../components/ui/Components';
 import { formatPrice } from '../constants';
 import { useToast } from '../components/ui/Toast';
 
@@ -145,7 +144,7 @@ const OrderDetails: React.FC<{ user: User }> = ({ user }) => {
     }
   };
 
-  if (!order) return <div className="p-20 text-center text-foreground/50">Loading Order Details...</div>;
+  if (!order) return <div className="p-20 text-center text-foreground/30 font-satoshi">Loading Order Profile...</div>;
 
   const totalAmount = order.total_amount || 0;
   const amountPaid = order.amount_paid || 0;
@@ -158,392 +157,396 @@ const OrderDetails: React.FC<{ user: User }> = ({ user }) => {
   const isFullyPaid = totalAmount > 0 && amountPaid >= totalAmount;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <Link to={user.role === 'admin' || user.role === 'super_admin' || user.role === 'developer' ? '/admin' : '/dashboard'} className="inline-flex items-center text-foreground/50 hover:text-foreground mb-6 transition-colors">
-        <ChevronLeft className="w-4 h-4 mr-1" /> Back to Dashboard
-      </Link>
+    <div className="min-h-screen relative overflow-hidden py-10">
+      {/* Ambient backgrounds */}
+      <div
+        className="absolute top-0 right-1/4 pointer-events-none"
+        aria-hidden="true"
+        style={{
+          width: '500px', height: '500px', borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(124,143,161,0.02) 0%, transparent 70%)',
+          filter: 'blur(80px)',
+        }}
+      />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 h-[calc(100vh-140px)]">
-        {/* Order Info Column */}
-        <div className="lg:col-span-1 space-y-6 overflow-y-auto pr-2 custom-scrollbar">
-          <Card>
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <h2 className="text-xl font-bold text-foreground mb-1">
-                    <ScrollFloat>{`Order #${order.id.slice(-6).toUpperCase()}`}</ScrollFloat>
-                </h2>
-                <p className="text-sm text-foreground/50">{new Date(order.created_at).toLocaleDateString()}</p>
-              </div>
-              <Badge variant={getStatusColor(order.status)}>{order.status.replace('_', ' ')}</Badge>
-            </div>
-            
-            <div className="space-y-4 py-4 border-t border-divider">
-              <div>
-                <p className="text-xs text-foreground/50 uppercase font-semibold">{order.type === 'project' ? 'Project' : 'Service'}</p>
-                <p className="text-foreground font-medium flex items-center gap-2 mt-1">
-                    {order.service_title}
-                    {order.type === 'project' && <Box size={14} className="text-foreground/70" />}
-                </p>
+      <div className="container-vb relative z-10">
+        <Link 
+          to={user.role === 'admin' || user.role === 'super_admin' || user.role === 'developer' ? '/admin' : '/dashboard'} 
+          className="inline-flex items-center text-foreground/40 hover:text-foreground mb-6 transition-colors font-satoshi text-xs uppercase tracking-widest gap-1"
+        >
+          <ChevronLeft className="w-4 h-4" /> Back to Dashboard
+        </Link>
+
+        {/* 2-Column Split: Info / Chat */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          {/* LEFT: Info/Details Panel */}
+          <div className="lg:col-span-4 space-y-5">
+            <div className="glass-card p-6 md:p-8 space-y-6">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h2 className="text-xl font-display font-bold text-foreground mb-1">
+                    Order #{order.id.slice(-6).toUpperCase()}
+                  </h2>
+                  <p className="text-xs text-foreground/45 font-satoshi">
+                    Received: {new Date(order.created_at).toLocaleDateString()}
+                  </p>
+                </div>
+                <Badge variant={getStatusColor(order.status)} className="uppercase text-[9px] font-mono py-0.5 px-2">
+                  {order.status.replace('_', ' ')}
+                </Badge>
               </div>
               
-              {order.type === 'service' ? (
+              <div className="space-y-4 pt-5 border-t border-white/5 font-satoshi text-sm">
+                <div>
+                  <span className="text-[10px] text-foreground/30 uppercase tracking-widest font-mono block mb-1">
+                    Requested Work
+                  </span>
+                  <p className="text-foreground font-semibold flex items-center gap-1.5">
+                    {order.service_title}
+                    {order.type === 'project' && <Box size={14} className="text-foreground/45" />}
+                  </p>
+                </div>
+                
+                {order.type === 'service' ? (
                   <>
-                      <div>
-                        <p className="text-xs text-foreground/50 uppercase font-semibold">Business Name</p>
-                        <p className="text-foreground mt-1">{order.requirements.business_name}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-foreground/50 uppercase font-semibold">Requirements</p>
-                        <p className="text-foreground/70 text-sm mt-1">{order.requirements.requirements_text}</p>
-                      </div>
+                    <div>
+                      <span className="text-[10px] text-foreground/30 uppercase tracking-widest font-mono block mb-1">
+                        Company Name
+                      </span>
+                      <p className="text-foreground/80">{order.requirements.business_name}</p>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-foreground/30 uppercase tracking-widest font-mono block mb-1">
+                        Brief / Details
+                      </span>
+                      <p className="text-foreground/50 text-xs leading-relaxed">{order.requirements.requirements_text}</p>
+                    </div>
                   </>
-              ) : (
+                ) : (
                   <div>
-                      <p className="text-xs text-foreground/50 uppercase font-semibold">License Type</p>
-                      <p className="text-foreground mt-1">Standard Commercial License</p>
+                    <span className="text-[10px] text-foreground/30 uppercase tracking-widest font-mono block mb-1">
+                      License Type
+                    </span>
+                    <p className="text-foreground/80">Developer Commercial License</p>
                   </div>
+                )}
+              </div>
+
+              {/* Financial Breakdown */}
+              <div className="pt-5 border-t border-white/5 space-y-3 text-xs font-satoshi">
+                <div className="flex justify-between">
+                  <span className="text-foreground/40">Total Quote Budget</span>
+                  <span className="font-semibold text-foreground">
+                    {totalAmount > 0 && !isPendingQuote ? formatPrice(totalAmount, user.country) : 'Pending Review'}
+                  </span>
+                </div>
+                {depositAmount > 0 && !isPendingQuote && (
+                  <div className="flex justify-between text-foreground/30">
+                    <span>Initial Deposit</span>
+                    <span>{formatPrice(depositAmount, user.country)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between items-center text-sm font-semibold text-foreground pt-3 border-t border-white/5">
+                  <span>Paid Balance</span>
+                  <span className="text-emerald-400 font-mono">{formatPrice(amountPaid, user.country)}</span>
+                </div>
+              </div>
+
+              {/* Payment Actions */}
+              {user.role === 'client' && (
+                <div className="pt-5 border-t border-white/5">
+                  {isPendingQuote && (
+                    <div className="bg-white/[0.01] border border-white/5 p-4 rounded-lg text-center space-y-2">
+                      <Clock className="w-6 h-6 text-foreground/30 mx-auto" />
+                      <p className="text-[10px] text-foreground/75 font-display font-semibold uppercase tracking-widest">
+                        Quote Under Review
+                      </p>
+                      <p className="text-[10px] text-foreground/40 leading-relaxed font-satoshi">
+                        Our developers are reviewing your brief. We will email you once payment options are available.
+                      </p>
+                    </div>
+                  )}
+
+                  {showDepositPay && (
+                    <div className="space-y-2.5">
+                      <p className="text-[9px] text-[var(--vb-accent)] uppercase tracking-wider font-mono">
+                        Step 1: Deposit Action Required
+                      </p>
+                      <button 
+                        onClick={() => handlePayment(depositAmount - amountPaid, 'Initial Deposit')}
+                        disabled={isPaying}
+                        className="w-full btn-primary h-10 text-xs tracking-wider flex items-center justify-center font-semibold"
+                      >
+                        {isPaying ? <Loader2 size={14} className="animate-spin" /> : `Pay Deposit ${formatPrice(depositAmount - amountPaid, user.country)}`}
+                      </button>
+                    </div>
+                  )}
+                  
+                  {showBalancePay && (
+                    <div className="space-y-2.5">
+                      <p className="text-[9px] text-[var(--vb-accent)] uppercase tracking-wider font-mono">
+                        Step 2: Remaining Balance Action
+                      </p>
+                      <button 
+                        onClick={() => handlePayment(remainingBalance, 'Final Balance')}
+                        disabled={isPaying}
+                        className="w-full btn-primary h-10 text-xs tracking-wider flex items-center justify-center font-semibold"
+                      >
+                        {isPaying ? <Loader2 size={14} className="animate-spin" /> : `Complete Balance ${formatPrice(remainingBalance, user.country)}`}
+                      </button>
+                    </div>
+                  )}
+
+                  {isFullyPaid && totalAmount > 0 && (
+                    <div className="flex items-center justify-center gap-2 p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/10 text-emerald-400 font-semibold text-xs uppercase tracking-widest font-mono">
+                      <CheckCircle2 size={14} /> Account Settled
+                    </div>
+                  )}
+                </div>
               )}
             </div>
 
-            {/* Financials Section */}
-            <div className="pt-4 border-t border-divider space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                    <span className="text-foreground/50">Total Quote</span>
-                    <span className="font-bold text-foreground">
-                        {totalAmount > 0 && !isPendingQuote ? formatPrice(totalAmount, user.country) : 'Pending Review'}
-                    </span>
-                </div>
-                {depositAmount > 0 && !isPendingQuote && (
-                    <div className="flex items-center justify-between text-xs text-foreground/50">
-                        <span>Required Deposit</span>
-                        <span>{formatPrice(depositAmount, user.country)}</span>
+            {/* Payments History log */}
+            {payments.length > 0 && (
+              <div className="glass-card p-6 md:p-8 space-y-4">
+                <h3 className="text-xs font-display font-semibold text-foreground uppercase tracking-widest flex items-center gap-2">
+                  <Receipt size={14} className="text-foreground/45" /> Payment Ledger
+                </h3>
+                <div className="space-y-2 max-h-[180px] overflow-y-auto pr-1 custom-scrollbar">
+                  {payments.map((payment) => (
+                    <div key={payment.id} className="flex justify-between items-center p-3 rounded bg-white/[0.01] border border-white/5 text-xs font-satoshi">
+                      <div>
+                        <div className="text-foreground/80 font-bold">{formatPrice(payment.amount, user.country)}</div>
+                        <div className="text-[10px] text-foreground/40 mt-0.5">{new Date(payment.date).toLocaleDateString()}</div>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-[8px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded uppercase font-bold tracking-widest">
+                          Cleared
+                        </span>
+                        <div className="text-[9px] text-foreground/30 font-mono mt-1 select-all">{payment.razorpay_id.slice(-10)}</div>
+                      </div>
                     </div>
-                )}
-                <div className="flex items-center justify-between text-sm font-bold text-foreground pt-1 border-t border-divider/20">
-                    <span>Amount Paid</span>
-                    <span>{formatPrice(amountPaid, user.country)}</span>
+                  ))}
                 </div>
-            </div>
-
-            {/* Payment Actions */}
-            {user.role === 'client' && (
-                <div className="mt-4 pt-4 border-t border-divider space-y-3">
-                    
-                    {isPendingQuote && (
-                         <div className="bg-content2 p-4 rounded-xl border border-divider text-center">
-                            <Clock className="w-8 h-8 text-foreground/70 mx-auto mb-2" />
-                            <p className="text-xs text-foreground/80 font-bold uppercase tracking-wide mb-1">Request Under Review</p>
-                            <p className="text-[10px] text-foreground/50 mt-1">
-                                A developer is reviewing your request. You will receive a notification with the quote and deposit link shortly.
-                            </p>
-                        </div>
-                    )}
-
-                    {showDepositPay && (
-                        <div className="bg-content2 p-4 rounded-xl border border-divider">
-                            <p className="text-xs text-foreground/75 mb-2 font-bold uppercase tracking-wide">Step 1: Deposit Required</p>
-                            <Button 
-                                className="w-full bg-foreground text-background hover:bg-foreground/90 border-none"
-                                onClick={() => handlePayment(depositAmount - amountPaid, 'Initial Deposit')}
-                                isLoading={isPaying}
-                            >
-                                Pay Deposit {formatPrice(depositAmount - amountPaid, user.country)}
-                            </Button>
-                        </div>
-                    )}
-                    
-                    {showBalancePay && (
-                        <div className="bg-content2 p-4 rounded-xl border border-divider">
-                            <p className="text-xs text-foreground/75 mb-2 font-bold uppercase tracking-wide">Step 2: Final Balance</p>
-                            <Button 
-                                className="w-full bg-foreground text-background hover:bg-foreground/90 border-none"
-                                onClick={() => handlePayment(remainingBalance, 'Final Balance')}
-                                isLoading={isPaying}
-                            >
-                                Pay Remaining {formatPrice(remainingBalance, user.country)}
-                            </Button>
-                        </div>
-                    )}
-
-                    {isFullyPaid && totalAmount > 0 && (
-                        <div className="bg-content2 p-3 rounded-xl border border-divider flex items-center justify-center gap-2 text-foreground text-sm font-bold">
-                            <CheckCircle2 size={16} className="text-success" /> Payment Complete
-                        </div>
-                    )}
-                </div>
+              </div>
             )}
-            
-            {order.status === 'completed' && order.type !== 'project' && (
-                <div className="mt-6 pt-6 border-t border-divider">
-                    <Button className="w-full" variant="secondary">
-                        <Download className="w-4 h-4 mr-2"/> Download Invoice
-                    </Button>
-                </div>
-            )}
-          </Card>
 
-           {/* Payments History */}
-           {payments.length > 0 && (
-               <Card>
-                   <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2 uppercase tracking-wide">
-                       <Receipt size={16} className="text-foreground/70" /> Payment History
-                   </h3>
-                   <div className="space-y-3">
-                       {payments.map((payment) => (
-                           <div key={payment.id} className="flex justify-between items-center p-3 rounded-lg bg-content2 border border-divider text-xs">
-                               <div>
-                                   <div className="text-foreground font-bold">{formatPrice(payment.amount, user.country)}</div>
-                                   <div className="text-foreground/50 mt-0.5">{new Date(payment.date).toLocaleDateString()}</div>
-                               </div>
-                               <div className="text-right">
-                                   <Badge variant="success" className="text-[10px] mb-1">SUCCESS</Badge>
-                                   <div className="text-[9px] text-foreground/45 font-mono truncate max-w-[80px]">{payment.razorpay_id}</div>
-                               </div>
-                           </div>
-                       ))}
-                   </div>
-               </Card>
-           )}
-
-           {/* Deliverables / Previews Section */}
-           {order.deliverables && order.deliverables.length > 0 && (
-               <Card>
-                   <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
-                       <ImageIcon size={18} className="text-foreground/70" /> Project Deliverables
-                   </h3>
-                   <div className="grid grid-cols-2 gap-3">
-                       {order.deliverables.map((url, idx) => (
-                           <div key={idx} className="group relative aspect-video bg-black/40 rounded-lg overflow-hidden border border-divider cursor-pointer" onClick={() => window.open(url, '_blank')}>
-                               <img src={url} alt={`Deliverable ${idx + 1}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
-                               <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                                   <ExternalLink className="text-foreground" size={20} />
-                               </div>
-                           </div>
-                       ))}
-                   </div>
-               </Card>
-           )}
-
-           {/* Rating Section */}
-           {order.status === 'completed' && user.role === 'client' && (
-               <Card className="border-t-2 border-t-foreground/30">
-                   <h3 className="text-lg font-bold text-foreground mb-2">Rate your Experience</h3>
-                   {!order.rating ? (
-                       <div className="space-y-4">
-                           <div className="flex gap-2">
-                               {[1, 2, 3, 4, 5].map((star) => (
-                                   <button
-                                     key={star}
-                                     type="button"
-                                     onMouseEnter={() => setHoverRating(star)}
-                                     onMouseLeave={() => setHoverRating(0)}
-                                     onClick={() => setRating(star)}
-                                     className="text-foreground/30 hover:scale-110 transition-transform focus:outline-none"
-                                   >
-                                       <Star 
-                                             size={28} 
-                                             fill={(hoverRating || rating) >= star ? "currentColor" : "none"} 
-                                             className={(hoverRating || rating) >= star ? "text-foreground" : "text-foreground/30"}
-                                         />
-                                   </button>
-                               ))}
-                           </div>
-                           <Textarea 
-                                placeholder="Share your feedback..."
-                                value={review}
-                                onChange={(e) => setReview(e.target.value)}
-                           />
-                           <Button 
-                                onClick={handleSubmitRating} 
-                                disabled={rating === 0 || isRatingSubmitting}
-                                className="w-full"
-                           >
-                               {isRatingSubmitting ? 'Submitting...' : 'Submit Review'}
-                           </Button>
-                       </div>
-                   ) : (
-                       <div className="text-center py-4">
-                           <div className="flex justify-center gap-1 mb-2">
-                               {[1, 2, 3, 4, 5].map((star) => (
-                                    <Star 
-                                        key={star}
-                                        size={20} 
-                                        fill={rating >= star ? "currentColor" : "none"} 
-                                        className={rating >= star ? "text-foreground" : "text-foreground/30"}
-                                    />
-                               ))}
-                           </div>
-                           <p className="text-foreground/70 italic">"{order.review || "No written review"}"</p>
-                       </div>
-                   )}
-               </Card>
-           )}
-         </div>
-
-         {/* Chat Column */}
-         <div className="lg:col-span-2 h-full flex flex-col">
-           <Card className="flex-grow flex flex-col p-0 overflow-hidden h-full border-divider shadow-md">
-             {/* Chat Header */}
-             <div className="p-4 border-b border-divider bg-content2/80 backdrop-blur-md flex justify-between items-center">
-               <div className="flex items-center gap-3">
-                   <div className="w-10 h-10 rounded-full bg-content1 border border-divider flex items-center justify-center text-foreground">
-                       <MessageSquarePlus size={20} />
-                   </div>
-                   <div>
-                     <h3 className="font-bold text-foreground flex items-center gap-2">
-                         {order.type === 'project' ? 'Project Support' : 'Live Development Channel'}
-                         <span className="w-2 h-2 rounded-full bg-success animate-pulse"></span>
-                     </h3>
-                     <p className="text-[10px] text-foreground/50 uppercase tracking-widest mt-0.5">Client & Dev Secure Stream</p>
-                   </div>
-               </div>
-               {user.role !== 'client' && (
-                 <Badge variant="default" className="uppercase text-[9px]">Staff Access</Badge>
-               )}
-             </div>
-
-             {/* Chat Area */}
-             <div className="flex-grow overflow-y-auto p-6 space-y-6 bg-content1/30" ref={scrollRef}>
-               {messages.length === 0 ? (
-                 <div className="flex flex-col items-center justify-center h-full text-foreground/40 opacity-40">
-                     <div className="p-6 bg-content2 rounded-full mb-4 border border-divider">
-                         <MessageSquarePlus size={48} />
-                     </div>
-                     <p className="font-display text-lg">Initialize conversation...</p>
-                 </div>
-               ) : (
-                 messages.map((msg) => {
-                   const isMe = msg.sender_id === user.id;
-                   const isAdmin = msg.sender_role === 'admin' || msg.sender_role === 'super_admin';
-                   const isDev = msg.sender_role === 'developer';
-                   
-                   // Image check
-                   const isImage = msg.attachment_url && (
-                       msg.attachment_url.toLowerCase().endsWith('.jpg') || 
-                       msg.attachment_url.toLowerCase().endsWith('.jpeg') || 
-                       msg.attachment_url.toLowerCase().endsWith('.png') || 
-                       msg.attachment_url.toLowerCase().endsWith('.webp') ||
-                       msg.attachment_url.includes('image')
-                   );
-
-                   return (
-                     <div key={msg.id} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'} animate-in fade-in slide-in-from-bottom-2`}>
-                       <div className={`max-w-[85%] sm:max-w-[70%] rounded-2xl p-4 shadow-sm ${
-                         isMe 
-                           ? 'bg-foreground/5 border border-divider text-foreground rounded-br-none' 
-                           : isAdmin 
-                             ? 'bg-foreground/10 border border-divider text-foreground rounded-bl-none font-medium'
-                             : isDev
-                               ? 'bg-foreground/10 border border-divider text-foreground rounded-bl-none'
-                               : 'bg-content2 border border-divider text-foreground rounded-bl-none'
-                       }`}>
-                          <div className="flex items-center justify-between gap-4 mb-2">
-                              <span className={`text-[10px] font-bold uppercase tracking-wider text-foreground/80`}>
-                                 {isMe ? 'You' : msg.sender_name} 
-                                 <span className="ml-1 opacity-60">
-                                     {isAdmin ? '(Admin)' : isDev ? '(Developer)' : '(Client)'}
-                                 </span>
-                              </span>
-                              <span className="text-[10px] text-foreground/40 font-mono">
-                                 {new Date(msg.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                              </span>
-                          </div>
-                          
-                          {isImage && (
-                              <div className="mb-3 rounded-lg overflow-hidden border border-divider cursor-pointer group relative" onClick={() => window.open(msg.attachment_url, '_blank')}>
-                                  <img src={msg.attachment_url} alt="Progress" className="w-full max-h-[300px] object-cover group-hover:scale-105 transition-transform duration-500" />
-                                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                                      <ExternalLink size={20} className="text-foreground" />
-                                  </div>
-                              </div>
-                          )}
-
-                          <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
-                          
-                          {!isImage && msg.attachment_url && (
-                              <a href={msg.attachment_url} target="_blank" rel="noreferrer" className="mt-3 p-3 bg-content2 rounded-lg border border-divider flex items-center group hover:border-foreground/50 transition-colors">
-                                  <FileText className="w-4 h-4 text-foreground/50 mr-2 group-hover:text-foreground" />
-                                  <span className="text-xs text-foreground/80 truncate max-w-[150px]">View Attachment</span>
-                                  <Download className="w-3 h-3 ml-auto text-foreground/40" />
-                              </a>
-                          )}
-                       </div>
-                     </div>
-                   );
-                 })
-               )}
-             </div>
-
-             {/* Preview Area */}
-             {filePreview && (
-                 <div className="p-4 bg-content2 border-t border-divider flex items-center gap-4 animate-in slide-in-from-bottom-4">
-                     <div className="relative w-16 h-16 rounded-lg overflow-hidden border border-divider">
-                         <img src={filePreview} className="w-full h-full object-cover" alt="Preview" />
-                         <button onClick={removeFile} className="absolute top-0 right-0 p-1 bg-black/60 text-white hover:text-red-400">
-                             <X size={12} />
-                         </button>
-                     </div>
-                     <div className="flex-1">
-                         <p className="text-xs text-foreground font-bold">{selectedFile?.name}</p>
-                         <p className="text-[10px] text-foreground/50">{(selectedFile!.size / 1024 / 1024).toFixed(2)} MB • Ready to send</p>
-                     </div>
-                 </div>
-             )}
-
-             {/* Input Area */}
-             <div className="p-4 border-t border-divider bg-content2/40 backdrop-blur-md">
-               <form onSubmit={handleSendMessage} className="flex gap-3">
-                  <input 
-                     type="file" 
-                     ref={fileInputRef} 
-                     onChange={handleFileChange} 
-                     className="hidden" 
-                     accept="image/*,.pdf,.zip"
-                  />
-                  <Button 
-                     type="button" 
-                     variant="ghost" 
-                     size="icon" 
-                     className="text-foreground/60 hover:text-foreground rounded-full hover:bg-content1 h-11 w-11 shrink-0 border-divider"
-                     onClick={() => fileInputRef.current?.click()}
-                     disabled={sending}
-                  >
-                      <Paperclip className="w-5 h-5" />
-                  </Button>
-                  <div className="flex-grow relative">
-                     <textarea 
-                         value={newMessage}
-                         onChange={(e) => setNewMessage(e.target.value)}
-                         placeholder="Type a message or share progress..."
-                         className="w-full bg-content1 border border-divider rounded-2xl px-5 py-3 text-sm text-foreground focus:outline-none focus:border-foreground/50 focus:ring-1 focus:ring-foreground/20 resize-none min-h-[44px] max-h-[120px] transition-all placeholder:text-foreground/40"
-                         rows={1}
-                         onKeyDown={(e) => {
-                             if (e.key === 'Enter' && !e.shiftKey) {
-                                 e.preventDefault();
-                                 handleSendMessage(e);
-                             }
-                         }}
-                     />
+            {/* Rating Box */}
+            {order.status === 'completed' && user.role === 'client' && (
+              <div className="glass-card p-6 md:p-8 space-y-4">
+                <h3 className="text-xs font-display font-semibold text-foreground uppercase tracking-widest">
+                  Review & Feedback
+                </h3>
+                {!order.rating ? (
+                  <div className="space-y-4">
+                    <div className="flex gap-1.5">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          type="button"
+                          onMouseEnter={() => setHoverRating(star)}
+                          onMouseLeave={() => setHoverRating(0)}
+                          onClick={() => setRating(star)}
+                          className="text-foreground/20 hover:scale-110 transition-transform focus:outline-none"
+                        >
+                          <Star 
+                            size={24} 
+                            fill={(hoverRating || rating) >= star ? "var(--vb-accent)" : "none"} 
+                            className={(hoverRating || rating) >= star ? "text-[var(--vb-accent)]" : "text-white/10"}
+                          />
+                        </button>
+                      ))}
+                    </div>
+                    <textarea 
+                      placeholder="Share details of your experience..."
+                      value={review}
+                      onChange={(e) => setReview(e.target.value)}
+                      className="w-full bg-white/[0.02] border border-white/5 rounded-lg p-3 text-xs text-foreground focus:outline-none focus:border-white/20 resize-none h-20"
+                    />
+                    <button 
+                      onClick={handleSubmitRating} 
+                      disabled={rating === 0 || isRatingSubmitting}
+                      className="w-full btn-primary h-9 text-xs font-semibold"
+                    >
+                      {isRatingSubmitting ? 'Posting...' : 'Submit Evaluation'}
+                    </button>
                   </div>
-                  <Button 
-                     type="submit" 
-                     disabled={sending || (!newMessage.trim() && !selectedFile)} 
-                     className="rounded-full h-11 w-11 shrink-0"
-                     variant="primary"
-                     size="icon"
-                  >
-                      {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                  </Button>
-               </form>
-               <p className="text-[9px] text-foreground/40 mt-2 text-center uppercase tracking-widest font-mono">
-                 Encrypted Peer-to-Peer Communication Protocol Active
-               </p>
-             </div>
-           </Card>
-         </div>
-       </div>
-     </div>
-   );
+                ) : (
+                  <div className="text-center py-2 space-y-2">
+                    <div className="flex justify-center gap-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                         <Star 
+                           key={star}
+                           size={16} 
+                           fill={rating >= star ? "var(--vb-accent)" : "none"} 
+                           className={rating >= star ? "text-[var(--vb-accent)]" : "text-white/10"}
+                         />
+                      ))}
+                    </div>
+                    <p className="text-xs text-foreground/60 italic font-satoshi">"{order.review || 'Excellent Delivery'}"</p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* RIGHT: Chat Stream Panel */}
+          <div className="lg:col-span-8">
+            <div className="glass-card flex flex-col h-[650px] relative overflow-hidden">
+              
+              {/* Chat Header */}
+              <div className="p-4 border-b border-white/5 bg-[#25292e] flex justify-between items-center z-10">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-white/[0.02] border border-white/5 flex items-center justify-center text-[var(--vb-accent)]">
+                    <MessageSquarePlus size={18} />
+                  </div>
+                  <div>
+                    <h3 className="font-display font-semibold text-foreground text-sm flex items-center gap-2">
+                      {order.type === 'project' ? 'Project Stream' : 'Development Stream'}
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    </h3>
+                    <p className="text-[9px] text-foreground/40 uppercase tracking-widest font-mono mt-0.5">
+                      Client-Developer Encrypted Channel
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Chat Area */}
+              <div className="flex-grow overflow-y-auto p-6 space-y-5 bg-black/[0.05]" ref={scrollRef}>
+                {messages.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full text-foreground/30 space-y-2.5">
+                    <MessageSquarePlus size={36} className="text-white/10" />
+                    <p className="font-display text-sm tracking-wider uppercase">Initialize Stream Connection</p>
+                  </div>
+                ) : (
+                  messages.map((msg) => {
+                    const isMe = msg.sender_id === user.id;
+                    const isAdmin = msg.sender_role === 'admin' || msg.sender_role === 'super_admin';
+                    const isDev = msg.sender_role === 'developer';
+                    
+                    const isImage = msg.attachment_url && (
+                        msg.attachment_url.toLowerCase().endsWith('.jpg') || 
+                        msg.attachment_url.toLowerCase().endsWith('.jpeg') || 
+                        msg.attachment_url.toLowerCase().endsWith('.png') || 
+                        msg.attachment_url.toLowerCase().endsWith('.webp') ||
+                        msg.attachment_url.includes('image')
+                    );
+
+                    return (
+                      <div key={msg.id} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
+                        <div className={`max-w-[85%] sm:max-w-[70%] rounded-xl p-4 border ${
+                          isMe 
+                            ? 'bg-white/[0.02] border-white/10 text-foreground' 
+                            : 'bg-white/[0.04] border-white/5 text-foreground'
+                        }`}>
+                           <div className="flex items-center justify-between gap-4 mb-2 pb-1.5 border-b border-white/5">
+                               <span className="text-[9px] font-display font-semibold uppercase tracking-wider text-foreground/60">
+                                  {isMe ? 'You' : msg.sender_name} 
+                                  <span className="ml-1 opacity-50 font-mono text-[8px]">
+                                      {isAdmin ? '(Admin)' : isDev ? '(Developer)' : '(Client)'}
+                                  </span>
+                               </span>
+                               <span className="text-[8px] text-foreground/35 font-mono">
+                                  {new Date(msg.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                               </span>
+                           </div>
+                           
+                           {isImage && (
+                               <div className="mb-3 rounded-lg overflow-hidden border border-white/5 cursor-pointer relative aspect-video" onClick={() => window.open(msg.attachment_url, '_blank')}>
+                                   <img src={msg.attachment_url} alt="Attachment" className="w-full h-full object-cover" />
+                                   <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 flex items-center justify-center transition-opacity">
+                                       <ExternalLink size={16} className="text-foreground" />
+                                   </div>
+                               </div>
+                           )}
+
+                           <p className="text-xs leading-relaxed font-satoshi text-foreground/80 whitespace-pre-wrap">{msg.content}</p>
+                           
+                           {!isImage && msg.attachment_url && (
+                               <a href={msg.attachment_url} target="_blank" rel="noreferrer" className="mt-3 p-2.5 bg-white/[0.01] rounded border border-white/5 flex items-center hover:border-white/10 transition-colors">
+                                   <FileText className="w-3.5 h-3.5 text-foreground/40 mr-2" />
+                                   <span className="text-[10px] text-foreground/75 truncate max-w-[150px] font-mono">Download Attachment</span>
+                                   <Download className="w-3 h-3 ml-auto text-foreground/30" />
+                               </a>
+                           )}
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+
+              {/* Upload Previews */}
+              {filePreview && (
+                  <div className="p-4 bg-[#25292e] border-t border-white/5 flex items-center gap-4">
+                      <div className="relative w-12 h-12 rounded overflow-hidden border border-white/5">
+                          <img src={filePreview} className="w-full h-full object-cover" alt="Preview" />
+                          <button onClick={removeFile} className="absolute top-0 right-0 p-0.5 bg-black/60 text-white/70 hover:text-red-400">
+                              <X size={10} />
+                          </button>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                          <p className="text-[10px] text-foreground font-semibold truncate">{selectedFile?.name}</p>
+                          <p className="text-[9px] text-foreground/45 mt-0.5 font-mono">{(selectedFile!.size / 1024 / 1024).toFixed(2)} MB</p>
+                      </div>
+                  </div>
+              )}
+
+              {/* Input Control Area */}
+              <div className="p-4 border-t border-white/5 bg-[#212529] z-10">
+                <form onSubmit={handleSendMessage} className="flex gap-3">
+                   <input 
+                      type="file" 
+                      ref={fileInputRef} 
+                      onChange={handleFileChange} 
+                      className="hidden" 
+                      accept="image/*,.pdf,.zip"
+                   />
+                   <button 
+                      type="button" 
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={sending}
+                      className="btn-ghost p-0 h-10 w-10 shrink-0 border-white/5 rounded-lg flex items-center justify-center text-foreground/40 hover:text-foreground"
+                   >
+                       <Paperclip className="w-4 h-4" />
+                   </button>
+                   <div className="flex-grow">
+                      <textarea 
+                          value={newMessage}
+                          onChange={(e) => setNewMessage(e.target.value)}
+                          placeholder="Type brief or message..."
+                          className="w-full bg-[#1b1e22] border border-white/5 rounded-lg px-4 py-2.5 text-xs text-foreground focus:outline-none focus:border-white/10 resize-none h-10 min-h-[40px] max-h-[100px] font-satoshi placeholder:text-foreground/20"
+                          rows={1}
+                          onKeyDown={(e) => {
+                              if (e.key === 'Enter' && !e.shiftKey) {
+                                  e.preventDefault();
+                                  handleSendMessage(e);
+                              }
+                          }}
+                      />
+                   </div>
+                   <button 
+                      type="submit" 
+                      disabled={sending || (!newMessage.trim() && !selectedFile)} 
+                      className="btn-primary p-0 h-10 w-10 shrink-0 rounded-lg flex items-center justify-center"
+                   >
+                       {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+                   </button>
+                </form>
+                <p className="text-[8px] text-foreground/35 mt-2.5 text-center uppercase tracking-widest font-mono select-none">
+                  Secure Socket Layer Active // P2P Channel Stream
+                </p>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default OrderDetails;

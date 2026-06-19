@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Lock, Shield, Terminal, ArrowRight, Fingerprint, ChevronRight } from 'lucide-react';
@@ -6,6 +5,7 @@ import { api } from '../services/api';
 import { User } from '../types';
 import { Logo } from '../components/ui/Logo';
 import { useToast } from '../components/ui/Toast';
+import { motion } from 'framer-motion';
 
 const DevLogin: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
   const [email, setEmail] = useState('');
@@ -22,7 +22,6 @@ const DevLogin: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
 
     try {
         // Use password login for devs with a timeout wrapper to prevent hanging
-        // Increased timeout to 60s (was 10s) to handle Supabase cold starts on slower connections
         const user = await Promise.race([
             api.signInWithPassword(email, password),
             new Promise<never>((_, reject) => setTimeout(() => reject(new Error("Authentication timed out. Database might be waking up, please try again.")), 60000))
@@ -51,118 +50,126 @@ const DevLogin: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#050505] text-green-500 font-mono flex items-center justify-center relative overflow-hidden selection:bg-green-900 selection:text-white">
-      {/* Matrix-style background effect */}
-      <div className="absolute inset-0 opacity-20 pointer-events-none">
-          <div className="absolute inset-0 bg-[linear-gradient(rgba(0,255,0,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(0,255,0,0.05)_1px,transparent_1px)] bg-[size:20px_20px]"></div>
-      </div>
-      
-      {/* Scanline */}
-      <div className="absolute inset-0 pointer-events-none z-50 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.25)_50%)] bg-[size:100%_4px] opacity-20"></div>
+    <div className="min-h-screen bg-background text-emerald-400 font-mono flex items-center justify-center relative overflow-hidden selection:bg-emerald-950 selection:text-white">
+      {/* Scanline & grid */}
+      <div className="absolute inset-0 pointer-events-none z-50 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.15)_50%)] bg-[size:100%_4px] opacity-15" />
+      <div className="absolute inset-0 pointer-events-none opacity-[0.02] bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:30px_30px]" />
 
-      <div className="relative z-10 w-full max-w-md p-2">
+      {/* Ambient green glow behind the login panel */}
+      <div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+        aria-hidden="true"
+        style={{
+          width: '500px', height: '500px', borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(16,185,129,0.03) 0%, transparent 70%)',
+          filter: 'blur(60px)',
+        }}
+      />
+
+      <div className="relative z-10 w-full max-w-md p-4">
          {/* Terminal Header */}
-         <div className="border border-green-800 bg-black/90 shadow-[0_0_30px_rgba(34,197,94,0.1)] rounded-sm overflow-hidden">
-             <div className="bg-green-900/20 border-b border-green-800 p-2 flex items-center justify-between">
-                 <div className="flex items-center gap-2 text-xs">
-                     <Terminal size={14} />
+         <motion.div 
+           initial={{ opacity: 0, y: 15 }}
+           animate={{ opacity: 1, y: 0 }}
+           className="border border-emerald-500/20 bg-[#25292e] shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-lg overflow-hidden"
+         >
+             <div className="bg-emerald-500/[0.02] border-b border-emerald-500/10 px-4 py-3.5 flex items-center justify-between">
+                 <div className="flex items-center gap-2 text-[10px] tracking-widest text-emerald-500/60 font-semibold uppercase">
+                     <Terminal size={12} />
                      <span>SYS.ROOT.ACCESS</span>
                  </div>
-                 <div className="flex gap-1">
-                     <div className="w-2 h-2 rounded-full bg-red-500/50"></div>
-                     <div className="w-2 h-2 rounded-full bg-yellow-500/50"></div>
-                     <div className="w-2 h-2 rounded-full bg-green-500/50"></div>
+                 <div className="flex gap-1.5 select-none">
+                     <div className="w-2.5 h-2.5 rounded-full bg-red-500/20 border border-red-500/10"></div>
+                     <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/20 border border-yellow-500/10"></div>
+                     <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/20 border border-emerald-500/10"></div>
                  </div>
              </div>
              
-             <div className="p-8">
-                 <div className="flex justify-center mb-8">
+             <div className="p-8 space-y-6">
+                 <div className="flex justify-center mb-4">
                      <div className="relative group">
-                         <div className="absolute inset-0 bg-green-500 blur-xl opacity-20 group-hover:opacity-40 transition-opacity"></div>
-                         <Logo className="w-16 h-16 relative z-10 grayscale brightness-200 contrast-200" />
+                         <div className="absolute inset-0 bg-emerald-500 blur-xl opacity-10 group-hover:opacity-20 transition-opacity"></div>
+                         <Logo className="w-14 h-14 relative z-10 grayscale brightness-150 contrast-200" />
                      </div>
                  </div>
 
-                 <div className="mb-6 space-y-1 text-xs opacity-70">
-                     <p>{'>'} INITIALIZING SECURE CONNECTION...</p>
-                     <p>{'>'} ENCRYPTING TRAFFIC (AES-256)...</p>
-                     <p>{'>'} ESTABLISHED.</p>
+                 <div className="space-y-1 text-[10px] text-emerald-500/40 select-none">
+                     <p>{'>'} INITIALIZING SECURE SHELL...</p>
+                     <p>{'>'} AES-256 TRAFFIC CRYPTO LINK ACTIVE.</p>
+                     <p>{'>'} PROTOCOL ESTABLISHED.</p>
                  </div>
 
-                 <form onSubmit={handleLogin} className="space-y-6">
+                 <form onSubmit={handleLogin} className="space-y-5">
                      <div className="space-y-4">
-                         <div className="relative group">
-                             <label className="text-[10px] uppercase tracking-widest opacity-60 mb-1 block">Operative ID</label>
-                             <div className="flex items-center border-b border-green-800 group-focus-within:border-green-500 transition-colors py-1">
-                                 <ChevronRight size={14} className="mr-2 animate-pulse" />
-                                 <input 
-                                     type="email" 
-                                     value={email}
-                                     onChange={(e) => setEmail(e.target.value)}
-                                     className="bg-transparent border-none outline-none text-green-400 w-full placeholder-green-900"
-                                     placeholder="admin@visionbuilt.com"
-                                     autoComplete="off"
-                                 />
-                             </div>
-                         </div>
-                         
-                         <div className="relative group">
-                             <label className="text-[10px] uppercase tracking-widest opacity-60 mb-1 block">Security Key</label>
-                             <div className="flex items-center border-b border-green-800 group-focus-within:border-green-500 transition-colors py-1">
-                                 <Lock size={14} className="mr-2" />
-                                 <input 
-                                     type="password" 
-                                     value={password}
-                                     onChange={(e) => setPassword(e.target.value)}
-                                     className="bg-transparent border-none outline-none text-green-400 w-full placeholder-green-900"
-                                     placeholder="••••••••••••"
-                                 />
-                             </div>
-                         </div>
+                          <div className="space-y-1.5">
+                              <label className="text-[9px] uppercase tracking-widest text-emerald-500/50 block">Operative ID</label>
+                              <div className="flex items-center border border-emerald-500/10 bg-black/10 focus-within:border-emerald-500/30 transition-all rounded-lg px-3.5 py-2.5">
+                                  <ChevronRight size={14} className="mr-2 text-emerald-500/50 animate-pulse" />
+                                  <input 
+                                      type="email" 
+                                      value={email}
+                                      onChange={(e) => setEmail(e.target.value)}
+                                      className="bg-transparent border-none outline-none text-emerald-300 w-full placeholder-emerald-950 text-xs"
+                                      placeholder="admin@visionbuilt.com"
+                                      autoComplete="off"
+                                  />
+                              </div>
+                          </div>
+                          
+                          <div className="space-y-1.5">
+                              <label className="text-[9px] uppercase tracking-widest text-emerald-500/50 block">Security Key</label>
+                              <div className="flex items-center border border-emerald-500/10 bg-black/10 focus-within:border-emerald-500/30 transition-all rounded-lg px-3.5 py-2.5">
+                                  <Lock size={14} className="mr-2 text-emerald-500/50" />
+                                  <input 
+                                      type="password" 
+                                      value={password}
+                                      onChange={(e) => setPassword(e.target.value)}
+                                      className="bg-transparent border-none outline-none text-emerald-300 w-full placeholder-emerald-950 text-xs"
+                                      placeholder="••••••••••••"
+                                  />
+                              </div>
+                          </div>
                      </div>
 
                      {error && (
-                         <div className="border border-red-500/50 bg-red-900/10 text-red-500 p-3 text-xs flex flex-col gap-2">
-                             <div className="flex items-center font-bold">
-                                <Shield size={14} className="mr-2" />
-                                ACCESS DENIED
-                             </div>
-                             <p>{error}</p>
-                             {error.includes("Email not confirmed") && (
-                                <p className="text-[10px] text-red-400 opacity-80">
-                                    Hint: Run the SQL command to verify your email manually if this is a restored admin account.
-                                </p>
-                             )}
-                         </div>
+                          <div className="border border-red-500/20 bg-red-950/5 text-red-400 p-3.5 text-xs flex flex-col gap-1.5 rounded-lg">
+                              <div className="flex items-center font-bold tracking-wider">
+                                 <Shield size={12} className="mr-2" />
+                                 SYS.ACCESS.REJECTED
+                              </div>
+                              <p className="text-[11px] leading-relaxed text-red-400/80">{error}</p>
+                              {error.includes("Email not confirmed") && (
+                                 <p className="text-[9px] text-red-500/50 leading-relaxed font-sans">
+                                     Hint: Run SQL commands to update auth.users email confirmation manually.
+                                 </p>
+                              )}
+                          </div>
                      )}
 
                      <button 
                         type="submit" 
                         disabled={loading}
-                        className="w-full bg-green-900/20 border border-green-700 hover:bg-green-500 hover:text-black text-green-500 py-3 text-sm font-bold uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 group relative overflow-hidden"
+                        className="w-full bg-emerald-500/5 border border-emerald-500/20 hover:bg-emerald-400 hover:text-black text-emerald-400 py-3 rounded-lg text-xs font-bold uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 group relative overflow-hidden"
                      >
-                         {loading ? (
-                             <>
-                                <Fingerprint className="animate-pulse" size={16} />
-                                <span>Verifying...</span>
-                             </>
-                         ) : (
-                             <>
-                                <span>Authenticate</span>
-                                <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                             </>
-                         )}
-                         {loading && (
-                             <div className="absolute bottom-0 left-0 h-0.5 bg-green-400 animate-[shine_2s_infinite] w-full"></div>
-                         )}
+                          {loading ? (
+                              <>
+                                 <Fingerprint className="animate-pulse" size={14} />
+                                 <span>SYS.VERIFYING...</span>
+                              </>
+                          ) : (
+                              <>
+                                 <span>Authenticate</span>
+                                 <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
+                              </>
+                          )}
                      </button>
                  </form>
              </div>
              
-             <div className="bg-black border-t border-green-900 p-2 text-[10px] text-center opacity-40">
-                 RESTRICTED ACCESS // AUTHORIZED PERSONNEL ONLY
+             <div className="bg-black/20 border-t border-emerald-500/10 py-3 text-[9px] text-center text-emerald-500/30 uppercase tracking-wider select-none">
+                 RESTRICTED AREA // PROTOCOL ACTIVE
              </div>
-         </div>
+         </motion.div>
       </div>
     </div>
   );

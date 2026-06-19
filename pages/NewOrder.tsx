@@ -3,10 +3,11 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
 import { Service, User, Offer, MarketplaceItem } from '../types';
 import { SUPPORTED_COUNTRIES } from '../constants';
-import { Button, Card, Input, Textarea } from '../components/ui/Components';
-import { Stepper, ScrollFloat } from '../components/ui/ReactBits';
+import { Input, Textarea } from '../components/ui/Components';
+import { Stepper } from '../components/ui/ReactBits';
 import { Globe, User as UserIcon, Tag, ShieldCheck, Image as ImageIcon, Check } from 'lucide-react';
 import { useToast } from '../components/ui/Toast';
+import { motion } from 'framer-motion';
 
 const NewOrder: React.FC<{ user: User }> = ({ user }) => {
   const [searchParams] = useSearchParams();
@@ -133,180 +134,291 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
 
   if (isProcessing) {
      return (
-        <div className="min-h-[80vh] flex items-center justify-center px-4 py-10">
-            <Card className="w-full max-w-2xl p-8 sm:p-12 text-center relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-foreground/20 via-foreground/60 to-foreground/20 animate-gradient-x"></div>
+        <div className="min-h-[85vh] flex items-center justify-center px-4 py-10 relative overflow-hidden">
+            {/* Ambient Glow */}
+            <div
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+              aria-hidden="true"
+              style={{
+                width: '500px', height: '500px', borderRadius: '50%',
+                background: 'radial-gradient(circle, rgba(124,143,161,0.06) 0%, transparent 70%)',
+                filter: 'blur(60px)',
+              }}
+            />
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="w-full max-w-2xl p-12 text-center glass-card relative overflow-hidden"
+            >
+                <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[var(--vb-accent)] to-transparent animate-pulse" />
                 <h2 className="text-2xl sm:text-3xl font-display font-bold text-foreground mb-2">
-                    <ScrollFloat>Submitting Request</ScrollFloat>
+                  Submitting Request
                 </h2>
-                <p className="text-foreground/50 mb-12">Sending details to our developer team...</p>
+                <p className="text-foreground/45 text-sm mb-12">Sending details to our developer team...</p>
                 <div className="max-w-xl mx-auto px-4">
                      <Stepper currentStep={processingStep} steps={[{ id: 1, label: "Saving" }, { id: 2, label: "Routing" }, { id: 3, label: "Notifying" }, { id: 4, label: "Done" }]} />
                 </div>
-            </Card>
+            </motion.div>
         </div>
      )
   }
 
-  if (!service && !isCustom) return <div className="p-20 text-center text-foreground/50">Loading Service...</div>;
+  if (!service && !isCustom) return <div className="p-20 text-center text-foreground/30 font-satoshi">Loading Service Details...</div>;
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-4 py-8 sm:py-16">
-      <Card className="border-divider/50 w-full">
-        <div className="mb-8 flex flex-col sm:flex-row justify-between items-start gap-4">
-            <div>
-                <h1 className="text-xl sm:text-2xl font-display font-bold text-foreground">
-                    {isCustom ? <span>Request Custom Build</span> : <>New Request: <span className="text-foreground/80">{service?.title}</span></>}
-                </h1>
-                <p className="text-xs text-foreground/50 mt-1 uppercase tracking-widest font-mono">Phase {step} / 02</p>
-            </div>
-            <div className="flex items-center space-x-2 bg-content2 px-3 py-1.5 rounded-lg border border-divider">
-                <Globe size={14} className="text-foreground/75" />
-                <select value={country} onChange={(e) => setCountry(e.target.value)} className="bg-transparent text-foreground text-[10px] font-bold uppercase outline-none cursor-pointer">
-                    {SUPPORTED_COUNTRIES.map(c => <option key={c} value={c} className="bg-content1 text-foreground">{c}</option>)}
-                </select>
-            </div>
-        </div>
+    <div className="min-h-screen relative overflow-hidden py-12">
+      {/* Ambient background glows */}
+      <div
+        className="absolute top-0 left-1/4 pointer-events-none"
+        aria-hidden="true"
+        style={{
+          width: '600px', height: '400px', borderRadius: '50%',
+          background: 'radial-gradient(ellipse, rgba(124,143,161,0.03) 0%, transparent 75%)',
+          filter: 'blur(80px)',
+        }}
+      />
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {step === 1 ? (
-             <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 sm:p-6 bg-content2/40 rounded-xl border border-divider shadow-inner">
-                    <div className="col-span-full mb-2">
-                        <h4 className="text-[10px] font-bold text-foreground/80 uppercase tracking-widest flex items-center gap-2">
-                            <UserIcon size={12} /> Contact & Identity
-                        </h4>
-                    </div>
-                    <Input label="Your Name" name="client_name" value={formData.client_name} onChange={handleChange} required className="h-12" />
-                    {isCustom && <Input label="Project Title" name="project_title" value={formData.project_title} onChange={handleChange} placeholder="e.g. Portfolio v2" required className="h-12" />}
-                    <Input label="Email Address" type="email" name="client_email" value={formData.client_email} onChange={handleChange} required className="h-12" />
-                    <Input label="Phone / WhatsApp (Required)" type="tel" name="client_phone" value={formData.client_phone} onChange={handleChange} placeholder="+1..." required className="h-12" />
-                </div>
+      <div className="container-vb relative z-10 max-w-4xl">
+        <div className="glass-card p-8 md:p-12 space-y-8">
+          
+          {/* Header Area */}
+          <div className="flex flex-col sm:flex-row justify-between items-start gap-4 pb-6 border-b border-white/5">
+              <div>
+                  <h1 className="text-2xl sm:text-3xl font-display font-bold text-foreground">
+                      {isCustom ? <span>Request Custom Build</span> : <>New Request: <span className="text-foreground/80">{service?.title}</span></>}
+                  </h1>
+                  <p className="text-[10px] text-foreground/40 mt-1 uppercase tracking-widest font-mono">
+                    Step {step} of 2
+                  </p>
+              </div>
+              
+              <div className="flex items-center space-x-2 bg-white/[0.02] hover:bg-white/[0.04] px-3.5 py-1.5 rounded-lg border border-white/5 transition-colors">
+                  <Globe size={14} className="text-foreground/40" />
+                  <select 
+                    value={country} 
+                    onChange={(e) => setCountry(e.target.value)} 
+                    className="bg-transparent text-foreground text-[10px] font-display font-semibold uppercase tracking-wider outline-none cursor-pointer"
+                  >
+                      {SUPPORTED_COUNTRIES.map(c => (
+                        <option key={c} value={c} className="bg-[#212529] text-foreground">
+                          {c}
+                        </option>
+                      ))}
+                  </select>
+              </div>
+          </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <Input label="Business Name" name="business_name" value={formData.business_name} onChange={handleChange} required className="h-12" />
-                    <Input label="Industry Category" name="business_category" value={formData.business_category} onChange={handleChange} placeholder="e.g. Retail" required className="h-12" />
-                </div>
-                <Input label="Address or Online Handle" name="address_or_online" value={formData.address_or_online} onChange={handleChange} required className="h-12" />
-                <Textarea label="Core Requirements" name="requirements_text" value={formData.requirements_text} onChange={handleChange} rows={6} placeholder="Describe the functionality, tech stack, or specific features you need..." required />
-                <Input label="Reference URLs (Links)" name="reference_links" value={formData.reference_links} onChange={handleChange} placeholder="competitor.com, design.com" className="h-12" />
-                
-                {/* Visual References Selection */}
-                <div className="pt-6 border-t border-divider">
-                    <h4 className="text-xs font-bold text-foreground uppercase tracking-widest mb-4">Attach Design References</h4>
-                    <p className="text-xs text-foreground/50 mb-4">Select projects from our marketplace that match the style or functionality you are looking for.</p>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 max-h-[300px] overflow-y-auto custom-scrollbar p-1">
-                        {marketplaceItems.map(item => (
-                            <div 
-                                key={item.id} 
-                                onClick={() => toggleReference(item.id)}
-                                className={`relative cursor-pointer rounded-lg border overflow-hidden group transition-all ${selectedReferences.includes(item.id) ? 'border-foreground ring-1 ring-foreground' : 'border-divider hover:border-foreground/30'}`}
-                            >
-                                <div className="aspect-video bg-black/40">
-                                    {item.image_url ? (
-                                        <img src={item.image_url} className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity" alt={item.title} />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-foreground/30"><ImageIcon size={20} /></div>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {step === 1 ? (
+               <>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 p-6 bg-white/[0.01] rounded-xl border border-white/5">
+                      <div className="col-span-full mb-2">
+                          <h4 className="text-[10px] font-display font-semibold text-foreground/80 uppercase tracking-widest flex items-center gap-2">
+                              <UserIcon size={12} className="text-[var(--vb-accent)]" /> Contact & Client Details
+                          </h4>
+                      </div>
+                      <Input label="Your Name" name="client_name" value={formData.client_name} onChange={handleChange} required />
+                      {isCustom && <Input label="Project Name" name="project_title" value={formData.project_title} onChange={handleChange} placeholder="e.g. E-Commerce Platform" required />}
+                      <Input label="Email Address" type="email" name="client_email" value={formData.client_email} onChange={handleChange} required />
+                      <Input label="Phone / WhatsApp" type="tel" name="client_phone" value={formData.client_phone} onChange={handleChange} placeholder="+91..." required />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                      <Input label="Company / Brand Name" name="business_name" value={formData.business_name} onChange={handleChange} required />
+                      <Input label="Industry / Niche" name="business_category" value={formData.business_category} onChange={handleChange} placeholder="e.g. Design, Retail" required />
+                  </div>
+                  <Input label="Address or Online Handle" name="address_or_online" value={formData.address_or_online} onChange={handleChange} placeholder="e.g. San Francisco, CA or @username" required />
+                  <Textarea label="Core System Requirements" name="requirements_text" value={formData.requirements_text} onChange={handleChange} rows={6} placeholder="Provide a detailed brief of features, preferred stack, database design, design aesthetic, or other specific requirements..." required />
+                  <Input label="Inspirational Reference Links" name="reference_links" value={formData.reference_links} onChange={handleChange} placeholder="competitor-site.com, dribbble.com/shot" />
+                  
+                  {/* Design References */}
+                  {marketplaceItems.length > 0 && (
+                    <div className="pt-6 border-t border-white/5 space-y-4">
+                        <div className="space-y-1">
+                          <h4 className="text-xs font-display font-bold text-foreground uppercase tracking-widest">Visual Project References</h4>
+                          <p className="text-xs text-foreground/40 font-satoshi">Select one or more templates/projects from our studio inventory that match your desired aesthetic.</p>
+                        </div>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar p-1">
+                            {marketplaceItems.map(item => (
+                                <div 
+                                    key={item.id} 
+                                    onClick={() => toggleReference(item.id)}
+                                    className={`relative cursor-pointer rounded-lg border overflow-hidden group transition-all ${
+                                      selectedReferences.includes(item.id) 
+                                        ? 'border-[var(--vb-accent)] ring-1 ring-[var(--vb-accent)]' 
+                                        : 'border-white/5 hover:border-white/20'
+                                    }`}
+                                >
+                                    <div className="aspect-video bg-black/40">
+                                        {item.image_url ? (
+                                            <img src={item.image_url} className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity" alt={item.title} />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-foreground/20"><ImageIcon size={20} /></div>
+                                        )}
+                                    </div>
+                                    <div className="p-3 bg-white/[0.02]">
+                                        <p className="text-[10px] font-display font-bold text-foreground truncate">{item.title}</p>
+                                        <p className="text-[9px] text-foreground/40 mt-0.5">{item.category}</p>
+                                    </div>
+                                    {selectedReferences.includes(item.id) && (
+                                        <div className="absolute top-1.5 right-1.5 bg-[var(--vb-accent)] text-[#212529] rounded-full p-0.5">
+                                            <Check size={10} strokeWidth={3} />
+                                        </div>
                                     )}
                                 </div>
-                                <div className="p-2 bg-content2">
-                                    <p className="text-[10px] font-bold text-foreground truncate">{item.title}</p>
-                                    <p className="text-[9px] text-foreground/50">{item.category}</p>
+                            ))}
+                        </div>
+                    </div>
+                  )}
+
+                  {/* Optional provisions */}
+                  <div className="pt-6 border-t border-white/5 space-y-4">
+                      <h4 className="text-xs font-display font-bold text-foreground uppercase tracking-widest">Asset Provisions (Include in Request)</h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {(isCustom || service?.allow_domain) && (
+                            <label className="flex items-center space-x-3.5 cursor-pointer p-4 rounded-xl border border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-all">
+                                <input 
+                                  type="checkbox" 
+                                  name="domain_requested" 
+                                  checked={formData.domain_requested} 
+                                  onChange={handleCheckbox} 
+                                  className="form-checkbox h-4 w-4 text-[var(--vb-accent)] rounded bg-transparent border-white/10 focus:ring-0 focus:ring-offset-0" 
+                                />
+                                <div className="flex-grow">
+                                    <span className="text-foreground text-sm font-semibold block">Register Domain Name</span>
+                                    <span className="text-[9px] text-foreground/45 uppercase tracking-widest font-mono">Include domain setup</span>
                                 </div>
-                                {selectedReferences.includes(item.id) && (
-                                    <div className="absolute top-1 right-1 bg-foreground text-background rounded-full p-0.5">
-                                        <Check size={12} />
-                                    </div>
-                                )}
+                            </label>
+                        )}
+                        {(isCustom || service?.allow_business_email) && (
+                            <label className="flex items-center space-x-3.5 cursor-pointer p-4 rounded-xl border border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-all">
+                                <input 
+                                  type="checkbox" 
+                                  name="business_email_requested" 
+                                  checked={formData.business_email_requested} 
+                                  onChange={handleCheckbox} 
+                                  className="form-checkbox h-4 w-4 text-[var(--vb-accent)] rounded bg-transparent border-white/10 focus:ring-0 focus:ring-offset-0" 
+                                />
+                                <div className="flex-grow">
+                                    <span className="text-foreground text-sm font-semibold block">Business Workspace Email</span>
+                                    <span className="text-[9px] text-foreground/45 uppercase tracking-widest font-mono">Google Workspace Setup</span>
+                                </div>
+                            </label>
+                        )}
+                      </div>
+                  </div>
+
+                  <div className="flex justify-end pt-8 border-t border-white/5">
+                      <button 
+                        type="submit" 
+                        className="btn-primary h-12 px-8 font-display text-xs tracking-widest font-semibold"
+                      >
+                          Review & Finalize
+                      </button>
+                  </div>
+               </>
+            ) : (
+               <div className="text-center py-6">
+                   <h2 className="text-xl font-display font-bold text-foreground mb-8 uppercase tracking-widest">
+                     Confirm Order Request
+                   </h2>
+                   
+                   <div className="glass-card p-8 sm:p-10 mb-8 text-left max-w-lg mx-auto space-y-5 relative overflow-hidden">
+                       <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[var(--vb-accent)] to-transparent" />
+                       
+                       <div className="flex justify-between items-center text-foreground/90 pb-4 border-b border-white/5">
+                           <span className="flex items-center gap-2 font-display font-bold text-sm uppercase tracking-widest">
+                            <Tag size={14} className="text-[var(--vb-accent)]" /> 
+                            {isCustom ? formData.project_title : service?.title}
+                           </span>
+                           <span className="font-mono text-[9px] uppercase font-bold text-[var(--vb-accent)] bg-white/[0.04] border border-white/5 px-2 py-0.5 rounded">
+                            Pending Review
+                           </span>
+                       </div>
+                       
+                       <div className="space-y-3 py-2 text-xs font-satoshi text-foreground/50">
+                           <div>
+                            <span className="text-foreground/30 uppercase tracking-wider block text-[9px] mb-0.5">Contact Name</span> 
+                            <span className="text-foreground/80 font-medium">{formData.client_name}</span>
+                           </div>
+                           <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <span className="text-foreground/30 uppercase tracking-wider block text-[9px] mb-0.5">Phone / WA</span> 
+                              <span className="text-foreground/80 font-mono">{formData.client_phone}</span>
                             </div>
-                        ))}
-                    </div>
-                </div>
-
-                <div className="pt-6 border-t border-divider space-y-4">
-                    <h4 className="text-xs font-bold text-foreground uppercase tracking-widest">Asset Provisions (Optional)</h4>
-                    {(isCustom || service?.allow_domain) && (
-                        <label className="flex items-center space-x-3 cursor-pointer p-4 rounded-xl border border-divider hover:bg-content2 transition-all">
-                            <input type="checkbox" name="domain_requested" checked={formData.domain_requested} onChange={handleCheckbox} className="form-checkbox h-5 w-5 text-foreground rounded bg-transparent border-divider focus:ring-0" />
-                            <div className="flex-grow">
-                                <span className="text-foreground block text-sm font-medium">Provision Custom Domain</span>
-                                <span className="text-[10px] text-foreground/50 uppercase tracking-wider">Include in quote request</span>
+                            <div>
+                              <span className="text-foreground/30 uppercase tracking-wider block text-[9px] mb-0.5">Email</span> 
+                              <span className="text-foreground/80 font-mono">{formData.client_email}</span>
                             </div>
-                        </label>
-                    )}
-                    {(isCustom || service?.allow_business_email) && (
-                        <label className="flex items-center space-x-3 cursor-pointer p-4 rounded-xl border border-divider hover:bg-content2 transition-all">
-                            <input type="checkbox" name="business_email_requested" checked={formData.business_email_requested} onChange={handleCheckbox} className="form-checkbox h-5 w-5 text-foreground rounded bg-transparent border-divider focus:ring-0" />
-                            <div className="flex-grow">
-                                <span className="text-foreground block text-sm font-medium">Business Workspace Email</span>
-                                <span className="text-[10px] text-foreground/50 uppercase tracking-wider">Include in quote request</span>
-                            </div>
-                        </label>
-                    )}
-                </div>
+                           </div>
+                           <div className="grid grid-cols-2 gap-4">
+                            {formData.domain_requested && (
+                              <div>
+                                <span className="text-foreground/30 uppercase tracking-wider block text-[9px] mb-0.5">Asset</span> 
+                                <span className="text-foreground/85 font-medium">Custom Domain Registration</span>
+                              </div>
+                            )}
+                            {formData.business_email_requested && (
+                              <div>
+                                <span className="text-foreground/30 uppercase tracking-wider block text-[9px] mb-0.5">Asset</span> 
+                                <span className="text-foreground/85 font-medium">Workspace Email Setup</span>
+                              </div>
+                            )}
+                           </div>
+                           {selectedReferences.length > 0 && (
+                               <div>
+                                <span className="text-foreground/30 uppercase tracking-wider block text-[9px] mb-0.5">Design References</span> 
+                                <span className="text-foreground/85 font-medium">{selectedReferences.length} items attached</span>
+                               </div>
+                           )}
+                       </div>
 
-                <div className="flex justify-end pt-6">
-                    <Button type="submit" size="lg" variant="primary" className="w-full sm:w-auto min-w-[200px] h-12">
-                        Review & Submit
-                    </Button>
-                </div>
-             </>
-          ) : (
-             <div className="text-center py-6">
-                 <h2 className="text-xl font-bold text-foreground mb-8 uppercase tracking-tight">Request Summary</h2>
-                 <div className="bg-content2/40 rounded-2xl p-6 sm:p-10 mb-8 text-left max-w-lg mx-auto space-y-4 border border-divider shadow-md overflow-hidden relative">
-                     <div className="absolute -top-4 -right-4 w-24 h-24 bg-foreground/5 rounded-full blur-2xl" />
-                     
-                     <div className="flex justify-between items-center text-foreground/90">
-                         <span className="flex items-center gap-2 font-bold text-sm uppercase tracking-wider"><Tag size={14} className="text-foreground/75" /> {isCustom ? formData.project_title : service?.title}</span>
-                         <span className="font-mono text-foreground font-bold text-sm bg-foreground/10 px-2 py-1 rounded">Pending Review</span>
-                     </div>
-                     
-                     <div className="space-y-2 border-l border-divider pl-4 py-2 mt-4 text-xs text-foreground/70">
-                         <div><span className="text-foreground/40 uppercase">Contact:</span> {formData.client_phone}</div>
-                         <div><span className="text-foreground/40 uppercase">Email:</span> {formData.client_email}</div>
-                         {formData.domain_requested && <div><span className="text-foreground/40 uppercase">Feature:</span> Custom Domain Requested</div>}
-                         {formData.business_email_requested && <div><span className="text-foreground/40 uppercase">Feature:</span> Business Email Requested</div>}
-                         {selectedReferences.length > 0 && (
-                             <div><span className="text-foreground/40 uppercase">References:</span> {selectedReferences.length} items attached</div>
-                         )}
-                     </div>
+                       <div className="border-t border-white/5 pt-5 flex justify-between text-xl font-display font-semibold text-foreground items-center">
+                           <span className="text-xs uppercase tracking-widest text-foreground/40 font-satoshi">
+                              Estimated Budget
+                           </span>
+                           <span className="text-sm font-semibold text-[var(--vb-accent)]">
+                            To Be Determined
+                           </span>
+                       </div>
+                       <p className="text-[10px] text-foreground/30 text-center font-satoshi mt-2 italic">
+                          A customized quote will be provided by your developer after review.
+                       </p>
+                   </div>
 
-                     <div className="border-t border-divider pt-6 flex justify-between text-xl font-bold text-foreground items-center mt-4">
-                         <span className="text-base uppercase tracking-widest text-foreground/60">
-                            Quote Total
-                         </span>
-                         <div className="text-right">
-                             <span className="text-sm text-foreground/50">To Be Determined</span>
-                         </div>
-                     </div>
-                     <p className="text-[10px] text-foreground/50 text-right mt-1">
-                        Final pricing will be provided by developer after review.
-                     </p>
-                 </div>
-
-                 <div className="flex items-start gap-3 max-w-lg mx-auto mb-8 p-4 bg-content2 border border-divider rounded-xl">
-                    <ShieldCheck className="text-foreground shrink-0 mt-0.5" size={20} />
-                    <div className="text-left">
-                        <h4 className="text-xs font-bold text-foreground uppercase tracking-widest mb-1">
-                             Quote Request
-                        </h4>
-                        <p className="text-xs text-foreground/60">
-                            Submitting this request is free. Our team will analyze your requirements and send a custom quote with payment options to your dashboard.
-                        </p>
-                    </div>
-                 </div>
-                 
-                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <Button type="button" variant="ghost" onClick={() => { setStep(1); window.scrollTo(0,0); }} disabled={isProcessing} className="h-12 px-8">Edit Details</Button>
-                    <Button type="submit" isLoading={isProcessing} className="min-w-[240px] h-12" variant="primary">
-                        Submit Request
-                    </Button>
-                 </div>
-             </div>
-          )}
-        </form>
-      </Card>
+                   <div className="flex items-start gap-4.5 max-w-lg mx-auto mb-8 p-4 border border-white/5 bg-white/[0.01] rounded-xl text-left">
+                      <ShieldCheck className="text-emerald-400 shrink-0 mt-0.5" size={18} />
+                      <div className="space-y-1">
+                          <h4 className="text-xs font-display font-semibold text-foreground uppercase tracking-widest">
+                            No Initial Charges
+                          </h4>
+                          <p className="text-xs text-foreground/45 font-satoshi leading-relaxed">
+                            Submitting this build brief is completely free. We will review your files, design a detailed proposal/quote, and post it to your dashboard.
+                          </p>
+                      </div>
+                   </div>
+                   
+                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                      <button 
+                        type="button" 
+                        onClick={() => { setStep(1); window.scrollTo(0,0); }} 
+                        disabled={isProcessing} 
+                        className="btn-ghost h-12 px-8 text-xs tracking-widest font-semibold"
+                      >
+                        Adjust Brief
+                      </button>
+                      <button 
+                        type="submit" 
+                        className="btn-primary h-12 px-8 font-display text-xs tracking-widest font-semibold min-w-[200px]"
+                      >
+                        Submit Order Brief
+                      </button>
+                   </div>
+               </div>
+            )}
+          </form>
+        </div>
+      </div>
     </div>
   );
 };
