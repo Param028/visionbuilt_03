@@ -1,7 +1,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, useInView } from 'framer-motion';
+import { motion, useInView, AnimatePresence } from 'framer-motion';
 import {
   ArrowRight, Code2, Layers, Palette, TrendingUp,
   Zap, Globe, CheckCircle, ArrowLeft,
@@ -141,6 +141,34 @@ const SOCIAL_MEDIA_SHOWCASE = [
   }
 ];
 
+// ── Hero showcase items ───────────────────────────────────────
+const HERO_PREVIEWS = [
+  {
+    type: 'video',
+    url: 'https://assets.mixkit.co/videos/preview/mixkit-abstract-laser-lights-background-loop-41761-large.mp4',
+    title: 'Driftwood Rebranding Site',
+    category: 'Motion Graphics / WebGL'
+  },
+  {
+    type: 'image',
+    url: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800',
+    title: 'Hadid Construct Platform',
+    category: 'SaaS / Enterprise'
+  },
+  {
+    type: 'video',
+    url: 'https://assets.mixkit.co/videos/preview/mixkit-rotating-grid-of-purple-squares-33230-large.mp4',
+    title: 'Cyberware Web3 Dashboard',
+    category: 'DeFi / Web3'
+  },
+  {
+    type: 'image',
+    url: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800',
+    title: 'Aether Nexus Portfolio',
+    category: 'Creative / Showcase'
+  }
+];
+
 // ── COMPONENT ─────────────────────────────────────────────────
 const Landing: React.FC = () => {
   const [stats, setStats] = useState<{ totalDelivered: number; averageRating: number }>({
@@ -151,6 +179,16 @@ const Landing: React.FC = () => {
   const [subscriptions, setSubscriptions] = useState<any[]>([]);
   const [siteSettings, setSiteSettings]   = useState<any>(null);
   const [activeTab, setActiveTab]         = useState('Websites');
+  const [activePreviewIdx, setActivePreviewIdx] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+
+  useEffect(() => {
+    if (isPaused) return;
+    const timer = setInterval(() => {
+      setActivePreviewIdx((prev) => (prev + 1) % HERO_PREVIEWS.length);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, [isPaused]);
 
   useEffect(() => {
     api.getSiteSettings().then(setSiteSettings);
@@ -220,62 +258,159 @@ const Landing: React.FC = () => {
         </div>
 
         {/* Content */}
-        <div className="container-vb relative z-10 pt-24 pb-20">
-          <div className="max-w-5xl">
+        <div className="container-vb relative z-10 pt-24 pb-20 w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+            
+            {/* Left Column: Text & Actions */}
+            <div className="lg:col-span-7 xl:col-span-7 flex flex-col justify-center">
+              {/* Eyebrow label */}
+              <motion.p
+                className="text-label mb-6"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 1 }}
+              >
+                Digital Agency · Premium Craftsmanship
+              </motion.p>
 
-            {/* Eyebrow label */}
-            <motion.p
-              className="text-label mb-10"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 1 }}
-            >
-              Digital Agency · Premium Craftsmanship
-            </motion.p>
+              {/* Main heading — Clash Display, cinematic scale */}
+              <motion.h1
+                className="text-hero font-display font-bold text-foreground mb-6"
+                initial={{ opacity: 0, y: 32 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.1, ease: [0.4, 0, 0.2, 1] }}
+              >
+                {heroHeadingLines.main}
+                <br />
+                <span className="text-[#7C8FA1]">
+                  {heroHeadingLines.accent}
+                </span>
+              </motion.h1>
 
-            {/* Main heading — Clash Display, cinematic scale */}
-            <motion.h1
-              className="text-hero font-display font-bold text-foreground mb-10"
-              initial={{ opacity: 0, y: 32 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.1, ease: [0.4, 0, 0.2, 1] }}
-            >
-              {heroHeadingLines.main}
-              <br />
-              <span className="text-[#7C8FA1]">
-                {heroHeadingLines.accent}
-              </span>
-            </motion.h1>
+              {/* Subheading */}
+              <motion.p
+                className="text-[#495057] text-lg md:text-xl max-w-xl mb-10 leading-relaxed font-light"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.25, ease: [0.4, 0, 0.2, 1] }}
+              >
+                {siteSettings?.hero_subtitle ||
+                  'Premium websites, immersive digital experiences, and brand identities for companies that demand excellence.'}
+              </motion.p>
 
-            {/* Subheading */}
-            <motion.p
-              className="text-[#495057] text-lg md:text-xl max-w-lg mb-14 leading-relaxed font-light"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.25, ease: [0.4, 0, 0.2, 1] }}
-            >
-              {siteSettings?.hero_subtitle ||
-                'Premium websites, immersive digital experiences, and brand identities for companies that demand excellence.'}
-            </motion.p>
+              {/* CTAs */}
+              <motion.div
+                className="flex flex-col sm:flex-row gap-3"
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.4, ease: [0.4, 0, 0.2, 1] }}
+              >
+                <Link to="/services" className="btn-primary group">
+                  Start a Project
+                  <ArrowRight
+                    size={14}
+                    className="group-hover:translate-x-1 transition-transform duration-300"
+                  />
+                </Link>
+                <Link to="/marketplace" className="btn-ghost">
+                  View Our Work
+                </Link>
+              </motion.div>
+            </div>
 
-            {/* CTAs */}
-            <motion.div
-              className="flex flex-col sm:flex-row gap-3"
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4, ease: [0.4, 0, 0.2, 1] }}
-            >
-              <Link to="/services" className="btn-primary group">
-                Start a Project
-                <ArrowRight
-                  size={14}
-                  className="group-hover:translate-x-1 transition-transform duration-300"
-                />
-              </Link>
-              <Link to="/marketplace" className="btn-ghost">
-                View Our Work
-              </Link>
-            </motion.div>
+            {/* Right Column: Luxury Mock Browser Carousel */}
+            <div className="lg:col-span-5 xl:col-span-5 w-full flex flex-col items-center lg:items-end justify-center">
+              <motion.div
+                className="w-full max-w-[480px] lg:max-w-full aspect-[4/3] glass-card border border-white/12 relative overflow-hidden group shadow-2xl"
+                initial={{ opacity: 0, scale: 0.95, y: 24 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.2, ease: [0.4, 0, 0.2, 1] }}
+                onMouseEnter={() => setIsPaused(true)}
+                onMouseLeave={() => setIsPaused(false)}
+              >
+                {/* Browser Top Bar */}
+                <div className="h-9 border-b border-white/10 px-4 flex items-center justify-between bg-black/40 backdrop-blur-md relative z-30">
+                  {/* Mock Window controls */}
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#FF5F56] opacity-80" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#FFBD2E] opacity-80" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#27C93F] opacity-80" />
+                  </div>
+                  
+                  {/* Address/URL bar */}
+                  <div className="w-[60%] h-5 bg-white/5 border border-white/8 rounded flex items-center justify-center text-[10px] font-satoshi text-white/50 px-2 select-none overflow-hidden truncate">
+                    visionbuilt.in/showcase/{HERO_PREVIEWS[activePreviewIdx].title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}
+                  </div>
+                  
+                  {/* Empty spacer for alignment */}
+                  <div className="w-[30px]" />
+                </div>
+
+                {/* Media Container & Transitions */}
+                <div className="absolute inset-0 pt-9 bg-black/20 z-10 flex items-center justify-center overflow-hidden">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={activePreviewIdx}
+                      initial={{ opacity: 0, scale: 1.02 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.98 }}
+                      transition={{ duration: 0.5, ease: 'easeInOut' }}
+                      className="w-full h-full relative"
+                    >
+                      {HERO_PREVIEWS[activePreviewIdx].type === 'video' ? (
+                        <video
+                          src={HERO_PREVIEWS[activePreviewIdx].url}
+                          muted
+                          loop
+                          autoPlay
+                          playsInline
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <img
+                          src={HERO_PREVIEWS[activePreviewIdx].url}
+                          alt={HERO_PREVIEWS[activePreviewIdx].title}
+                          className="w-full h-full object-cover"
+                          loading="eager"
+                        />
+                      )}
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+
+                {/* Gradient Shadow Overlay */}
+                <div className="absolute inset-0 pt-9 bg-gradient-to-t from-black/80 via-black/10 to-transparent pointer-events-none z-20" />
+
+                {/* Floating Project Info Label */}
+                <div className="absolute bottom-4 left-4 right-4 z-20">
+                  <div className="glass-panel p-3.5 rounded-lg border border-white/12 backdrop-blur-md space-y-1">
+                    <span className="text-[9px] font-mono text-[var(--vb-accent)] uppercase tracking-wider block">
+                      {HERO_PREVIEWS[activePreviewIdx].category}
+                    </span>
+                    <h4 className="font-display font-semibold text-white text-sm leading-snug">
+                      {HERO_PREVIEWS[activePreviewIdx].title}
+                    </h4>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Dots indicator controls below card */}
+              <div className="flex gap-2.5 mt-5 justify-center lg:pr-4">
+                {HERO_PREVIEWS.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setActivePreviewIdx(idx)}
+                    className="w-2 h-2 rounded-full transition-all duration-300 focus:outline-none"
+                    style={{
+                      backgroundColor: activePreviewIdx === idx ? '#FFFFFF' : 'rgba(255, 255, 255, 0.24)',
+                      transform: activePreviewIdx === idx ? 'scale(1.25)' : 'scale(1)',
+                    }}
+                    aria-label={`Go to slide ${idx + 1}`}
+                  />
+                ))}
+              </div>
+            </div>
+
           </div>
         </div>
 
