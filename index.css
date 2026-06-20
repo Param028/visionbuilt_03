@@ -69,10 +69,10 @@
   --font-heading: 'Clash Display', 'Inter', sans-serif;
   --font-satoshi: 'Satoshi', 'Inter', sans-serif;
 
-  /* Color Palette & Surface Hierarchy */
-  --vb-bg:          #212529; /* LEVEL 0 - Dark matte background */
-  --vb-bg-alt:      #2A2F35; /* LEVEL 1 - Alternate sections */
-  --vb-section:     #343A40; /* LEVEL 2 - Ambient surface */
+  /* Color Palette & Surface Hierarchy (Premium Matte Black) */
+  --vb-bg:          #08080A; /* LEVEL 0 - Matte Black background */
+  --vb-bg-alt:      #0F0F11; /* LEVEL 1 - Alternate sections */
+  --vb-section:     #17171C; /* LEVEL 2 - Ambient surface */
   --vb-surface:     rgba(255, 255, 255, 0.09); /* LEVEL 3 - Elevated white glass */
   --vb-border:      rgba(255, 255, 255, 0.14); /* White glass border */
 
@@ -82,7 +82,7 @@
   --vb-glass-hover:     rgba(255, 255, 255, 0.13);
   --vb-glass-border:    rgba(255, 255, 255, 0.14);
   --vb-glass-highlight: rgba(255, 255, 255, 0.08);
-  --vb-glass-shadow:    0 10px 40px rgba(0, 0, 0, 0.18);
+  --vb-glass-shadow:    0 10px 40px rgba(0, 0, 0, 0.22);
 
   /* Typography Colors */
   --vb-text:        #FFFFFF; /* Primary Headings */
@@ -517,4 +517,84 @@ h1, h2, h3, h4, h5, h6, .font-display {
   opacity: 0.4;
   pointer-events: none;
   z-index: 0;
+}
+
+body, html {
+  background-color: var(--vb-bg) !important;
+}
+
+/* ────────────────────────────────────────────────────
+   HEROUI COMPONENT OVERRIDES (WHITE GLASS & MATTE BLACK)
+───────────────────────────────────────────────────── */
+.card, .card--default, .card--secondary, .card--tertiary {
+  background: var(--vb-glass-primary) !important;
+  backdrop-filter: blur(28px) !important;
+  -webkit-backdrop-filter: blur(28px) !important;
+  border: 1px solid var(--vb-glass-border) !important;
+  box-shadow: var(--vb-glass-shadow), inset 0 1px 0 var(--vb-glass-highlight) !important;
+  color: var(--vb-text-sec) !important;
+}
+.card__header, .card__content, .card__footer {
+  color: var(--vb-text-sec) !important;
+}
+.card__title {
+  color: var(--vb-text) !important;
+}
+.card__description {
+  color: var(--vb-muted) !important;
+}
+
+.button {
+  border-radius: 8px !important;
+  font-family: var(--font-satoshi) !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+  cursor: pointer !important;
+  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+.button--primary {
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #FFFFFF !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.10), 0 10px 40px rgba(0, 0, 0, 0.25) !important;
+}
+.button--primary:hover, .button--primary[data-hovered="true"] {
+  background: rgba(255, 255, 255, 0.18) !important;
+  border-color: rgba(255, 255, 255, 0.24) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 12px 44px rgba(0, 0, 0, 0.30) !important;
+}
+.button--secondary {
+  background: rgba(255, 255, 255, 0.07) !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+}
+.button--secondary:hover, .button--secondary[data-hovered="true"] {
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #FFFFFF !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+}
+.button--outline {
+  background: transparent !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+}
+.button--outline:hover, .button--outline[data-hovered="true"] {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #FFFFFF !important;
+  border-color: rgba(255, 255, 255, 0.24) !important;
+}
+.button--ghost {
+  background: transparent !important;
+  color: rgba(255, 255, 255, 0.6) !important;
+  border: 1px solid transparent !important;
+}
+.button--ghost:hover, .button--ghost[data-hovered="true"] {
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: #FFFFFF !important;
 }

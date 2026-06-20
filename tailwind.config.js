@@ -22,8 +22,8 @@ export default {
       colors: {
         // Extended VisionBuilt palette (accessible as vb-* classes)
         'vb': {
-          bg:      '#212529',
-          bgalt:   '#2A2F35',
+          bg:      '#08080A',
+          bgalt:   '#0F0F11',
           surface: 'rgba(255, 255, 255, 0.07)',
           glass:   'rgba(255, 255, 255, 0.09)',
           border:  'rgba(255, 255, 255, 0.14)',
@@ -73,15 +73,15 @@ export default {
       themes: {
         light: {
           colors: {
-            background:  '#212529',
+            background:  '#08080A',
             foreground:  '#FFFFFF',
 
             // Elevated surfaces (cards, inputs, code blocks)
             content1:    'rgba(255, 255, 255, 0.09)',
             'content1-foreground': '#FFFFFF',
-            content2:    '#2A2F35',
+            content2:    '#0F0F11',
             'content2-foreground': 'rgba(255, 255, 255, 0.82)',
-            content3:    '#343A40',
+            content3:    '#17171C',
             'content3-foreground': 'rgba(255, 255, 255, 0.82)',
             content4:    'rgba(255, 255, 255, 0.06)',
             'content4-foreground': 'rgba(255, 255, 255, 0.58)',
@@ -89,7 +89,7 @@ export default {
             // Primary action color = accent
             primary: {
               DEFAULT:    '#B8C4D0',
-              foreground: '#212529',
+              foreground: '#08080A',
               50:  '#F5F7F8',
               100: '#E5EAEF',
               200: '#D1DAE3',
@@ -128,15 +128,15 @@ export default {
         },
         dark: {
           colors: {
-            background:  '#212529',
+            background:  '#08080A',
             foreground:  '#FFFFFF',
 
             // Elevated surfaces (cards, inputs, code blocks)
             content1:    'rgba(255, 255, 255, 0.09)',
             'content1-foreground': '#FFFFFF',
-            content2:    '#2A2F35',
+            content2:    '#0F0F11',
             'content2-foreground': 'rgba(255, 255, 255, 0.82)',
-            content3:    '#343A40',
+            content3:    '#17171C',
             'content3-foreground': 'rgba(255, 255, 255, 0.82)',
             content4:    'rgba(255, 255, 255, 0.06)',
             'content4-foreground': 'rgba(255, 255, 255, 0.58)',
@@ -144,7 +144,7 @@ export default {
             // Primary action color = accent
             primary: {
               DEFAULT:    '#B8C4D0',
-              foreground: '#212529',
+              foreground: '#08080A',
               50:  '#F5F7F8',
               100: '#E5EAEF',
               200: '#D1DAE3',
