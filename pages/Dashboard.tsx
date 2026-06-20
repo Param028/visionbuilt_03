@@ -490,6 +490,83 @@ const Dashboard: React.FC<{ user: User }> = ({ user }) => {
           )}
 
         </AnimatePresence>
+
+        {/* ── 💻 DELIVERED PROJECTS / COMPLETED WORKS DIRECTORY ── */}
+        <div className="mt-20 pt-16 border-t border-white/10">
+          <SectionLabel>Client Deliveries</SectionLabel>
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+            <div>
+              <h2 className="text-display-sm font-display font-bold text-foreground mb-3">
+                Delivered Projects
+              </h2>
+              <p className="text-foreground/45 text-sm max-w-lg leading-relaxed font-satoshi">
+                Quick access to live builds and deployed repositories for systems we have constructed.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {[
+              {
+                title: 'Metaverse Space Portfolio',
+                category: '3D Web Experience',
+                client: 'Aether Nexus',
+                link: 'https://aether-nexus.visionbuilt.in',
+                description: 'An immersive 3D space utilizing WebGL, Three.js, and custom shaders for showcasing digital fashion items.'
+              },
+              {
+                title: 'Solana Staking Protocol',
+                category: 'Web3 / DeFi',
+                client: 'Driftwood Finance',
+                link: 'https://driftwood-defi.example.com',
+                description: 'High-frequency liquidity staking interface built with Next.js, tailwind-variants, and Rust smart contracts integration.'
+              },
+              {
+                title: 'Architectural Booking Engine',
+                category: 'Custom SaaS Platform',
+                client: 'Hadid Construct',
+                link: 'https://hadid-construct.example.com',
+                description: 'A resource planning and booking engine built for luxury real estate development firms with real-time BIM model rendering.'
+              }
+            ].map((proj, idx) => (
+              <div 
+                key={idx} 
+                className="glass-card p-6 flex flex-col justify-between h-full group border transition-all relative overflow-hidden"
+                style={{ borderRadius: '8px' }}
+              >
+                <div className="space-y-4">
+                  <div className="flex justify-between items-start">
+                    <Badge variant="info" className="text-[8px] uppercase tracking-wider px-2 py-0.5">
+                      {proj.category}
+                    </Badge>
+                    <span className="text-[9px] font-mono text-foreground/30 uppercase">
+                      Client: {proj.client}
+                    </span>
+                  </div>
+                  <h3 className="font-display font-bold text-foreground text-base group-hover:text-[var(--vb-accent)] transition-colors">
+                    {proj.title}
+                  </h3>
+                  <p className="text-foreground/40 text-xs leading-relaxed font-satoshi line-clamp-3">
+                    {proj.description}
+                  </p>
+                </div>
+                <div className="pt-6 mt-6 border-t border-white/10 flex justify-between items-center">
+                  <span className="text-[10px] font-mono text-[var(--vb-accent)] break-all truncate max-w-[200px]">
+                    {proj.link.replace('https://', '')}
+                  </span>
+                  <a 
+                    href={proj.link} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="inline-flex items-center gap-1.5 text-[10px] font-satoshi tracking-widest uppercase text-white hover:text-[var(--vb-accent)] transition-colors"
+                  >
+                    Launch <ArrowRight size={10} />
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

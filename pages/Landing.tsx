@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { motion, useInView } from 'framer-motion';
 import {
   ArrowRight, Code2, Layers, Palette, TrendingUp,
-  Zap, Globe, CheckCircle,
+  Zap, Globe, CheckCircle, ArrowLeft,
 } from 'lucide-react';
 import { CountUp, LogoLoop, ProjectLoop } from '../components/ui/ReactBits';
 import { api } from '../services/api';
@@ -93,6 +93,52 @@ const PROCESS = [
   { num: '04', title: 'Develop',   desc: 'Engineering with clean code and modern best practices.' },
   { num: '05', title: 'Launch',    desc: 'Careful deployment with zero-downtime confidence.' },
   { num: '06', title: 'Scale',     desc: 'Ongoing optimization and growth post-launch.' },
+];
+
+// ── Social Media handling showreel items ───────────────────────
+const SOCIAL_MEDIA_SHOWCASE = [
+  {
+    type: 'video',
+    url: 'https://assets.mixkit.co/videos/preview/mixkit-abstract-laser-lights-background-loop-41761-large.mp4',
+    title: 'Cinematic Motion Graphics Reel',
+    stats: 'Reach: +312% · Engagement: 14.8%',
+    campaign: 'Driftwood Rebranding Campaign'
+  },
+  {
+    type: 'image',
+    url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800',
+    title: 'Hadid-Inspired Architecture Teaser',
+    stats: 'CTR: 8.4% · Impressions: 2.1M',
+    campaign: 'Aether Launch Poster'
+  },
+  {
+    type: 'video',
+    url: 'https://assets.mixkit.co/videos/preview/mixkit-rotating-grid-of-purple-squares-33230-large.mp4',
+    title: '3D Product Commercial Loop',
+    stats: 'Conversions: +185% · Saves: 42K',
+    campaign: 'Cyberware Accessories Drop'
+  },
+  {
+    type: 'image',
+    url: 'https://images.unsplash.com/photo-1604871000636-074fa5117945?w=800',
+    title: 'Fluid Neon Concept Graphic',
+    stats: 'Shares: 12.4K · Engagement: 11.2%',
+    campaign: 'Exo Concert Poster'
+  },
+  {
+    type: 'video',
+    url: 'https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-spheres-and-lines-33223-large.mp4',
+    title: 'Network Topologies Promo Video',
+    stats: 'Reach: 1.2M · Impressions: 5.6M',
+    campaign: 'Loom Keynote Teaser'
+  },
+  {
+    type: 'image',
+    url: 'https://images.unsplash.com/photo-1618005198143-d5660b593293?w=800',
+    title: 'Minimalist Monolithic Identity',
+    stats: 'Likes: 84K · Reach: +410%',
+    campaign: 'Vector Rebranding Showcase'
+  }
 ];
 
 // ── COMPONENT ─────────────────────────────────────────────────
@@ -417,6 +463,117 @@ const Landing: React.FC = () => {
                 ]
           }
         />
+      </section>
+
+      {/* ── 🎬 SOCIAL MEDIA SHOWCASE — CAROUSEL ── */}
+      <section className="section-y border-b border-white/8 relative overflow-hidden">
+        {/* Background ambient lighting */}
+        <div
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+          aria-hidden="true"
+          style={{
+            width: '600px',
+            height: '400px',
+            borderRadius: '50%',
+            background: 'radial-gradient(ellipse, rgba(184,196,208,0.04) 0%, transparent 70%)',
+            filter: 'blur(50px)',
+          }}
+        />
+
+        <div className="container-vb mb-12 relative z-10">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
+            <FadeUp>
+              <p className="text-label mb-4">Handling & Content</p>
+              <h2 className="text-display font-display font-bold text-foreground">Social Marketing</h2>
+            </FadeUp>
+            
+            <FadeUp delay={0.1}>
+              <div className="flex items-center gap-2.5">
+                <button
+                  onClick={() => {
+                    const el = document.getElementById('social-carousel');
+                    el?.scrollBy({ left: -380, behavior: 'smooth' });
+                  }}
+                  className="w-10 h-10 rounded-full border border-white/10 hover:border-white/20 bg-white/4 hover:bg-white/10 flex items-center justify-center text-white/60 hover:text-white transition-all active:scale-95"
+                  aria-label="Previous slide"
+                >
+                  <ArrowLeft size={16} />
+                </button>
+                <button
+                  onClick={() => {
+                    const el = document.getElementById('social-carousel');
+                    el?.scrollBy({ left: 380, behavior: 'smooth' });
+                  }}
+                  className="w-10 h-10 rounded-full border border-white/10 hover:border-white/20 bg-white/4 hover:bg-white/10 flex items-center justify-center text-white/60 hover:text-white transition-all active:scale-95"
+                  aria-label="Next slide"
+                >
+                  <ArrowRight size={16} />
+                </button>
+              </div>
+            </FadeUp>
+          </div>
+        </div>
+
+        {/* Carousel Slider Row */}
+        <div className="relative z-10 w-full overflow-hidden">
+          <div 
+            id="social-carousel"
+            className="flex gap-6 overflow-x-auto pb-10 px-[max(1.5rem,calc((100vw-88rem)/2))] md:px-[max(2rem,calc((100vw-88rem)/2))] snap-x snap-mandatory scroll-smooth scrollbar-none"
+            style={{ WebkitOverflowScrolling: 'touch' }}
+          >
+            {SOCIAL_MEDIA_SHOWCASE.map((item, idx) => (
+              <FadeUp key={idx} delay={idx * 0.05} className="snap-start flex-shrink-0">
+                <div 
+                  className="w-[280px] sm:w-[340px] h-[440px] sm:h-[500px] glass-card relative overflow-hidden group border border-white/10"
+                  style={{ borderRadius: '12px' }}
+                >
+                  {item.type === 'video' ? (
+                    <video
+                      src={item.url}
+                      muted
+                      loop
+                      autoPlay
+                      playsInline
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                  ) : (
+                    <img
+                      src={item.url}
+                      alt={item.title}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                  )}
+
+                  {/* Permanent Visual tag */}
+                  <div className="absolute bottom-4 left-4 right-4 z-10 p-4 bg-black/55 backdrop-blur-md border border-white/10 rounded-lg group-hover:opacity-0 group-hover:translate-y-2 transition-all duration-300">
+                    <span className="text-[8px] font-mono text-[var(--vb-accent)] uppercase tracking-wider block mb-0.5">
+                      {item.campaign}
+                    </span>
+                    <h4 className="font-display font-semibold text-white text-xs truncate">
+                      {item.title}
+                    </h4>
+                  </div>
+
+                  {/* Hover reveal overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-400 flex flex-col justify-end p-4 md:p-6 z-20">
+                    <div className="glass-panel p-4 rounded-lg border border-white/14 backdrop-blur-md transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 space-y-2">
+                      <span className="text-[8px] font-mono text-[var(--vb-accent)] uppercase tracking-wider block">
+                        {item.campaign}
+                      </span>
+                      <h4 className="font-display font-semibold text-white text-sm leading-snug">
+                        {item.title}
+                      </h4>
+                      <p className="text-[10px] font-satoshi text-white/82 tracking-wide font-medium bg-white/5 py-1.5 px-3 rounded border border-white/8 mt-1">
+                        📈 {item.stats}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </FadeUp>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* ═══════════════════════════════════════════════
