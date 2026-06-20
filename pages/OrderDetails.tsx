@@ -438,38 +438,38 @@ const OrderDetails: React.FC<{ user: User }> = ({ user }) => {
                       <div key={msg.id} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
                         <div className={`max-w-[85%] sm:max-w-[70%] rounded-xl p-4 border ${
                           isMe 
-                            ? 'bg-white/80 border-black/10 text-foreground' 
-                            : 'bg-white/50 border-black/5 text-foreground'
+                            ? 'bg-[rgba(52,58,64,0.68)] border-[rgba(255,255,255,0.08)] text-[#F8F9FA]' 
+                            : 'bg-[rgba(33,37,41,0.4)] border-[rgba(255,255,255,0.05)] text-[rgba(248,249,250,0.78)]'
                         }`}>
-                           <div className="flex items-center justify-between gap-4 mb-2 pb-1.5 border-b border-black/10">
-                               <span className="text-[9px] font-display font-semibold uppercase tracking-wider text-foreground/60">
+                           <div className="flex items-center justify-between gap-4 mb-2 pb-1.5 border-b border-[rgba(255,255,255,0.08)]">
+                               <span className="text-[9px] font-display font-semibold uppercase tracking-wider text-[rgba(248,249,250,0.78)]">
                                   {isMe ? 'You' : msg.sender_name} 
                                   <span className="ml-1 opacity-50 font-mono text-[8px]">
                                       {isAdmin ? '(Admin)' : isDev ? '(Developer)' : '(Client)'}
                                   </span>
-                               </span>
-                               <span className="text-[8px] text-foreground/35 font-mono">
+                                </span>
+                               <span className="text-[8px] text-[rgba(248,249,250,0.56)] font-mono">
                                   {new Date(msg.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                                </span>
                            </div>
                            
                            {isImage && (
-                               <div className="mb-3 rounded-lg overflow-hidden border border-black/10 cursor-pointer relative aspect-video" onClick={() => window.open(msg.attachment_url, '_blank')}>
+                               <div className="mb-3 rounded-lg overflow-hidden border border-[rgba(255,255,255,0.08)] cursor-pointer relative aspect-video" onClick={() => window.open(msg.attachment_url, '_blank')}>
                                    <img src={msg.attachment_url} alt="Attachment" className="w-full h-full object-cover" />
                                    <div className="absolute inset-0 bg-black/20 opacity-0 hover:opacity-100 flex items-center justify-center transition-opacity">
-                                       <ExternalLink size={16} className="text-foreground" />
+                                       <ExternalLink size={16} className="text-white" />
                                    </div>
                                </div>
                            )}
-
-                           <p className="text-xs leading-relaxed font-satoshi text-foreground/80 whitespace-pre-wrap">{msg.content}</p>
+  
+                           <p className="text-xs leading-relaxed font-satoshi text-[rgba(248,249,250,0.78)] whitespace-pre-wrap">{msg.content}</p>
                            
                            {!isImage && msg.attachment_url && (
-                               <a href={msg.attachment_url} target="_blank" rel="noreferrer" className="mt-3 p-2.5 bg-white/70 rounded border border-black/10 flex items-center hover:border-black/20 transition-colors">
-                                   <FileText className="w-3.5 h-3.5 text-foreground/40 mr-2" />
-                                   <span className="text-[10px] text-foreground/75 truncate max-w-[150px] font-mono">Download Attachment</span>
-                                   <Download className="w-3 h-3 ml-auto text-foreground/30" />
-                               </a>
+                               <a href={msg.attachment_url} target="_blank" rel="noreferrer" className="mt-3 p-2.5 bg-black/20 rounded border border-[rgba(255,255,255,0.08)] flex items-center hover:border-[rgba(255,255,255,0.14)] transition-colors">
+                                   <FileText className="w-3.5 h-3.5 text-[rgba(248,249,250,0.56)] mr-2" />
+                                   <span className="text-[10px] text-[rgba(248,249,250,0.78)] truncate max-w-[150px] font-mono">Download Attachment</span>
+                                   <Download className="w-3 h-3 ml-auto text-[rgba(248,249,250,0.4)]" />
+                                </a>
                            )}
                         </div>
                       </div>

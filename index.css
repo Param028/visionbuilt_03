@@ -75,10 +75,6 @@
   font-display: swap;
   font-style: normal;
 }
-
-/* ────────────────────────────────────────────────────
-   DESIGN TOKENS — CSS CUSTOM PROPERTIES
-───────────────────────────────────────────────────── */
 :root {
   /* Typography */
   --font-sans: 'Inter', system-ui, sans-serif;
@@ -90,8 +86,15 @@
   --vb-bg-alt:      #EEF1F4; /* LEVEL 1 - Alternate sections */
   --vb-section:     #E9ECEF; /* Section surface */
   --vb-surface:     rgba(255, 255, 255, 0.72); /* LEVEL 2 - Elevated surfaces */
-  --vb-glass:       rgba(255, 255, 255, 0.55); /* LEVEL 3 - Glass cards */
   --vb-border:      rgba(0, 0, 0, 0.08);
+
+  /* NEW DARK GLASS COLOR SYSTEM */
+  --vb-glass-primary:   rgba(33, 37, 41, 0.72);
+  --vb-glass-secondary: rgba(52, 58, 64, 0.68);
+  --vb-glass-hover:     rgba(73, 80, 87, 0.78);
+  --vb-glass-border:    rgba(255, 255, 255, 0.08);
+  --vb-glass-highlight: rgba(255, 255, 255, 0.05);
+  --vb-glass-shadow:    0 10px 40px rgba(0, 0, 0, 0.12);
 
   /* Typography Colors */
   --vb-text:        #111418; /* Headings */
@@ -105,7 +108,7 @@
 
 /* ────────────────────────────────────────────────────
    BASE
-───────────────────────────────────────────────────── */
+ ───────────────────────────────────────────────────── */
 html {
   color-scheme: light;
 }
@@ -133,40 +136,38 @@ h1, h2, h3, h4, h5, h6, .font-display {
 
 /* ────────────────────────────────────────────────────
    GLASS SYSTEM
-───────────────────────────────────────────────────── */
+ ───────────────────────────────────────────────────── */
 
 /* Premium glass panel (cards, surfaces) */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.58);
-  backdrop-filter: blur(28px);
-  -webkit-backdrop-filter: blur(28px);
-  border: 1px solid rgba(255, 255, 255, 0.65);
+  background: var(--vb-glass-primary);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--vb-glass-border);
   box-shadow:
-    0 10px 40px rgba(0, 0, 0, 0.06),
-    0 2px 12px rgba(0, 0, 0, 0.03),
-    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    var(--vb-glass-shadow),
+    inset 0 1px 0 var(--vb-glass-highlight);
   transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
 }
 .glass-panel:hover {
-  background: rgba(255, 255, 255, 0.68);
-  border-color: rgba(255, 255, 255, 0.75);
+  background: var(--vb-glass-hover);
+  border-color: var(--vb-glass-border);
   box-shadow:
-    0 16px 48px rgba(0, 0, 0, 0.09),
-    0 4px 18px rgba(0, 0, 0, 0.04),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    0 16px 48px rgba(0, 0, 0, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 /* Premium glass card (bento items) */
 .glass-card {
-  background: rgba(255, 255, 255, 0.58);
-  backdrop-filter: blur(28px);
-  -webkit-backdrop-filter: blur(28px);
-  border: 1px solid rgba(255, 255, 255, 0.65);
+  background: var(--vb-glass-primary);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--vb-glass-border);
   border-radius: 12px;
   box-shadow:
-    0 10px 40px rgba(0, 0, 0, 0.06),
-    0 2px 12px rgba(0, 0, 0, 0.03),
-    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    var(--vb-glass-shadow),
+    inset 0 1px 0 var(--vb-glass-highlight);
   transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
   position: relative;
   overflow: hidden;
@@ -175,20 +176,19 @@ h1, h2, h3, h4, h5, h6, .font-display {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, transparent 60%);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, transparent 60%);
   opacity: 0.4;
   transition: opacity 0.4s ease;
   pointer-events: none;
   border-radius: inherit;
 }
 .glass-card:hover {
-  background: rgba(255, 255, 255, 0.68);
-  border-color: rgba(255, 255, 255, 0.75);
+  background: var(--vb-glass-hover);
+  border-color: var(--vb-glass-border);
   transform: translateY(-4px);
   box-shadow:
-    0 18px 48px rgba(0, 0, 0, 0.10),
-    0 6px 20px rgba(0, 0, 0, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    0 18px 48px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 .glass-card:hover::before {
   opacity: 0.8;
@@ -196,15 +196,100 @@ h1, h2, h3, h4, h5, h6, .font-display {
 
 /* Navbar glass */
 .glass-nav {
-  background: rgba(255, 255, 255, 0.65);
-  backdrop-filter: blur(28px);
-  -webkit-backdrop-filter: blur(28px);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  background: var(--vb-glass-primary);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid var(--vb-glass-border);
+  transition: background 0.4s ease, border-color 0.4s ease;
+}
+
+/* Scoped Typography Contrast Overrides for Dark Glass Surfaces */
+.glass-panel, .glass-card {
+  --vb-text: #F8F9FA;
+  --vb-text-sec: rgba(248, 249, 250, 0.78);
+  --vb-muted: rgba(248, 249, 250, 0.56);
+  --vb-accent: #B8C4D0;
+  
+  color: var(--vb-text-sec);
+}
+
+.glass-panel h1, .glass-panel h2, .glass-panel h3, .glass-panel h4, .glass-panel h5, .glass-panel h6,
+.glass-card h1, .glass-card h2, .glass-card h3, .glass-card h4, .glass-card h5, .glass-card h6 {
+  color: var(--vb-text) !important;
+}
+
+.glass-panel .text-foreground, .glass-card .text-foreground {
+  color: var(--vb-text) !important;
+}
+
+.glass-panel p, .glass-card p,
+.glass-panel .text-\[\#495057\], .glass-card .text-\[\#495057\],
+.glass-panel .text-\[\#6C757D\], .glass-card .text-\[\#6C757D\],
+.glass-panel .text-foreground\/80, .glass-card .text-foreground\/80,
+.glass-panel .text-foreground\/90, .glass-card .text-foreground\/90 {
+  color: var(--vb-text-sec) !important;
+}
+
+.glass-panel .text-muted, .glass-card .text-muted,
+.glass-panel .text-foreground\/60, .glass-card .text-foreground\/60,
+.glass-panel .text-foreground\/70, .glass-card .text-foreground\/70,
+.glass-panel .text-muted-foreground, .glass-card .text-muted-foreground {
+  color: var(--vb-muted) !important;
+}
+
+.glass-panel li, .glass-card li {
+  color: var(--vb-text-sec);
+}
+
+.glass-panel .text-primary, .glass-card .text-primary,
+.glass-panel .text-accent, .glass-card .text-accent {
+  color: var(--vb-accent) !important;
+}
+
+/* Scrolled Navbar Glass Overrides */
+.glass-nav {
+  --vb-text: #F8F9FA;
+  --vb-text-sec: rgba(248, 249, 250, 0.78);
+  --vb-muted: rgba(248, 249, 250, 0.56);
+  --vb-accent: #B8C4D0;
+  
+  color: var(--vb-text);
+}
+.glass-nav a,
+.glass-nav span,
+.glass-nav button,
+.glass-nav svg {
+  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.glass-nav .text-foreground {
+  color: var(--vb-text) !important;
+}
+.glass-nav .text-foreground\/45,
+.glass-nav .text-foreground\/50,
+.glass-nav .text-foreground\/60,
+.glass-nav .text-foreground\/40 {
+  color: var(--vb-text-sec) !important;
+}
+.glass-nav .bg-white\/5 {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+.glass-nav .logo-placeholder {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  background: rgba(33, 37, 41, 0.72) !important;
+}
+.glass-nav .logo-placeholder svg {
+  color: var(--vb-text-sec) !important;
+}
+.glass-nav .border-black\/10 {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+.glass-nav .border-t.vb-divider {
+  border-color: rgba(255, 255, 255, 0.08) !important;
 }
 
 /* ────────────────────────────────────────────────────
    TYPOGRAPHY UTILITIES
-───────────────────────────────────────────────────── */
+ ───────────────────────────────────────────────────── */
 
 /* Cinematic hero heading */
 .text-hero {
@@ -250,7 +335,7 @@ h1, h2, h3, h4, h5, h6, .font-display {
 
 /* ────────────────────────────────────────────────────
    SECTION SPACING
-───────────────────────────────────────────────────── */
+ ───────────────────────────────────────────────────── */
 .section-y {
   padding-top: clamp(5rem, 10vw, 9rem);
   padding-bottom: clamp(5rem, 10vw, 9rem);
@@ -275,33 +360,33 @@ h1, h2, h3, h4, h5, h6, .font-display {
 
 /* ────────────────────────────────────────────────────
    CTA BUTTONS
-───────────────────────────────────────────────────── */
+ ───────────────────────────────────────────────────── */
 .btn-primary {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0.875rem 2rem;
-  background: rgba(255, 255, 255, 0.68);
+  background: var(--vb-glass-primary);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  color: var(--vb-text);
+  color: #F8F9FA;
   font-size: 0.8125rem;
   font-weight: 500;
   font-family: var(--font-satoshi);
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  border: 1px solid rgba(255, 255, 255, 0.80);
+  border: 1px solid var(--vb-glass-border);
   cursor: pointer;
   transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
   text-decoration: none;
   white-space: nowrap;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 4px 12px rgba(0, 0, 0, 0.04);
+  box-shadow: inset 0 1px 0 var(--vb-glass-highlight), var(--vb-glass-shadow);
 }
 .btn-primary:hover {
-  background: rgba(255, 255, 255, 0.85);
-  border-color: rgba(255, 255, 255, 0.95);
+  background: var(--vb-glass-hover);
+  border-color: rgba(255, 255, 255, 0.14);
   transform: translateY(-2px);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 6px 16px rgba(0, 0, 0, 0.06);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 12px 44px rgba(0, 0, 0, 0.15);
 }
 .btn-primary:active {
   transform: translateY(0);
@@ -313,22 +398,22 @@ h1, h2, h3, h4, h5, h6, .font-display {
   gap: 0.5rem;
   padding: 0.875rem 2rem;
   background: transparent;
-  color: var(--vb-text-sec);
+  color: rgba(248, 249, 250, 0.78);
   font-size: 0.8125rem;
   font-weight: 500;
   font-family: var(--font-satoshi);
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--vb-glass-border);
   cursor: pointer;
   transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
   text-decoration: none;
   white-space: nowrap;
 }
 .btn-ghost:hover {
-  color: var(--vb-text);
-  border-color: rgba(0, 0, 0, 0.16);
-  background: rgba(255, 255, 255, 0.4);
+  color: #F8F9FA;
+  border-color: rgba(255, 255, 255, 0.14);
+  background: var(--vb-glass-secondary);
 }
 
 .btn-accent {
@@ -336,23 +421,23 @@ h1, h2, h3, h4, h5, h6, .font-display {
   align-items: center;
   gap: 0.5rem;
   padding: 0.875rem 2rem;
-  background: rgba(255, 255, 255, 0.4);
-  color: var(--vb-text);
+  background: var(--vb-glass-secondary);
+  color: var(--vb-accent);
   font-size: 0.8125rem;
   font-weight: 500;
   font-family: var(--font-satoshi);
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  border: 1px solid rgba(255, 255, 255, 0.6);
+  border: 1px solid var(--vb-glass-border);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
   text-decoration: none;
 }
 .btn-accent:hover {
-  background: rgba(255, 255, 255, 0.65);
+  background: var(--vb-glass-hover);
   transform: translateY(-2px);
+  color: #F8F9FA;
 }
-
 /* ────────────────────────────────────────────────────
    SELECTION
 ───────────────────────────────────────────────────── */

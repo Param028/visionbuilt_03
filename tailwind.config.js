@@ -77,10 +77,14 @@ export default {
             foreground:  '#111418',
 
             // Elevated surfaces (cards, inputs, code blocks)
-            content1:    '#EEF1F4',
-            content2:    'rgba(255, 255, 255, 0.72)',
-            content3:    'rgba(255, 255, 255, 0.55)',
-            content4:    'rgba(255, 255, 255, 0.65)',
+            content1:    'rgba(33, 37, 41, 0.72)',
+            'content1-foreground': '#F8F9FA',
+            content2:    'rgba(52, 58, 64, 0.68)',
+            'content2-foreground': 'rgba(248, 249, 250, 0.78)',
+            content3:    'rgba(73, 80, 87, 0.78)',
+            'content3-foreground': '#F8F9FA',
+            content4:    'rgba(33, 37, 41, 0.4)',
+            'content4-foreground': 'rgba(248, 249, 250, 0.56)',
 
             // Primary action color = accent
             primary: {
@@ -99,12 +103,12 @@ export default {
             },
 
             secondary: {
-              DEFAULT:    '#EEF1F4',
-              foreground: '#495057',
+              DEFAULT:    'rgba(52, 58, 64, 0.68)',
+              foreground: 'rgba(248, 249, 250, 0.78)',
             },
 
             // Borders — very subtle
-            divider:    'rgba(0, 0, 0, 0.08)',
+            divider:    'rgba(255, 255, 255, 0.08)',
             focus:      '#7C8FA1',
 
             // Status colors
@@ -128,10 +132,14 @@ export default {
             foreground:  '#111418',
 
             // Elevated surfaces (cards, inputs, code blocks)
-            content1:    '#EEF1F4',
-            content2:    'rgba(255, 255, 255, 0.72)',
-            content3:    'rgba(255, 255, 255, 0.55)',
-            content4:    'rgba(255, 255, 255, 0.65)',
+            content1:    'rgba(33, 37, 41, 0.72)',
+            'content1-foreground': '#F8F9FA',
+            content2:    'rgba(52, 58, 64, 0.68)',
+            'content2-foreground': 'rgba(248, 249, 250, 0.78)',
+            content3:    'rgba(73, 80, 87, 0.78)',
+            'content3-foreground': '#F8F9FA',
+            content4:    'rgba(33, 37, 41, 0.4)',
+            'content4-foreground': 'rgba(248, 249, 250, 0.56)',
 
             // Primary action color = accent
             primary: {
@@ -150,12 +158,12 @@ export default {
             },
 
             secondary: {
-              DEFAULT:    '#EEF1F4',
-              foreground: '#495057',
+              DEFAULT:    'rgba(52, 58, 64, 0.68)',
+              foreground: 'rgba(248, 249, 250, 0.78)',
             },
 
             // Borders — very subtle
-            divider:    'rgba(0, 0, 0, 0.08)',
+            divider:    'rgba(255, 255, 255, 0.08)',
             focus:      '#7C8FA1',
 
             // Status colors

@@ -220,8 +220,8 @@ export const Carousel: React.FC<{ items: CarouselItem[] }> = ({ items }) => {
                   damping: 20,
                 }}
                 className={cn(
-                  "absolute w-[300px] md:w-[400px] h-[300px] bg-white/[0.58] border border-white/65 backdrop-blur-xl rounded-2xl p-6 flex flex-col items-center justify-center shadow-2xl cursor-pointer",
-                  isActive ? "border-white shadow-[0_10px_30px_rgba(0,0,0,0.06)]" : "hover:bg-white/[0.68]",
+                  "absolute w-[300px] md:w-[400px] h-[300px] bg-[rgba(33,37,41,0.72)] border border-[rgba(255,255,255,0.08)] backdrop-blur-xl rounded-2xl p-6 flex flex-col items-center justify-center shadow-2xl cursor-pointer text-[#F8F9FA]",
+                  isActive ? "border-[rgba(255,255,255,0.14)] shadow-[0_10px_40px_rgba(0,0,0,0.12)]" : "hover:bg-[rgba(73,80,87,0.78)]",
                   item.className
                 )}
                 onClick={() => {
@@ -404,7 +404,7 @@ export const GlareCard: React.FC<{ children: React.ReactNode; className?: string
   // Disable expensive tilt on mobile
   if (isMobile) {
     return (
-      <div className={cn("rounded-xl border border-white/65 bg-white/[0.58] shadow-xl backdrop-blur-xl overflow-hidden", className)}>
+      <div className={cn("rounded-xl border border-[rgba(255,255,255,0.08)] bg-[rgba(33,37,41,0.72)] shadow-xl backdrop-blur-xl overflow-hidden text-[#F8F9FA]", className)}>
         {children}
       </div>
     );
@@ -443,19 +443,19 @@ export const GlareCard: React.FC<{ children: React.ReactNode; className?: string
             animate={{ rotateX: rotate.x, rotateY: rotate.y }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
         >
-            <div className="w-full h-full overflow-hidden rounded-xl border border-white/65 bg-white/[0.58] shadow-xl backdrop-blur-xl">
+            <div className="w-full h-full overflow-hidden rounded-xl border border-[rgba(255,255,255,0.08)] bg-[rgba(33,37,41,0.72)] shadow-xl backdrop-blur-xl text-[#F8F9FA]">
                  {children}
             </div>
             <div 
                 className="absolute inset-0 rounded-xl pointer-events-none overflow-hidden mix-blend-overlay"
                 style={{
-                    background: `radial-gradient(circle at ${glare.x}% ${glare.y}%, rgba(255,255,255,0.6), transparent 50%)`,
+                    background: `radial-gradient(circle at ${glare.x}% ${glare.y}%, rgba(255,255,255,0.4), transparent 50%)`,
                     opacity: glare.opacity,
                     transition: 'opacity 0.3s ease'
                 }}
             />
              <div 
-                className="absolute inset-0 rounded-xl pointer-events-none border border-white/20"
+                className="absolute inset-0 rounded-xl pointer-events-none border border-[rgba(255,255,255,0.12)]"
                 style={{
                     opacity: glare.opacity,
                     transition: 'opacity 0.3s ease'

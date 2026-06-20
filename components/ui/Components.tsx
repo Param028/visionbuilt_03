@@ -39,10 +39,10 @@ export const Button: React.FC<ButtonProps> = ({
   const baseStyles = "relative inline-flex items-center justify-center rounded-lg font-medium transition-all focus:outline-none disabled:opacity-50 disabled:pointer-events-none overflow-hidden group border select-none";
   
   const variants = {
-    primary: "bg-white/[0.68] hover:bg-white/[0.85] text-foreground border-white/80 hover:border-white/95 backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_4px_12px_rgba(0,0,0,0.04)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_6px_16px_rgba(0,0,0,0.06)] active:scale-[0.98] transition-all duration-400 ease-out",
-    secondary: "bg-transparent border-black/10 hover:border-black/20 text-foreground/80 hover:text-foreground hover:bg-white/[0.4] active:scale-[0.98] transition-all duration-400 ease-out",
-    outline: "bg-transparent border-black/10 hover:border-black/20 text-foreground hover:bg-white/[0.4] active:scale-[0.98] transition-all duration-400 ease-out",
-    ghost: "bg-transparent border-transparent text-foreground/60 hover:text-foreground hover:bg-white/[0.4] active:scale-[0.98] transition-all duration-400 ease-out"
+    primary: "bg-[rgba(33,37,41,0.72)] hover:bg-[rgba(73,80,87,0.78)] text-[#F8F9FA] border-[rgba(255,255,255,0.08)] backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_10px_40px_rgba(0,0,0,0.12)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_12px_44px_rgba(0,0,0,0.15)] active:scale-[0.98] transition-all duration-400 ease-out",
+    secondary: "bg-[rgba(52,58,64,0.68)] hover:bg-[rgba(73,80,87,0.78)] text-[rgba(248,249,250,0.78)] hover:text-[#F8F9FA] border-[rgba(255,255,255,0.08)] backdrop-blur-md active:scale-[0.98] transition-all duration-400 ease-out",
+    outline: "bg-transparent border-[rgba(255,255,255,0.08)] text-[rgba(248,249,250,0.78)] hover:text-[#F8F9FA] hover:bg-[rgba(73,80,87,0.78)] active:scale-[0.98] transition-all duration-400 ease-out",
+    ghost: "bg-transparent border-transparent text-[rgba(248,249,250,0.56)] hover:text-[#F8F9FA] hover:bg-[rgba(52,58,64,0.68)] active:scale-[0.98] transition-all duration-400 ease-out"
   };
   
   const sizes = {
@@ -74,7 +74,7 @@ export const Button: React.FC<ButtonProps> = ({
       {/* Glare Effect Layer */}
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
         <div 
-            className="absolute -inset-[100%] bg-[radial-gradient(circle_at_var(--x,_50%)_var(--y,_50%),rgba(0,0,0,0.03)_0%,transparent_50%)]" 
+            className="absolute -inset-[100%] bg-[radial-gradient(circle_at_var(--x,_50%)_var(--y,_50%),rgba(255,255,255,0.08)_0%,transparent_50%)]" 
             style={{ willChange: "transform" }}
         />
       </div>
@@ -102,10 +102,10 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 export const Input: React.FC<InputProps> = ({ label, error, className, ...props }) => {
   return (
     <div className="space-y-1.5 w-full">
-      {label && <label className="text-xs font-semibold text-foreground/70 uppercase tracking-wider">{label}</label>}
+      {label && <label className="text-xs font-semibold text-[rgba(248,249,250,0.78)] uppercase tracking-wider">{label}</label>}
       <input
         className={cn(
-          "flex h-10 w-full rounded-lg border border-black/10 bg-white/70 px-3 py-2 text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-black/20 transition-all duration-300",
+          "flex h-10 w-full rounded-lg border border-[rgba(255,255,255,0.08)] bg-black/20 px-3 py-2 text-sm text-[#F8F9FA] placeholder:text-[rgba(248,249,250,0.4)] focus:outline-none focus:ring-2 focus:ring-[#B8C4D0]/10 focus:border-[#B8C4D0] transition-all duration-300",
           error && "border-red-500/50 focus:ring-red-500/30",
           className
         )}
@@ -125,10 +125,10 @@ interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement
 export const Textarea: React.FC<TextareaProps> = ({ label, error, className, ...props }) => {
   return (
     <div className="space-y-1.5 w-full">
-      {label && <label className="text-xs font-semibold text-foreground/70 uppercase tracking-wider">{label}</label>}
+      {label && <label className="text-xs font-semibold text-[rgba(248,249,250,0.78)] uppercase tracking-wider">{label}</label>}
       <textarea
         className={cn(
-          "flex min-h-[80px] w-full rounded-lg border border-black/10 bg-white/70 px-3 py-2 text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-black/20 transition-all duration-300",
+          "flex min-h-[80px] w-full rounded-lg border border-[rgba(255,255,255,0.08)] bg-black/20 px-3 py-2 text-sm text-[#F8F9FA] placeholder:text-[rgba(248,249,250,0.4)] focus:outline-none focus:ring-2 focus:ring-[#B8C4D0]/10 focus:border-[#B8C4D0] transition-all duration-300",
           error && "border-red-500/50 focus:ring-red-500/30",
           className
         )}
