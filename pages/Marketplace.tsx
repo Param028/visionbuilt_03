@@ -92,7 +92,7 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
       {/* ── PAGE HEADER ── */}
       <div
         className="relative border-b pt-20 pb-16 overflow-hidden"
-        style={{ borderColor: 'rgba(255,255,255,0.06)' }}
+        style={{ borderColor: 'rgba(255,255,255,0.10)' }}
       >
         <div
           className="absolute top-0 left-1/2 -translate-x-1/2 pointer-events-none"
@@ -120,7 +120,7 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
             Marketplace
           </motion.h1>
           <motion.p
-            className="text-foreground/40 text-lg max-w-xl mx-auto leading-relaxed font-light"
+            className="text-[#DDE1E6] text-lg max-w-xl mx-auto leading-relaxed font-light"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
@@ -161,9 +161,9 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
         {/* Controls row */}
         <div
           className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4 pb-5 border-b"
-          style={{ borderColor: 'rgba(255,255,255,0.06)' }}
+          style={{ borderColor: 'rgba(255,255,255,0.10)' }}
         >
-          <p className="text-foreground/35 text-sm font-satoshi">
+          <p className="text-[#ADB5BD] text-sm font-satoshi">
             Showing{' '}
             <span className="text-foreground font-medium">{displayedItems.length}</span>{' '}
             {activeTab.toLowerCase()}
@@ -277,9 +277,9 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
                             key={tag}
                             className="text-[10px] font-satoshi font-medium px-2 py-0.5 tracking-widest uppercase border"
                             style={{
-                              borderColor: 'rgba(255,255,255,0.08)',
-                              color: 'rgba(248,249,250,0.35)',
-                              background: 'rgba(255,255,255,0.03)',
+                              borderColor: 'rgba(255,255,255,0.10)',
+                              color: 'rgba(248,249,250,0.65)',
+                              background: 'rgba(255,255,255,0.04)',
                             }}
                           >
                             {tag}
@@ -292,14 +292,14 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
                         <UserIcon size={10} />
                         <span>by <span style={{ color: 'rgba(248,249,250,0.55)' }}>{item.developer_name}</span></span>
                       </div>
-                      <p className="text-foreground/38 text-sm mb-4 line-clamp-2 flex-grow leading-relaxed">
+                      <p className="text-[#ADB5BD] text-sm mb-4 line-clamp-2 flex-grow leading-relaxed">
                         {item.short_description}
                       </p>
 
                       {/* Stats */}
                       <div
                         className="flex justify-between items-center text-xs pt-3 mb-4 border-t"
-                        style={{ borderColor: 'rgba(255,255,255,0.06)', color: 'rgba(248,249,250,0.28)' }}
+                        style={{ borderColor: 'rgba(255,255,255,0.10)', color: 'rgba(248,249,250,0.65)' }}
                       >
                         <div className="flex items-center gap-1.5">
                           <TrendingUp size={11} /> <span>{item.views} views</span>
@@ -332,7 +332,7 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
                         ) : (
                           <div
                             className="flex-1 py-2.5 text-center text-[10px] font-satoshi tracking-widest uppercase border"
-                            style={{ borderColor: 'rgba(255,255,255,0.07)', color: 'rgba(248,249,250,0.2)' }}
+                            style={{ borderColor: 'rgba(255,255,255,0.10)', color: 'rgba(248,249,250,0.65)' }}
                           >
                             Admin Mode
                           </div>

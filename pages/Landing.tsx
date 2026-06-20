@@ -196,14 +196,14 @@ const Landing: React.FC = () => {
             >
               {heroHeadingLines.main}
               <br />
-              <span style={{ color: 'rgba(248,249,250,0.2)' }}>
+              <span className="text-[#AAB7C4]">
                 {heroHeadingLines.accent}
               </span>
             </motion.h1>
 
             {/* Subheading */}
             <motion.p
-              className="text-foreground/45 text-lg md:text-xl max-w-lg mb-14 leading-relaxed font-light"
+              className="text-[#DDE1E6] text-lg md:text-xl max-w-lg mb-14 leading-relaxed font-light"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.25, ease: [0.4, 0, 0.2, 1] }}
@@ -255,7 +255,7 @@ const Landing: React.FC = () => {
       ═══════════════════════════════════════════════ */}
       <section
         className="border-y py-10 md:py-12"
-        style={{ borderColor: 'rgba(255,255,255,0.06)', background: 'rgba(44,49,55,0.25)' }}
+        style={{ borderColor: 'rgba(255,255,255,0.10)', background: '#2A2F35' }}
       >
         <div className="container-vb">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-4">
@@ -312,7 +312,7 @@ const Landing: React.FC = () => {
                 <h3 className="text-display-sm font-display font-bold text-foreground mb-4">
                   {SERVICES[0].title}
                 </h3>
-                <p className="text-foreground/45 leading-relaxed max-w-md">
+                <p className="text-[#DDE1E6] leading-relaxed max-w-md">
                   {SERVICES[0].desc}
                 </p>
                 <Link
@@ -337,7 +337,7 @@ const Landing: React.FC = () => {
                 <h3 className="font-display font-bold text-foreground text-xl mb-3">
                   {SERVICES[1].title}
                 </h3>
-                <p className="text-foreground/40 text-sm leading-relaxed">
+                <p className="text-[#DDE1E6] text-sm leading-relaxed">
                   {SERVICES[1].desc}
                 </p>
               </div>
@@ -353,7 +353,7 @@ const Landing: React.FC = () => {
                   <h3 className="font-display font-semibold text-foreground mb-2">
                     {svc.title}
                   </h3>
-                  <p className="text-foreground/38 text-sm leading-relaxed">
+                  <p className="text-[#ADB5BD] text-sm leading-relaxed">
                     {svc.desc}
                   </p>
                 </div>
@@ -368,7 +368,7 @@ const Landing: React.FC = () => {
       ═══════════════════════════════════════════════ */}
       <section
         className="section-y-sm border-y"
-        style={{ borderColor: 'rgba(255,255,255,0.06)', background: 'rgba(33,37,41,0.5)' }}
+        style={{ borderColor: 'rgba(255,255,255,0.10)', background: '#2A2F35' }}
       >
         <div className="container-vb mb-12">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
@@ -456,7 +456,7 @@ const Landing: React.FC = () => {
                   <h3 className="font-display font-semibold text-foreground mb-2 text-sm">
                     {step.title}
                   </h3>
-                  <p className="text-foreground/35 text-xs leading-relaxed">
+                  <p className="text-[#ADB5BD] text-xs leading-relaxed">
                     {step.desc}
                   </p>
                 </div>
@@ -471,7 +471,7 @@ const Landing: React.FC = () => {
       ═══════════════════════════════════════════════ */}
       <section
         className="section-y-sm border-y"
-        style={{ borderColor: 'rgba(255,255,255,0.05)', background: 'rgba(44,49,55,0.15)' }}
+        style={{ borderColor: 'rgba(255,255,255,0.10)', background: '#2A2F35' }}
       >
         <div className="container-vb mb-8 text-center">
           <p className="text-label">Technology Stack</p>
@@ -505,12 +505,12 @@ const Landing: React.FC = () => {
                         /{sub.interval}
                       </span>
                     </div>
-                    <p className="text-foreground/40 text-sm mb-7 flex-1 leading-relaxed">
+                    <p className="text-[#DDE1E6] text-sm mb-7 flex-1 leading-relaxed">
                       {sub.description}
                     </p>
                     <ul className="space-y-2.5 mb-8">
                       {sub.features.slice(0, 5).map((f: string, fi: number) => (
-                        <li key={fi} className="flex items-start gap-2.5 text-xs text-foreground/50">
+                        <li key={fi} className="flex items-start gap-2.5 text-xs text-[#ADB5BD]">
                           <CheckCircle
                             size={12}
                             className="shrink-0 mt-0.5"
@@ -534,7 +534,7 @@ const Landing: React.FC = () => {
       {/* ═══════════════════════════════════════════════
           CTA SECTION — immersive, massive typography
       ═══════════════════════════════════════════════ */}
-      <section className="relative section-y overflow-hidden">
+      <section className="relative section-y overflow-hidden border-t" style={{ borderColor: 'rgba(255,255,255,0.10)', background: '#2A2F35' }}>
         {/* Atmospheric glow */}
         <div
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
@@ -560,10 +560,10 @@ const Landing: React.FC = () => {
             >
               Let&apos;s Build Something
               <br />
-              <span style={{ color: 'rgba(248,249,250,0.18)' }}>Extraordinary.</span>
+              <span className="text-[#AAB7C4]">Extraordinary.</span>
             </h2>
             <p
-              className="text-foreground/38 text-lg mb-14 max-w-xl mx-auto leading-relaxed font-light"
+              className="text-[#DDE1E6] text-lg mb-14 max-w-xl mx-auto leading-relaxed font-light"
             >
               Partner with Vision Built to create digital experiences that define your category and outlast trends.
             </p>

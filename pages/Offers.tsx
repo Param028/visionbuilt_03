@@ -87,12 +87,13 @@ const Offers: React.FC<{ user: User | null }> = ({ user }) => {
           )}
 
           {/* Icon */}
+          {/* Icon */}
           <div
             className="mt-4 mb-6 p-4 border"
             style={{
-              borderColor: isExpired ? 'rgba(255,255,255,0.06)' : 'rgba(124,143,161,0.25)',
-              background: isExpired ? 'rgba(255,255,255,0.02)' : 'rgba(124,143,161,0.05)',
-              color: isExpired ? 'rgba(248,249,250,0.2)' : 'var(--vb-accent)',
+              borderColor: isExpired ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.10)',
+              background: isExpired ? 'rgba(255,255,255,0.02)' : 'rgba(255,255,255,0.04)',
+              color: isExpired ? 'rgba(248,249,250,0.2)' : '#AAB7C4',
             }}
           >
             <Sparkles size={28} />
@@ -100,7 +101,7 @@ const Offers: React.FC<{ user: User | null }> = ({ user }) => {
 
           {/* Title + Description */}
           <h3 className="font-display font-bold text-foreground text-xl mb-2">{offer.title}</h3>
-          <p className="text-foreground/45 text-sm leading-relaxed mb-5 line-clamp-2">
+          <p className="text-[#ADB5BD] text-sm leading-relaxed mb-5 line-clamp-2">
             {offer.description}
           </p>
 
@@ -108,7 +109,7 @@ const Offers: React.FC<{ user: User | null }> = ({ user }) => {
           <div
             className="w-full flex items-center justify-between px-4 py-3 border mb-3"
             style={{
-              borderColor: isExpired ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.1)',
+              borderColor: isExpired ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.10)',
               background: isExpired ? 'rgba(255,255,255,0.02)' : 'rgba(255,255,255,0.04)',
             }}
           >
@@ -122,7 +123,7 @@ const Offers: React.FC<{ user: User | null }> = ({ user }) => {
               onClick={(e) => { e.stopPropagation(); if (!isExpired) handleCopy(offer.code, offer.id); }}
               className="transition-colors"
               disabled={isExpired}
-              style={{ color: isExpired ? 'rgba(248,249,250,0.2)' : 'rgba(124,143,161,0.7)' }}
+              style={{ color: isExpired ? 'rgba(248,249,250,0.2)' : 'rgba(255,255,255,0.4)' }}
               aria-label={`Copy code ${offer.code}`}
             >
               <AnimatePresence mode="wait">
@@ -178,7 +179,7 @@ const Offers: React.FC<{ user: User | null }> = ({ user }) => {
       {/* ── PAGE HEADER ── */}
       <div
         className="relative border-b pt-20 pb-16 overflow-hidden"
-        style={{ borderColor: 'rgba(255,255,255,0.06)' }}
+        style={{ borderColor: 'rgba(255,255,255,0.10)' }}
       >
         <div
           className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[280px] pointer-events-none"
@@ -205,7 +206,7 @@ const Offers: React.FC<{ user: User | null }> = ({ user }) => {
             Exclusive Offers
           </motion.h1>
           <motion.p
-            className="text-foreground/40 text-lg max-w-xl mx-auto leading-relaxed font-light"
+            className="text-[#DDE1E6] text-lg max-w-xl mx-auto leading-relaxed font-light"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}

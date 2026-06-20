@@ -220,8 +220,8 @@ export const Carousel: React.FC<{ items: CarouselItem[] }> = ({ items }) => {
                   damping: 20,
                 }}
                 className={cn(
-                  "absolute w-[300px] md:w-[400px] h-[300px] bg-black/40 border border-white/10 backdrop-blur-xl rounded-2xl p-6 flex flex-col items-center justify-center shadow-2xl cursor-pointer",
-                  isActive ? "border-vision-primary/50 shadow-[0_0_30px_rgba(6,182,212,0.2)]" : "hover:bg-white/5",
+                  "absolute w-[300px] md:w-[400px] h-[300px] bg-white/[0.06] border border-white/10 backdrop-blur-xl rounded-2xl p-6 flex flex-col items-center justify-center shadow-2xl cursor-pointer",
+                  isActive ? "border-white/20 shadow-[0_0_30px_rgba(255,255,255,0.06)]" : "hover:bg-white/[0.08]",
                   item.className
                 )}
                 onClick={() => {
@@ -256,7 +256,7 @@ export const Carousel: React.FC<{ items: CarouselItem[] }> = ({ items }) => {
               onClick={() => setActive(i)}
               className={cn(
                   "w-2 h-2 rounded-full transition-all duration-300", 
-                  i === active ? "bg-vision-primary w-6" : "bg-gray-600 hover:bg-gray-400"
+                  i === active ? "bg-white w-6" : "bg-white/20 hover:bg-white/40"
               )}
             />
          ))}
@@ -331,7 +331,7 @@ interface ProjectLoopItem {
 export const ProjectLoop: React.FC<{ items: ProjectLoopItem[] }> = ({ items }) => {
    if (items.length <= 4) {
        return (
-        <div className="py-10 bg-black/20 flex flex-wrap justify-center gap-6 px-4">
+        <div className="py-10 flex flex-wrap justify-center gap-6 px-4">
            {items.map((item, idx) => (
              <Link key={`${item.id}-${idx}`} to={item.url || '#'} className="group">
                 <div className="w-[280px] h-[160px] md:w-[400px] md:h-[225px] overflow-hidden relative glass-panel group-hover:border-white/20 transition-all duration-300">
@@ -347,7 +347,7 @@ export const ProjectLoop: React.FC<{ items: ProjectLoopItem[] }> = ({ items }) =
    }
 
    return (
-    <div className="relative w-full overflow-hidden py-10 bg-black/20">
+    <div className="relative w-full overflow-hidden py-10">
       <div className="absolute left-0 top-0 bottom-0 w-32 z-10 bg-gradient-to-r from-background to-transparent pointer-events-none" />
       <div className="absolute right-0 top-0 bottom-0 w-32 z-10 bg-gradient-to-l from-background to-transparent pointer-events-none" />
       
@@ -404,7 +404,7 @@ export const GlareCard: React.FC<{ children: React.ReactNode; className?: string
   // Disable expensive tilt on mobile
   if (isMobile) {
     return (
-      <div className={cn("rounded-xl border border-white/10 bg-black/40 shadow-xl overflow-hidden", className)}>
+      <div className={cn("rounded-xl border border-white/10 bg-white/[0.06] shadow-xl backdrop-blur-md overflow-hidden", className)}>
         {children}
       </div>
     );
@@ -443,7 +443,7 @@ export const GlareCard: React.FC<{ children: React.ReactNode; className?: string
             animate={{ rotateX: rotate.x, rotateY: rotate.y }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
         >
-            <div className="w-full h-full overflow-hidden rounded-xl border border-white/10 bg-black/40 shadow-xl backdrop-blur-sm">
+            <div className="w-full h-full overflow-hidden rounded-xl border border-white/10 bg-white/[0.06] shadow-xl backdrop-blur-md">
                  {children}
             </div>
             <div 

@@ -23,12 +23,14 @@ export default {
         // Extended VisionBuilt palette (accessible as vb-* classes)
         'vb': {
           bg:      '#212529',
-          bg2:     '#343A40',
-          surface: '#495057',
+          bgalt:   '#2A2F35',
+          surface: 'rgba(255, 255, 255, 0.04)',
+          glass:   'rgba(255, 255, 255, 0.06)',
+          border:  'rgba(255, 255, 255, 0.10)',
           text:    '#F8F9FA',
-          text2:   '#CED4DA',
+          text2:   '#DDE1E6',
           muted:   '#ADB5BD',
-          accent:  '#7C8FA1',
+          accent:  '#AAB7C4',
         },
       },
       animation: {
@@ -76,25 +78,25 @@ export default {
             foreground:  '#F8F9FA',
 
             // Elevated surfaces (cards, inputs, code blocks)
-            content1:    '#2C3137',
-            content2:    '#343A40',
-            content3:    '#3D444A',
-            content4:    '#495057',
+            content1:    '#2A2F35',
+            content2:    'rgba(255, 255, 255, 0.04)',
+            content3:    'rgba(255, 255, 255, 0.06)',
+            content4:    'rgba(255, 255, 255, 0.08)',
 
             // Primary action color = accent
             primary: {
-              DEFAULT:    '#7C8FA1',
+              DEFAULT:    '#AAB7C4',
               foreground: '#F8F9FA',
               50:  '#F0F3F6',
               100: '#D5DDE3',
               200: '#B0BFCB',
               300: '#8AA0B2',
-              400: '#7C8FA1',
-              500: '#6E8090',
-              600: '#5A6A78',
-              700: '#465460',
-              800: '#323D47',
-              900: '#1E272F',
+              400: '#AAB7C4',
+              500: '#94A3B0',
+              600: '#7E8F9C',
+              700: '#687B88',
+              800: '#526774',
+              900: '#3C5360',
             },
 
             secondary: {
