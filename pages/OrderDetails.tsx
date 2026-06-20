@@ -247,7 +247,7 @@ const OrderDetails: React.FC<{ user: User }> = ({ user }) => {
                     <span>{formatPrice(depositAmount, user.country)}</span>
                   </div>
                 )}
-                <div className="flex justify-between items-center text-sm font-semibold text-foreground pt-3 border-t border-black/10">
+                <div className="flex justify-between items-center text-sm font-semibold text-foreground pt-3 border-t border-white/10">
                   <span>Paid Balance</span>
                   <span className="text-emerald-400 font-mono">{formatPrice(amountPaid, user.country)}</span>
                 </div>
@@ -255,9 +255,9 @@ const OrderDetails: React.FC<{ user: User }> = ({ user }) => {
 
               {/* Payment Actions */}
               {user.role === 'client' && (
-                <div className="pt-5 border-t border-black/10">
+                <div className="pt-5 border-t border-white/10">
                   {isPendingQuote && (
-                    <div className="bg-[#EEF1F4] border border-black/10 p-4 rounded-lg text-center space-y-2">
+                    <div className="bg-white/4 border border-white/10 p-4 rounded-lg text-center space-y-2">
                       <Clock className="w-6 h-6 text-foreground/30 mx-auto" />
                       <p className="text-[10px] text-foreground/75 font-display font-semibold uppercase tracking-widest">
                         Quote Under Review
@@ -315,7 +315,7 @@ const OrderDetails: React.FC<{ user: User }> = ({ user }) => {
                 </h3>
                 <div className="space-y-2 max-h-[180px] overflow-y-auto pr-1 custom-scrollbar">
                   {payments.map((payment) => (
-                    <div key={payment.id} className="flex justify-between items-center p-3 rounded bg-[#EEF1F4] border border-black/10 text-xs font-satoshi">
+                    <div key={payment.id} className="flex justify-between items-center p-3 rounded-lg bg-white/4 border border-white/10 text-xs font-satoshi">
                       <div>
                         <div className="text-foreground/80 font-bold">{formatPrice(payment.amount, user.country)}</div>
                         <div className="text-[10px] text-foreground/40 mt-0.5">{new Date(payment.date).toLocaleDateString()}</div>
@@ -396,9 +396,9 @@ const OrderDetails: React.FC<{ user: User }> = ({ user }) => {
             <div className="glass-card flex flex-col h-[650px] relative overflow-hidden">
               
               {/* Chat Header */}
-              <div className="p-4 border-b border-black/10 bg-[#EEF1F4] flex justify-between items-center z-10">
+              <div className="p-4 border-b border-white/10 bg-white/4 flex justify-between items-center z-10">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-white/70 border border-black/10 flex items-center justify-center text-[var(--vb-accent)]">
+                  <div className="w-10 h-10 rounded-full bg-white/10 border border-white/10 flex items-center justify-center text-[var(--vb-accent)]">
                     <MessageSquarePlus size={18} />
                   </div>
                   <div>
@@ -414,7 +414,7 @@ const OrderDetails: React.FC<{ user: User }> = ({ user }) => {
               </div>
 
               {/* Chat Area */}
-              <div className="flex-grow overflow-y-auto p-6 space-y-5 bg-[#EEF1F4]/40" ref={scrollRef}>
+              <div className="flex-grow overflow-y-auto p-6 space-y-5 bg-white/[0.02]" ref={scrollRef}>
                 {messages.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full text-foreground/30 space-y-2.5">
                     <MessageSquarePlus size={36} className="text-black/10" />
@@ -480,8 +480,8 @@ const OrderDetails: React.FC<{ user: User }> = ({ user }) => {
 
               {/* Upload Previews */}
               {filePreview && (
-                  <div className="p-4 bg-[#EEF1F4] border-t border-black/10 flex items-center gap-4">
-                      <div className="relative w-12 h-12 rounded overflow-hidden border border-black/10">
+                  <div className="p-4 bg-white/6 border-t border-white/10 flex items-center gap-4">
+                      <div className="relative w-12 h-12 rounded overflow-hidden border border-white/10">
                           <img src={filePreview} className="w-full h-full object-cover" alt="Preview" />
                           <button onClick={removeFile} className="absolute top-0 right-0 p-0.5 bg-black/60 text-white/70 hover:text-red-400">
                               <X size={10} />
@@ -495,7 +495,7 @@ const OrderDetails: React.FC<{ user: User }> = ({ user }) => {
               )}
 
               {/* Input Control Area */}
-              <div className="p-4 border-t border-black/10 bg-[#EEF1F4] z-10">
+              <div className="p-4 border-t border-white/10 bg-white/4 z-10">
                 <form onSubmit={handleSendMessage} className="flex gap-3">
                    <input 
                       type="file" 

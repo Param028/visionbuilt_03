@@ -147,7 +147,7 @@ const PrivacyPolicy: React.FC = () => {
                 <div
                   key={item.label}
                   className="p-4 border"
-                  style={{ borderColor: 'rgba(0,0,0,0.08)', background: '#EEF1F4' }}
+                  style={{ borderColor: 'rgba(255, 255, 255, 0.08)', background: 'rgba(255, 255, 255, 0.04)' }}
                 >
                   <p className="text-label mb-1.5">{item.label}</p>
                   <p className="text-foreground/70 font-satoshi text-sm">{item.value}</p>

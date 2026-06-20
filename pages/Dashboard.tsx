@@ -156,7 +156,7 @@ const Dashboard: React.FC<{ user: User }> = ({ user }) => {
               {/* View mode toggle */}
               <div
                 className="flex border p-0.5"
-                style={{ borderColor: 'rgba(0,0,0,0.08)', background: '#EEF1F4' }}
+                style={{ borderColor: 'rgba(255,255,255,0.08)', background: 'var(--vb-bg-alt)' }}
               >
                 {(['orders', 'wishlist'] as const).map((mode) => (
                   <button
@@ -164,8 +164,8 @@ const Dashboard: React.FC<{ user: User }> = ({ user }) => {
                     onClick={() => setViewMode(mode)}
                     className="flex items-center gap-2 px-4 py-2 text-xs font-satoshi tracking-widest uppercase transition-all"
                     style={{
-                      color: viewMode === mode ? '#111418' : 'rgba(17,20,24,0.48)',
-                      background: viewMode === mode ? 'rgba(255,255,255,0.72)' : 'transparent',
+                      color: viewMode === mode ? '#FFFFFF' : 'rgba(255,255,255,0.58)',
+                      background: viewMode === mode ? 'rgba(255,255,255,0.12)' : 'transparent',
                     }}
                   >
                     {mode === 'orders' ? <Filter size={12} /> : <Lightbulb size={12} />}
@@ -213,9 +213,9 @@ const Dashboard: React.FC<{ user: User }> = ({ user }) => {
                       id={`filter-${f}`}
                       className="px-4 py-1.5 text-[10px] font-satoshi font-medium uppercase tracking-widest transition-all whitespace-nowrap border"
                       style={{
-                        borderColor: filter === f ? 'rgba(0,0,0,0.15)' : 'rgba(0,0,0,0.08)',
-                        color:       filter === f ? '#111418' : 'rgba(17,20,24,0.48)',
-                        background:  filter === f ? 'rgba(255,255,255,0.72)' : 'transparent',
+                        borderColor: filter === f ? 'rgba(255,255,255,0.24)' : 'rgba(255,255,255,0.08)',
+                        color:       filter === f ? '#FFFFFF' : 'rgba(255,255,255,0.58)',
+                        background:  filter === f ? 'rgba(255,255,255,0.12)' : 'transparent',
                       }}
                     >
                       {f}
@@ -235,7 +235,7 @@ const Dashboard: React.FC<{ user: User }> = ({ user }) => {
                 <div className="glass-card text-center py-20 px-8">
                   <div
                     className="w-14 h-14 mx-auto mb-7 flex items-center justify-center border"
-                    style={{ borderColor: 'rgba(0,0,0,0.08)', background: '#EEF1F4' }}
+                    style={{ borderColor: 'rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.06)' }}
                   >
                     <Clock size={22} style={{ color: 'var(--vb-muted)' }} />
                   </div>

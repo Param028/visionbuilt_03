@@ -182,7 +182,7 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
         <div className="glass-card p-8 md:p-12 space-y-8">
           
           {/* Header Area */}
-          <div className="flex flex-col sm:flex-row justify-between items-start gap-4 pb-6 border-b border-black/10">
+          <div className="flex flex-col sm:flex-row justify-between items-start gap-4 pb-6 border-b border-white/10">
               <div>
                   <h1 className="text-2xl sm:text-3xl font-display font-bold text-foreground">
                       {isCustom ? <span>Request Custom Build</span> : <>New Request: <span className="text-foreground/80">{service?.title}</span></>}
@@ -192,7 +192,7 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
                   </p>
               </div>
               
-              <div className="flex items-center space-x-2 bg-[#EEF1F4] hover:bg-white/50 px-3.5 py-1.5 rounded-lg border border-black/10 transition-colors">
+              <div className="flex items-center space-x-2 bg-white/6 hover:bg-white/12 px-3.5 py-1.5 rounded-lg border border-white/10 transition-colors">
                   <Globe size={14} className="text-foreground/40" />
                   <select 
                     value={country} 
@@ -211,7 +211,7 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
           <form onSubmit={handleSubmit} className="space-y-6">
             {step === 1 ? (
                <>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 p-6 bg-[#EEF1F4] rounded-xl border border-black/10">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 p-6 bg-white/4 rounded-xl border border-white/10">
                       <div className="col-span-full mb-2">
                           <h4 className="text-[10px] font-display font-semibold text-foreground/80 uppercase tracking-widest flex items-center gap-2">
                               <UserIcon size={12} className="text-[var(--vb-accent)]" /> Contact & Client Details
@@ -373,7 +373,7 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
                            )}
                        </div>
 
-                       <div className="border-t border-black/10 pt-5 flex justify-between text-xl font-display font-semibold text-foreground items-center">
+                       <div className="border-t border-white/10 pt-5 flex justify-between text-xl font-display font-semibold text-foreground items-center">
                            <span className="text-xs uppercase tracking-widest text-[#6C757D] font-satoshi">
                               Estimated Budget
                            </span>
@@ -386,7 +386,7 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
                        </p>
                    </div>
 
-                   <div className="flex items-start gap-4.5 max-w-lg mx-auto mb-8 p-4 border border-black/10 bg-[#EEF1F4] rounded-xl text-left">
+                   <div className="flex items-start gap-4.5 max-w-lg mx-auto mb-8 p-4 border border-white/10 bg-white/4 rounded-xl text-left">
                       <ShieldCheck className="text-emerald-400 shrink-0 mt-0.5" size={18} />
                       <div className="space-y-1">
                           <h4 className="text-xs font-display font-semibold text-foreground uppercase tracking-widest">

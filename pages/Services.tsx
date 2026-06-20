@@ -349,7 +349,7 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
         {/* ── CTA STRIP ── */}
         <div
           className="mt-24 glass-card p-10 md:p-14 text-center border"
-          style={{ borderColor: 'rgba(0,0,0,0.08)', background: '#EEF1F4' }}
+          style={{ borderColor: 'rgba(255, 255, 255, 0.08)' }}
         >
           <p className="text-label mb-5">Need Something Custom?</p>
           <h2 className="text-display-sm font-display font-bold text-foreground mb-5">

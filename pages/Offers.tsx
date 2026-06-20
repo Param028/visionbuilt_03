@@ -107,15 +107,15 @@ const Offers: React.FC<{ user: User | null }> = ({ user }) => {
 
           {/* Coupon code */}
           <div
-            className="w-full flex items-center justify-between px-4 py-3 border mb-3"
+            className="w-full flex items-center justify-between px-4 py-3 border mb-3 rounded-lg"
             style={{
-              borderColor: isExpired ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.08)',
-              background: isExpired ? 'rgba(0,0,0,0.02)' : '#EEF1F4',
+              borderColor: isExpired ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.08)',
+              background: isExpired ? 'rgba(255,255,255,0.02)' : 'rgba(255,255,255,0.05)',
             }}
           >
             <code
               className="font-mono text-base font-bold tracking-[0.15em]"
-              style={{ color: isExpired ? 'rgba(17,20,24,0.25)' : '#111418' }}
+              style={{ color: isExpired ? 'rgba(255,255,255,0.25)' : '#FFFFFF' }}
             >
               {offer.code}
             </code>
@@ -123,7 +123,7 @@ const Offers: React.FC<{ user: User | null }> = ({ user }) => {
               onClick={(e) => { e.stopPropagation(); if (!isExpired) handleCopy(offer.code, offer.id); }}
               className="transition-colors"
               disabled={isExpired}
-              style={{ color: isExpired ? 'rgba(17,20,24,0.2)' : '#7C8FA1' }}
+              style={{ color: isExpired ? 'rgba(255,255,255,0.2)' : 'var(--vb-accent)' }}
               aria-label={`Copy code ${offer.code}`}
             >
               <AnimatePresence mode="wait">
@@ -236,8 +236,8 @@ const Offers: React.FC<{ user: User | null }> = ({ user }) => {
           <div className="container-vb">
             <div className="glass-card flex flex-col items-center justify-center text-center p-16 max-w-md mx-auto">
               <div
-                className="mb-6 p-5 border"
-                style={{ borderColor: 'rgba(0,0,0,0.08)', background: '#EEF1F4' }}
+                className="mb-6 p-5 border rounded-lg"
+                style={{ borderColor: 'rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)' }}
               >
                 <Tag size={28} style={{ color: 'var(--vb-muted)' }} />
               </div>

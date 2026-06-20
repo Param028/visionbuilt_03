@@ -244,7 +244,7 @@ const Landing: React.FC = () => {
           <div
             className="w-px h-14 mx-auto"
             style={{
-              background: 'linear-gradient(to bottom, transparent, rgba(0,0,0,0.08), transparent)',
+              background: 'linear-gradient(to bottom, transparent, rgba(255,255,255,0.08), transparent)',
             }}
           />
         </motion.div>
@@ -255,7 +255,7 @@ const Landing: React.FC = () => {
       ═══════════════════════════════════════════════ */}
       <section
         className="border-y py-10 md:py-12"
-        style={{ borderColor: 'rgba(0,0,0,0.08)', background: '#EEF1F4' }}
+        style={{ borderColor: 'rgba(255,255,255,0.08)', background: 'var(--vb-bg-alt)' }}
       >
         <div className="container-vb">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-4">
@@ -368,7 +368,7 @@ const Landing: React.FC = () => {
       ═══════════════════════════════════════════════ */}
       <section
         className="section-y-sm border-y"
-        style={{ borderColor: 'rgba(0,0,0,0.08)', background: '#EEF1F4' }}
+        style={{ borderColor: 'rgba(255,255,255,0.08)', background: 'var(--vb-bg-alt)' }}
       >
         <div className="container-vb mb-12">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
@@ -388,11 +388,11 @@ const Landing: React.FC = () => {
                     className="text-[0.65rem] font-satoshi font-medium tracking-widest uppercase px-4 py-2 border transition-all duration-300"
                     style={{
                       borderColor:
-                        activeTab === tab ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.08)',
+                        activeTab === tab ? 'rgba(255,255,255,0.24)' : 'rgba(255,255,255,0.1)',
                       color:
-                        activeTab === tab ? '#111418' : 'rgba(17,20,24,0.48)',
+                        activeTab === tab ? '#FFFFFF' : 'rgba(255,255,255,0.58)',
                       background:
-                        activeTab === tab ? 'rgba(0,0,0,0.04)' : 'transparent',
+                        activeTab === tab ? 'rgba(255,255,255,0.08)' : 'transparent',
                     }}
                   >
                     {tab}
@@ -438,7 +438,7 @@ const Landing: React.FC = () => {
                   {i < PROCESS.length - 1 && (
                     <div
                       className="hidden lg:block absolute top-3 left-full w-full h-px"
-                      style={{ background: 'rgba(0,0,0,0.08)' }}
+                      style={{ background: 'rgba(255,255,255,0.08)' }}
                       aria-hidden="true"
                     />
                   )}
@@ -451,7 +451,7 @@ const Landing: React.FC = () => {
                   </p>
                   <div
                     className="w-6 h-px mb-4"
-                    style={{ background: 'rgba(0,0,0,0.08)' }}
+                    style={{ background: 'rgba(255,255,255,0.08)' }}
                   />
                   <h3 className="font-display font-semibold text-foreground mb-2 text-sm">
                     {step.title}
@@ -471,7 +471,7 @@ const Landing: React.FC = () => {
       ═══════════════════════════════════════════════ */}
       <section
         className="section-y-sm border-y"
-        style={{ borderColor: 'rgba(0,0,0,0.08)', background: '#EEF1F4' }}
+        style={{ borderColor: 'rgba(255,255,255,0.08)', background: 'var(--vb-bg-alt)' }}
       >
         <div className="container-vb mb-8 text-center">
           <p className="text-label">Technology Stack</p>
@@ -483,7 +483,7 @@ const Landing: React.FC = () => {
           SUBSCRIPTION PLANS (conditional)
       ═══════════════════════════════════════════════ */}
       {subscriptions.length > 0 && (
-        <section className="section-y border-b" style={{ borderColor: 'rgba(0,0,0,0.08)' }}>
+        <section className="section-y border-b" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
           <div className="container-vb">
             <FadeUp className="mb-14 md:mb-20">
               <p className="text-label mb-4">Recurring Value</p>
@@ -534,7 +534,7 @@ const Landing: React.FC = () => {
       {/* ═══════════════════════════════════════════════
           CTA SECTION — immersive, massive typography
       ═══════════════════════════════════════════════ */}
-      <section className="relative section-y overflow-hidden border-t" style={{ borderColor: 'rgba(0,0,0,0.08)', background: '#EEF1F4' }}>
+      <section className="relative section-y overflow-hidden border-t" style={{ borderColor: 'rgba(255,255,255,0.08)', background: 'var(--vb-bg-alt)' }}>
         {/* Atmospheric glow */}
         <div
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"

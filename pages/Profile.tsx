@@ -190,8 +190,8 @@ const Profile: React.FC<{ user: User; setUser: (u: User) => void }> = ({ user, s
                     <div
                       className="flex items-center gap-2 px-3 h-11 border text-sm"
                       style={{
-                        borderColor: 'rgba(0,0,0,0.08)',
-                        background: '#EEF1F4',
+                        borderColor: 'rgba(255,255,255,0.08)',
+                        background: 'rgba(255,255,255,0.04)',
                         color: 'var(--vb-muted)',
                       }}
                     >

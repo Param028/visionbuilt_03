@@ -219,7 +219,7 @@ const ProjectCheckout: React.FC<{ user: User }> = ({ user }) => {
             </div>
 
             {/* Main Preview Image */}
-            <div className="relative rounded-xl overflow-hidden border border-black/10 bg-[#EEF1F4] aspect-video group shadow-2xl">
+            <div className="relative rounded-xl overflow-hidden border border-white/10 bg-white/4 aspect-video group shadow-2xl">
               {selectedImage ? (
                 <img 
                   src={selectedImage} 
@@ -256,7 +256,7 @@ const ProjectCheckout: React.FC<{ user: User }> = ({ user }) => {
             {item.demo_url && (
               <button 
                 onClick={() => window.open(item.demo_url, '_blank')}
-                className="w-full flex items-center justify-center gap-2 py-4 border border-black/10 bg-white/50 hover:bg-white/80 text-foreground/80 hover:text-foreground font-satoshi text-sm transition-all"
+                className="w-full flex items-center justify-center gap-2 py-4 border border-white/10 bg-white/6 hover:bg-white/12 text-white/80 hover:text-white font-satoshi text-sm transition-all rounded-lg"
               >
                 <Eye size={16} />
                 <span>Open Live Project Demo</span>
@@ -264,7 +264,7 @@ const ProjectCheckout: React.FC<{ user: User }> = ({ user }) => {
             )}
 
             {/* Detailed Description */}
-            <div className="border-t border-black/10 pt-8 space-y-4">
+            <div className="border-t border-white/10 pt-8 space-y-4">
               <h3 className="font-display font-semibold text-foreground text-lg">Project Details</h3>
               <p className="text-foreground/60 leading-relaxed text-sm font-satoshi">
                 {item.full_description}
@@ -287,7 +287,7 @@ const ProjectCheckout: React.FC<{ user: User }> = ({ user }) => {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div 
                   className="p-5 border space-y-4"
-                  style={{ borderColor: 'rgba(0,0,0,0.08)', background: '#EEF1F4' }}
+                  style={{ borderColor: 'rgba(255, 255, 255, 0.08)', background: 'rgba(255, 255, 255, 0.04)' }}
                 >
                   <div className="flex justify-between items-center text-sm font-satoshi text-foreground/80">
                     <span>Standard Developer License</span>

@@ -137,7 +137,7 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
         <div className="flex justify-center mb-8">
           <div
             className="flex gap-1 p-1 border"
-            style={{ borderColor: 'rgba(0,0,0,0.08)', background: '#EEF1F4' }}
+            style={{ borderColor: 'rgba(255, 255, 255, 0.08)', background: 'var(--vb-bg-alt)' }}
           >
             {(availableTabs.length > 0 ? availableTabs : TABS.slice(0, 3)).map((tab) => (
               <button
@@ -146,9 +146,8 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
                 onClick={() => setActiveTab(tab.key)}
                 className="flex items-center gap-2 px-5 py-2 text-xs font-satoshi tracking-widest uppercase transition-all duration-300"
                 style={{
-                  color:   activeTab === tab.key ? '#111418' : 'rgba(17,20,24,0.48)',
-                  background: activeTab === tab.key ? 'rgba(255,255,255,0.72)' : 'transparent',
-                  borderBottom: activeTab === tab.key ? '1px solid rgba(0,0,0,0.15)' : '1px solid transparent',
+                  color:   activeTab === tab.key ? '#FFFFFF' : 'rgba(255,255,255,0.58)',
+                  background: activeTab === tab.key ? 'rgba(255,255,255,0.12)' : 'transparent',
                 }}
               >
                 {tab.icon}
@@ -275,11 +274,11 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
                         {item.tags.slice(0, 2).map(tag => (
                           <span
                             key={tag}
-                            className="text-[10px] font-satoshi font-medium px-2 py-0.5 tracking-widest uppercase border"
+                            className="text-[10px] font-satoshi font-medium px-2 py-0.5 tracking-widest uppercase border rounded-full"
                             style={{
-                              borderColor: 'rgba(0,0,0,0.08)',
-                              color: '#6C757D',
-                              background: '#EEF1F4',
+                              borderColor: 'rgba(255,255,255,0.08)',
+                              color: 'rgba(255,255,255,0.58)',
+                              background: 'rgba(255,255,255,0.05)',
                             }}
                           >
                             {tag}
