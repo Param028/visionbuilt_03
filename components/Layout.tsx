@@ -20,11 +20,11 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // ── Light mode: permanently enforced ──────────────────────────
+  // ── Dark mode: permanently enforced ──────────────────────────
   useEffect(() => {
-    document.documentElement.className = 'light';
-    document.documentElement.setAttribute('data-theme', 'light');
-    localStorage.setItem('theme', 'light');
+    document.documentElement.className = 'dark';
+    document.documentElement.setAttribute('data-theme', 'dark');
+    localStorage.setItem('theme', 'dark');
   }, []);
 
   // ── Scroll detection ──────────────────────────────────────────

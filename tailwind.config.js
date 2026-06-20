@@ -73,43 +73,43 @@ export default {
       themes: {
         light: {
           colors: {
-            background:  '#F8F9FA',
-            foreground:  '#111418',
+            background:  '#212529',
+            foreground:  '#FFFFFF',
 
             // Elevated surfaces (cards, inputs, code blocks)
-            content1:    'rgba(33, 37, 41, 0.72)',
-            'content1-foreground': '#F8F9FA',
-            content2:    'rgba(52, 58, 64, 0.68)',
-            'content2-foreground': 'rgba(248, 249, 250, 0.78)',
-            content3:    'rgba(73, 80, 87, 0.78)',
-            'content3-foreground': '#F8F9FA',
-            content4:    'rgba(33, 37, 41, 0.4)',
-            'content4-foreground': 'rgba(248, 249, 250, 0.56)',
+            content1:    'rgba(255, 255, 255, 0.09)',
+            'content1-foreground': '#FFFFFF',
+            content2:    '#2A2F35',
+            'content2-foreground': 'rgba(255, 255, 255, 0.82)',
+            content3:    '#343A40',
+            'content3-foreground': 'rgba(255, 255, 255, 0.82)',
+            content4:    'rgba(255, 255, 255, 0.06)',
+            'content4-foreground': 'rgba(255, 255, 255, 0.58)',
 
             // Primary action color = accent
             primary: {
-              DEFAULT:    '#7C8FA1',
-              foreground: '#FFFFFF',
-              50:  '#F0F3F6',
-              100: '#D5DDE3',
-              200: '#B0BFCB',
-              300: '#8AA0B2',
-              400: '#7C8FA1',
-              500: '#6E8090',
-              600: '#5A6A78',
-              700: '#465460',
-              800: '#323D47',
-              900: '#1E272F',
+              DEFAULT:    '#B8C4D0',
+              foreground: '#212529',
+              50:  '#F5F7F8',
+              100: '#E5EAEF',
+              200: '#D1DAE3',
+              300: '#B8C4D0',
+              400: '#9FAFC0',
+              500: '#8295AB',
+              600: '#677A91',
+              700: '#4E5F72',
+              800: '#364352',
+              900: '#1F2833',
             },
 
             secondary: {
-              DEFAULT:    'rgba(52, 58, 64, 0.68)',
-              foreground: 'rgba(248, 249, 250, 0.78)',
+              DEFAULT:    'rgba(255, 255, 255, 0.10)',
+              foreground: '#FFFFFF',
             },
 
-            // Borders — very subtle
-            divider:    'rgba(255, 255, 255, 0.08)',
-            focus:      '#7C8FA1',
+            // Borders — white glass
+            divider:    'rgba(255, 255, 255, 0.14)',
+            focus:      '#B8C4D0',
 
             // Status colors
             success: {
@@ -128,43 +128,43 @@ export default {
         },
         dark: {
           colors: {
-            background:  '#F8F9FA',
-            foreground:  '#111418',
+            background:  '#212529',
+            foreground:  '#FFFFFF',
 
             // Elevated surfaces (cards, inputs, code blocks)
-            content1:    'rgba(33, 37, 41, 0.72)',
-            'content1-foreground': '#F8F9FA',
-            content2:    'rgba(52, 58, 64, 0.68)',
-            'content2-foreground': 'rgba(248, 249, 250, 0.78)',
-            content3:    'rgba(73, 80, 87, 0.78)',
-            'content3-foreground': '#F8F9FA',
-            content4:    'rgba(33, 37, 41, 0.4)',
-            'content4-foreground': 'rgba(248, 249, 250, 0.56)',
+            content1:    'rgba(255, 255, 255, 0.09)',
+            'content1-foreground': '#FFFFFF',
+            content2:    '#2A2F35',
+            'content2-foreground': 'rgba(255, 255, 255, 0.82)',
+            content3:    '#343A40',
+            'content3-foreground': 'rgba(255, 255, 255, 0.82)',
+            content4:    'rgba(255, 255, 255, 0.06)',
+            'content4-foreground': 'rgba(255, 255, 255, 0.58)',
 
             // Primary action color = accent
             primary: {
-              DEFAULT:    '#7C8FA1',
-              foreground: '#FFFFFF',
-              50:  '#F0F3F6',
-              100: '#D5DDE3',
-              200: '#B0BFCB',
-              300: '#8AA0B2',
-              400: '#7C8FA1',
-              500: '#6E8090',
-              600: '#5A6A78',
-              700: '#465460',
-              800: '#323D47',
-              900: '#1E272F',
+              DEFAULT:    '#B8C4D0',
+              foreground: '#212529',
+              50:  '#F5F7F8',
+              100: '#E5EAEF',
+              200: '#D1DAE3',
+              300: '#B8C4D0',
+              400: '#9FAFC0',
+              500: '#8295AB',
+              600: '#677A91',
+              700: '#4E5F72',
+              800: '#364352',
+              900: '#1F2833',
             },
 
             secondary: {
-              DEFAULT:    'rgba(52, 58, 64, 0.68)',
-              foreground: 'rgba(248, 249, 250, 0.78)',
+              DEFAULT:    'rgba(255, 255, 255, 0.10)',
+              foreground: '#FFFFFF',
             },
 
-            // Borders — very subtle
-            divider:    'rgba(255, 255, 255, 0.08)',
-            focus:      '#7C8FA1',
+            // Borders — white glass
+            divider:    'rgba(255, 255, 255, 0.14)',
+            focus:      '#B8C4D0',
 
             // Status colors
             success: {
