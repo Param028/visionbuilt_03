@@ -197,7 +197,7 @@ const OrderDetails: React.FC<{ user: User }> = ({ user }) => {
                 </Badge>
               </div>
               
-              <div className="space-y-4 pt-5 border-t border-white/5 font-satoshi text-sm">
+              <div className="space-y-4 pt-5 border-t border-black/10 font-satoshi text-sm">
                 <div>
                   <span className="text-[10px] text-foreground/30 uppercase tracking-widest font-mono block mb-1">
                     Requested Work
@@ -234,7 +234,7 @@ const OrderDetails: React.FC<{ user: User }> = ({ user }) => {
               </div>
 
               {/* Financial Breakdown */}
-              <div className="pt-5 border-t border-white/5 space-y-3 text-xs font-satoshi">
+              <div className="pt-5 border-t border-black/10 space-y-3 text-xs font-satoshi">
                 <div className="flex justify-between">
                   <span className="text-foreground/40">Total Quote Budget</span>
                   <span className="font-semibold text-foreground">
@@ -247,7 +247,7 @@ const OrderDetails: React.FC<{ user: User }> = ({ user }) => {
                     <span>{formatPrice(depositAmount, user.country)}</span>
                   </div>
                 )}
-                <div className="flex justify-between items-center text-sm font-semibold text-foreground pt-3 border-t border-white/5">
+                <div className="flex justify-between items-center text-sm font-semibold text-foreground pt-3 border-t border-black/10">
                   <span>Paid Balance</span>
                   <span className="text-emerald-400 font-mono">{formatPrice(amountPaid, user.country)}</span>
                 </div>
@@ -255,9 +255,9 @@ const OrderDetails: React.FC<{ user: User }> = ({ user }) => {
 
               {/* Payment Actions */}
               {user.role === 'client' && (
-                <div className="pt-5 border-t border-white/5">
+                <div className="pt-5 border-t border-black/10">
                   {isPendingQuote && (
-                    <div className="bg-white/[0.01] border border-white/5 p-4 rounded-lg text-center space-y-2">
+                    <div className="bg-[#EEF1F4] border border-black/10 p-4 rounded-lg text-center space-y-2">
                       <Clock className="w-6 h-6 text-foreground/30 mx-auto" />
                       <p className="text-[10px] text-foreground/75 font-display font-semibold uppercase tracking-widest">
                         Quote Under Review
@@ -293,7 +293,7 @@ const OrderDetails: React.FC<{ user: User }> = ({ user }) => {
                         disabled={isPaying}
                         className="w-full btn-primary h-10 text-xs tracking-wider flex items-center justify-center font-semibold"
                       >
-                        {isPaying ? <Loader2 size={14} className="animate-spin" /> : `Complete Balance ${formatPrice(remainingBalance, user.country)}`}
+                        {isPaying ? <Loader2 size={14} className="animate-spin" /> : `Pay Balance ${formatPrice(remainingBalance, user.country)}`}
                       </button>
                     </div>
                   )}
@@ -315,7 +315,7 @@ const OrderDetails: React.FC<{ user: User }> = ({ user }) => {
                 </h3>
                 <div className="space-y-2 max-h-[180px] overflow-y-auto pr-1 custom-scrollbar">
                   {payments.map((payment) => (
-                    <div key={payment.id} className="flex justify-between items-center p-3 rounded bg-white/[0.01] border border-white/5 text-xs font-satoshi">
+                    <div key={payment.id} className="flex justify-between items-center p-3 rounded bg-[#EEF1F4] border border-black/10 text-xs font-satoshi">
                       <div>
                         <div className="text-foreground/80 font-bold">{formatPrice(payment.amount, user.country)}</div>
                         <div className="text-[10px] text-foreground/40 mt-0.5">{new Date(payment.date).toLocaleDateString()}</div>
@@ -353,7 +353,7 @@ const OrderDetails: React.FC<{ user: User }> = ({ user }) => {
                           <Star 
                             size={24} 
                             fill={(hoverRating || rating) >= star ? "var(--vb-accent)" : "none"} 
-                            className={(hoverRating || rating) >= star ? "text-[var(--vb-accent)]" : "text-white/10"}
+                            className={(hoverRating || rating) >= star ? "text-[var(--vb-accent)]" : "text-black/10"}
                           />
                         </button>
                       ))}
@@ -362,7 +362,7 @@ const OrderDetails: React.FC<{ user: User }> = ({ user }) => {
                       placeholder="Share details of your experience..."
                       value={review}
                       onChange={(e) => setReview(e.target.value)}
-                      className="w-full bg-white/[0.02] border border-white/5 rounded-lg p-3 text-xs text-foreground focus:outline-none focus:border-white/20 resize-none h-20"
+                      className="w-full bg-white/70 border border-black/10 rounded-lg p-3 text-xs text-foreground focus:outline-none focus:border-black/20 resize-none h-20"
                     />
                     <button 
                       onClick={handleSubmitRating} 
@@ -380,7 +380,7 @@ const OrderDetails: React.FC<{ user: User }> = ({ user }) => {
                            key={star}
                            size={16} 
                            fill={rating >= star ? "var(--vb-accent)" : "none"} 
-                           className={rating >= star ? "text-[var(--vb-accent)]" : "text-white/10"}
+                           className={rating >= star ? "text-[var(--vb-accent)]" : "text-black/10"}
                          />
                       ))}
                     </div>
@@ -396,17 +396,17 @@ const OrderDetails: React.FC<{ user: User }> = ({ user }) => {
             <div className="glass-card flex flex-col h-[650px] relative overflow-hidden">
               
               {/* Chat Header */}
-              <div className="p-4 border-b border-white/5 bg-[#25292e] flex justify-between items-center z-10">
+              <div className="p-4 border-b border-black/10 bg-[#EEF1F4] flex justify-between items-center z-10">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-white/[0.02] border border-white/5 flex items-center justify-center text-[var(--vb-accent)]">
+                  <div className="w-10 h-10 rounded-full bg-white/70 border border-black/10 flex items-center justify-center text-[var(--vb-accent)]">
                     <MessageSquarePlus size={18} />
                   </div>
                   <div>
                     <h3 className="font-display font-semibold text-foreground text-sm flex items-center gap-2">
-                      {order.type === 'project' ? 'Project Stream' : 'Development Stream'}
+                       {order.type === 'project' ? 'Project Stream' : 'Development Stream'}
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                     </h3>
-                    <p className="text-[9px] text-foreground/40 uppercase tracking-widest font-mono mt-0.5">
+                    <p className="text-[9px] text-[#6C757D] uppercase tracking-widest font-mono mt-0.5">
                       Client-Developer Encrypted Channel
                     </p>
                   </div>
@@ -414,10 +414,10 @@ const OrderDetails: React.FC<{ user: User }> = ({ user }) => {
               </div>
 
               {/* Chat Area */}
-              <div className="flex-grow overflow-y-auto p-6 space-y-5 bg-black/[0.05]" ref={scrollRef}>
+              <div className="flex-grow overflow-y-auto p-6 space-y-5 bg-[#EEF1F4]/40" ref={scrollRef}>
                 {messages.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full text-foreground/30 space-y-2.5">
-                    <MessageSquarePlus size={36} className="text-white/10" />
+                    <MessageSquarePlus size={36} className="text-black/10" />
                     <p className="font-display text-sm tracking-wider uppercase">Initialize Stream Connection</p>
                   </div>
                 ) : (
@@ -438,10 +438,10 @@ const OrderDetails: React.FC<{ user: User }> = ({ user }) => {
                       <div key={msg.id} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
                         <div className={`max-w-[85%] sm:max-w-[70%] rounded-xl p-4 border ${
                           isMe 
-                            ? 'bg-white/[0.02] border-white/10 text-foreground' 
-                            : 'bg-white/[0.04] border-white/5 text-foreground'
+                            ? 'bg-white/80 border-black/10 text-foreground' 
+                            : 'bg-white/50 border-black/5 text-foreground'
                         }`}>
-                           <div className="flex items-center justify-between gap-4 mb-2 pb-1.5 border-b border-white/5">
+                           <div className="flex items-center justify-between gap-4 mb-2 pb-1.5 border-b border-black/10">
                                <span className="text-[9px] font-display font-semibold uppercase tracking-wider text-foreground/60">
                                   {isMe ? 'You' : msg.sender_name} 
                                   <span className="ml-1 opacity-50 font-mono text-[8px]">
@@ -454,9 +454,9 @@ const OrderDetails: React.FC<{ user: User }> = ({ user }) => {
                            </div>
                            
                            {isImage && (
-                               <div className="mb-3 rounded-lg overflow-hidden border border-white/5 cursor-pointer relative aspect-video" onClick={() => window.open(msg.attachment_url, '_blank')}>
+                               <div className="mb-3 rounded-lg overflow-hidden border border-black/10 cursor-pointer relative aspect-video" onClick={() => window.open(msg.attachment_url, '_blank')}>
                                    <img src={msg.attachment_url} alt="Attachment" className="w-full h-full object-cover" />
-                                   <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 flex items-center justify-center transition-opacity">
+                                   <div className="absolute inset-0 bg-black/20 opacity-0 hover:opacity-100 flex items-center justify-center transition-opacity">
                                        <ExternalLink size={16} className="text-foreground" />
                                    </div>
                                </div>
@@ -465,7 +465,7 @@ const OrderDetails: React.FC<{ user: User }> = ({ user }) => {
                            <p className="text-xs leading-relaxed font-satoshi text-foreground/80 whitespace-pre-wrap">{msg.content}</p>
                            
                            {!isImage && msg.attachment_url && (
-                               <a href={msg.attachment_url} target="_blank" rel="noreferrer" className="mt-3 p-2.5 bg-white/[0.01] rounded border border-white/5 flex items-center hover:border-white/10 transition-colors">
+                               <a href={msg.attachment_url} target="_blank" rel="noreferrer" className="mt-3 p-2.5 bg-white/70 rounded border border-black/10 flex items-center hover:border-black/20 transition-colors">
                                    <FileText className="w-3.5 h-3.5 text-foreground/40 mr-2" />
                                    <span className="text-[10px] text-foreground/75 truncate max-w-[150px] font-mono">Download Attachment</span>
                                    <Download className="w-3 h-3 ml-auto text-foreground/30" />
@@ -480,8 +480,8 @@ const OrderDetails: React.FC<{ user: User }> = ({ user }) => {
 
               {/* Upload Previews */}
               {filePreview && (
-                  <div className="p-4 bg-[#25292e] border-t border-white/5 flex items-center gap-4">
-                      <div className="relative w-12 h-12 rounded overflow-hidden border border-white/5">
+                  <div className="p-4 bg-[#EEF1F4] border-t border-black/10 flex items-center gap-4">
+                      <div className="relative w-12 h-12 rounded overflow-hidden border border-black/10">
                           <img src={filePreview} className="w-full h-full object-cover" alt="Preview" />
                           <button onClick={removeFile} className="absolute top-0 right-0 p-0.5 bg-black/60 text-white/70 hover:text-red-400">
                               <X size={10} />
@@ -495,7 +495,7 @@ const OrderDetails: React.FC<{ user: User }> = ({ user }) => {
               )}
 
               {/* Input Control Area */}
-              <div className="p-4 border-t border-white/5 bg-[#212529] z-10">
+              <div className="p-4 border-t border-black/10 bg-[#EEF1F4] z-10">
                 <form onSubmit={handleSendMessage} className="flex gap-3">
                    <input 
                       type="file" 
@@ -508,7 +508,7 @@ const OrderDetails: React.FC<{ user: User }> = ({ user }) => {
                       type="button" 
                       onClick={() => fileInputRef.current?.click()}
                       disabled={sending}
-                      className="btn-ghost p-0 h-10 w-10 shrink-0 border-white/5 rounded-lg flex items-center justify-center text-foreground/40 hover:text-foreground"
+                      className="btn-ghost p-0 h-10 w-10 shrink-0 border-black/10 rounded-lg flex items-center justify-center text-foreground/40 hover:text-foreground"
                    >
                        <Paperclip className="w-4 h-4" />
                    </button>
@@ -517,7 +517,7 @@ const OrderDetails: React.FC<{ user: User }> = ({ user }) => {
                           value={newMessage}
                           onChange={(e) => setNewMessage(e.target.value)}
                           placeholder="Type brief or message..."
-                          className="w-full bg-[#1b1e22] border border-white/5 rounded-lg px-4 py-2.5 text-xs text-foreground focus:outline-none focus:border-white/10 resize-none h-10 min-h-[40px] max-h-[100px] font-satoshi placeholder:text-foreground/20"
+                          className="w-full bg-white/70 border border-black/10 rounded-lg px-4 py-2.5 text-xs text-foreground focus:outline-none focus:border-black/20 resize-none h-10 min-h-[40px] max-h-[100px] font-satoshi placeholder:text-foreground/20"
                           rows={1}
                           onKeyDown={(e) => {
                               if (e.key === 'Enter' && !e.shiftKey) {
@@ -535,7 +535,7 @@ const OrderDetails: React.FC<{ user: User }> = ({ user }) => {
                        {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
                    </button>
                 </form>
-                <p className="text-[8px] text-foreground/35 mt-2.5 text-center uppercase tracking-widest font-mono select-none">
+                <p className="text-[8px] text-[#6C757D] mt-2.5 text-center uppercase tracking-widest font-mono select-none">
                   Secure Socket Layer Active // P2P Channel Stream
                 </p>
               </div>

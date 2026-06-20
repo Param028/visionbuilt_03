@@ -13,7 +13,7 @@ const PolicySection: React.FC<{
   <div className="glass-card p-8 md:p-10">
     <div
       className="flex items-center gap-3 mb-5 pb-5 border-b"
-      style={{ borderColor: 'rgba(255,255,255,0.06)' }}
+      style={{ borderColor: 'rgba(0,0,0,0.08)' }}
     >
       <span style={{ color: statusColor || 'var(--vb-accent)' }}>{icon}</span>
       <h2 className="font-display font-bold text-foreground text-lg">{heading}</h2>
@@ -31,7 +31,7 @@ const RefundPolicy: React.FC = () => {
       {/* Page header */}
       <div
         className="relative border-b pt-20 pb-14 overflow-hidden"
-        style={{ borderColor: 'rgba(255,255,255,0.06)' }}
+        style={{ borderColor: 'rgba(0,0,0,0.08)' }}
       >
         <div
           className="absolute top-0 left-1/2 -translate-x-1/2 pointer-events-none"
@@ -139,7 +139,7 @@ const RefundPolicy: React.FC = () => {
               >
                 <Mail size={16} /> Email Support
               </a>
-              <div className="h-px w-10 bg-white/5 sm:h-10 sm:w-px" />
+              <div className="h-px w-10 bg-black/10 sm:h-10 sm:w-px" />
               <div className="text-left">
                 <p className="text-[10px] text-foreground/40 uppercase tracking-widest mb-0.5">Direct Contact</p>
                 <p className="text-foreground/70 font-mono text-sm">{INITIAL_CONTACT_INFO.email}</p>

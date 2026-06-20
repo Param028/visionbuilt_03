@@ -182,7 +182,7 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
         <div className="glass-card p-8 md:p-12 space-y-8">
           
           {/* Header Area */}
-          <div className="flex flex-col sm:flex-row justify-between items-start gap-4 pb-6 border-b border-white/5">
+          <div className="flex flex-col sm:flex-row justify-between items-start gap-4 pb-6 border-b border-black/10">
               <div>
                   <h1 className="text-2xl sm:text-3xl font-display font-bold text-foreground">
                       {isCustom ? <span>Request Custom Build</span> : <>New Request: <span className="text-foreground/80">{service?.title}</span></>}
@@ -192,7 +192,7 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
                   </p>
               </div>
               
-              <div className="flex items-center space-x-2 bg-white/[0.02] hover:bg-white/[0.04] px-3.5 py-1.5 rounded-lg border border-white/5 transition-colors">
+              <div className="flex items-center space-x-2 bg-[#EEF1F4] hover:bg-white/50 px-3.5 py-1.5 rounded-lg border border-black/10 transition-colors">
                   <Globe size={14} className="text-foreground/40" />
                   <select 
                     value={country} 
@@ -200,7 +200,7 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
                     className="bg-transparent text-foreground text-[10px] font-display font-semibold uppercase tracking-wider outline-none cursor-pointer"
                   >
                       {SUPPORTED_COUNTRIES.map(c => (
-                        <option key={c} value={c} className="bg-[#212529] text-foreground">
+                        <option key={c} value={c}>
                           {c}
                         </option>
                       ))}
@@ -211,7 +211,7 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
           <form onSubmit={handleSubmit} className="space-y-6">
             {step === 1 ? (
                <>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 p-6 bg-white/[0.01] rounded-xl border border-white/5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 p-6 bg-[#EEF1F4] rounded-xl border border-black/10">
                       <div className="col-span-full mb-2">
                           <h4 className="text-[10px] font-display font-semibold text-foreground/80 uppercase tracking-widest flex items-center gap-2">
                               <UserIcon size={12} className="text-[var(--vb-accent)]" /> Contact & Client Details
@@ -233,10 +233,10 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
                   
                   {/* Design References */}
                   {marketplaceItems.length > 0 && (
-                    <div className="pt-6 border-t border-white/5 space-y-4">
+                    <div className="pt-6 border-t border-black/10 space-y-4">
                         <div className="space-y-1">
                           <h4 className="text-xs font-display font-bold text-foreground uppercase tracking-widest">Visual Project References</h4>
-                          <p className="text-xs text-foreground/40 font-satoshi">Select one or more templates/projects from our studio inventory that match your desired aesthetic.</p>
+                          <p className="text-xs text-foreground/50 font-satoshi">Select one or more templates/projects from our studio inventory that match your desired aesthetic.</p>
                         </div>
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar p-1">
                             {marketplaceItems.map(item => (
@@ -246,22 +246,22 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
                                     className={`relative cursor-pointer rounded-lg border overflow-hidden group transition-all ${
                                       selectedReferences.includes(item.id) 
                                         ? 'border-[var(--vb-accent)] ring-1 ring-[var(--vb-accent)]' 
-                                        : 'border-white/5 hover:border-white/20'
+                                        : 'border-black/10 hover:border-black/20'
                                     }`}
                                 >
-                                    <div className="aspect-video bg-black/40">
+                                    <div className="aspect-video bg-black/5">
                                         {item.image_url ? (
                                             <img src={item.image_url} className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity" alt={item.title} />
                                         ) : (
                                             <div className="w-full h-full flex items-center justify-center text-foreground/20"><ImageIcon size={20} /></div>
                                         )}
                                     </div>
-                                    <div className="p-3 bg-white/[0.02]">
+                                    <div className="p-3 bg-white/70">
                                         <p className="text-[10px] font-display font-bold text-foreground truncate">{item.title}</p>
-                                        <p className="text-[9px] text-foreground/40 mt-0.5">{item.category}</p>
+                                        <p className="text-[9px] text-foreground/50 mt-0.5">{item.category}</p>
                                     </div>
                                     {selectedReferences.includes(item.id) && (
-                                        <div className="absolute top-1.5 right-1.5 bg-[var(--vb-accent)] text-[#212529] rounded-full p-0.5">
+                                        <div className="absolute top-1.5 right-1.5 bg-[var(--vb-accent)] text-white rounded-full p-0.5">
                                             <Check size={10} strokeWidth={3} />
                                         </div>
                                     )}
@@ -272,43 +272,43 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
                   )}
 
                   {/* Optional provisions */}
-                  <div className="pt-6 border-t border-white/5 space-y-4">
+                  <div className="pt-6 border-t border-black/10 space-y-4">
                       <h4 className="text-xs font-display font-bold text-foreground uppercase tracking-widest">Asset Provisions (Include in Request)</h4>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {(isCustom || service?.allow_domain) && (
-                            <label className="flex items-center space-x-3.5 cursor-pointer p-4 rounded-xl border border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-all">
+                            <label className="flex items-center space-x-3.5 cursor-pointer p-4 rounded-xl border border-black/10 bg-white/70 hover:bg-white/90 transition-all">
                                 <input 
                                   type="checkbox" 
                                   name="domain_requested" 
                                   checked={formData.domain_requested} 
                                   onChange={handleCheckbox} 
-                                  className="form-checkbox h-4 w-4 text-[var(--vb-accent)] rounded bg-transparent border-white/10 focus:ring-0 focus:ring-offset-0" 
+                                  className="form-checkbox h-4 w-4 text-[var(--vb-accent)] rounded bg-transparent border-black/20 focus:ring-0 focus:ring-offset-0" 
                                 />
                                 <div className="flex-grow">
                                     <span className="text-foreground text-sm font-semibold block">Register Domain Name</span>
-                                    <span className="text-[9px] text-foreground/45 uppercase tracking-widest font-mono">Include domain setup</span>
+                                    <span className="text-[9px] text-[#6C757D] uppercase tracking-widest font-mono">Include domain setup</span>
                                 </div>
                             </label>
                         )}
                         {(isCustom || service?.allow_business_email) && (
-                            <label className="flex items-center space-x-3.5 cursor-pointer p-4 rounded-xl border border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-all">
+                            <label className="flex items-center space-x-3.5 cursor-pointer p-4 rounded-xl border border-black/10 bg-white/70 hover:bg-white/90 transition-all">
                                 <input 
                                   type="checkbox" 
                                   name="business_email_requested" 
                                   checked={formData.business_email_requested} 
                                   onChange={handleCheckbox} 
-                                  className="form-checkbox h-4 w-4 text-[var(--vb-accent)] rounded bg-transparent border-white/10 focus:ring-0 focus:ring-offset-0" 
+                                  className="form-checkbox h-4 w-4 text-[var(--vb-accent)] rounded bg-transparent border-black/20 focus:ring-0 focus:ring-offset-0" 
                                 />
                                 <div className="flex-grow">
                                     <span className="text-foreground text-sm font-semibold block">Business Workspace Email</span>
-                                    <span className="text-[9px] text-foreground/45 uppercase tracking-widest font-mono">Google Workspace Setup</span>
+                                    <span className="text-[9px] text-[#6C757D] uppercase tracking-widest font-mono">Google Workspace Setup</span>
                                 </div>
                             </label>
                         )}
                       </div>
                   </div>
 
-                  <div className="flex justify-end pt-8 border-t border-white/5">
+                  <div className="flex justify-end pt-8 border-t border-black/10">
                       <button 
                         type="submit" 
                         className="btn-primary h-12 px-8 font-display text-xs tracking-widest font-semibold"
@@ -326,12 +326,12 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
                    <div className="glass-card p-8 sm:p-10 mb-8 text-left max-w-lg mx-auto space-y-5 relative overflow-hidden">
                        <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[var(--vb-accent)] to-transparent" />
                        
-                       <div className="flex justify-between items-center text-foreground/90 pb-4 border-b border-white/5">
+                       <div className="flex justify-between items-center text-foreground/90 pb-4 border-b border-black/10">
                            <span className="flex items-center gap-2 font-display font-bold text-sm uppercase tracking-widest">
                             <Tag size={14} className="text-[var(--vb-accent)]" /> 
                             {isCustom ? formData.project_title : service?.title}
                            </span>
-                           <span className="font-mono text-[9px] uppercase font-bold text-[var(--vb-accent)] bg-white/[0.04] border border-white/5 px-2 py-0.5 rounded">
+                           <span className="font-mono text-[9px] uppercase font-bold text-[var(--vb-accent)] bg-white/70 border border-black/15 px-2 py-0.5 rounded">
                             Pending Review
                            </span>
                        </div>
@@ -373,26 +373,26 @@ const NewOrder: React.FC<{ user: User }> = ({ user }) => {
                            )}
                        </div>
 
-                       <div className="border-t border-white/5 pt-5 flex justify-between text-xl font-display font-semibold text-foreground items-center">
-                           <span className="text-xs uppercase tracking-widest text-foreground/40 font-satoshi">
+                       <div className="border-t border-black/10 pt-5 flex justify-between text-xl font-display font-semibold text-foreground items-center">
+                           <span className="text-xs uppercase tracking-widest text-[#6C757D] font-satoshi">
                               Estimated Budget
                            </span>
                            <span className="text-sm font-semibold text-[var(--vb-accent)]">
                             To Be Determined
                            </span>
                        </div>
-                       <p className="text-[10px] text-foreground/30 text-center font-satoshi mt-2 italic">
+                       <p className="text-[10px] text-[#6C757D] text-center font-satoshi mt-2 italic">
                           A customized quote will be provided by your developer after review.
                        </p>
                    </div>
 
-                   <div className="flex items-start gap-4.5 max-w-lg mx-auto mb-8 p-4 border border-white/5 bg-white/[0.01] rounded-xl text-left">
+                   <div className="flex items-start gap-4.5 max-w-lg mx-auto mb-8 p-4 border border-black/10 bg-[#EEF1F4] rounded-xl text-left">
                       <ShieldCheck className="text-emerald-400 shrink-0 mt-0.5" size={18} />
                       <div className="space-y-1">
                           <h4 className="text-xs font-display font-semibold text-foreground uppercase tracking-widest">
                             No Initial Charges
                           </h4>
-                          <p className="text-xs text-foreground/45 font-satoshi leading-relaxed">
+                          <p className="text-xs text-[#6C757D] font-satoshi leading-relaxed">
                             Submitting this build brief is completely free. We will review your files, design a detailed proposal/quote, and post it to your dashboard.
                           </p>
                       </div>

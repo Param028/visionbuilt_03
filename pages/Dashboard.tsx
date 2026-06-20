@@ -97,7 +97,7 @@ const Dashboard: React.FC<{ user: User }> = ({ user }) => {
       {/* ── Dashboard header ── */}
       <div
         className="relative border-b pt-20 pb-12"
-        style={{ borderColor: 'rgba(255,255,255,0.06)' }}
+        style={{ borderColor: 'rgba(0,0,0,0.08)' }}
       >
         <div
           className="absolute top-0 right-0 pointer-events-none"
@@ -156,7 +156,7 @@ const Dashboard: React.FC<{ user: User }> = ({ user }) => {
               {/* View mode toggle */}
               <div
                 className="flex border p-0.5"
-                style={{ borderColor: 'rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)' }}
+                style={{ borderColor: 'rgba(0,0,0,0.08)', background: '#EEF1F4' }}
               >
                 {(['orders', 'wishlist'] as const).map((mode) => (
                   <button
@@ -164,8 +164,8 @@ const Dashboard: React.FC<{ user: User }> = ({ user }) => {
                     onClick={() => setViewMode(mode)}
                     className="flex items-center gap-2 px-4 py-2 text-xs font-satoshi tracking-widest uppercase transition-all"
                     style={{
-                      color: viewMode === mode ? '#F8F9FA' : 'rgba(248,249,250,0.4)',
-                      background: viewMode === mode ? 'rgba(255,255,255,0.08)' : 'transparent',
+                      color: viewMode === mode ? '#111418' : 'rgba(17,20,24,0.48)',
+                      background: viewMode === mode ? 'rgba(255,255,255,0.72)' : 'transparent',
                     }}
                   >
                     {mode === 'orders' ? <Filter size={12} /> : <Lightbulb size={12} />}
@@ -213,9 +213,9 @@ const Dashboard: React.FC<{ user: User }> = ({ user }) => {
                       id={`filter-${f}`}
                       className="px-4 py-1.5 text-[10px] font-satoshi font-medium uppercase tracking-widest transition-all whitespace-nowrap border"
                       style={{
-                        borderColor: filter === f ? 'rgba(248,249,250,0.4)' : 'rgba(255,255,255,0.08)',
-                        color:       filter === f ? '#F8F9FA' : 'rgba(248,249,250,0.4)',
-                        background:  filter === f ? 'rgba(255,255,255,0.06)' : 'transparent',
+                        borderColor: filter === f ? 'rgba(0,0,0,0.15)' : 'rgba(0,0,0,0.08)',
+                        color:       filter === f ? '#111418' : 'rgba(17,20,24,0.48)',
+                        background:  filter === f ? 'rgba(255,255,255,0.72)' : 'transparent',
                       }}
                     >
                       {f}
@@ -235,9 +235,9 @@ const Dashboard: React.FC<{ user: User }> = ({ user }) => {
                 <div className="glass-card text-center py-20 px-8">
                   <div
                     className="w-14 h-14 mx-auto mb-7 flex items-center justify-center border"
-                    style={{ borderColor: 'rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)' }}
+                    style={{ borderColor: 'rgba(0,0,0,0.08)', background: '#EEF1F4' }}
                   >
-                    <Clock size={22} style={{ color: 'rgba(248,249,250,0.2)' }} />
+                    <Clock size={22} style={{ color: 'var(--vb-muted)' }} />
                   </div>
                   <h3 className="font-display font-bold text-foreground text-xl mb-3">
                     {filter === 'all' ? 'No Active Sessions' : 'Search Returned Empty'}
@@ -299,7 +299,7 @@ const Dashboard: React.FC<{ user: User }> = ({ user }) => {
                             </div>
                             <div
                               className="flex items-center gap-3 text-[10px] font-satoshi tracking-wide"
-                              style={{ color: 'rgba(248,249,250,0.3)' }}
+                              style={{ color: 'var(--vb-muted)' }}
                             >
                               <span>REF #{order.id.slice(-8).toUpperCase()}</span>
                               <span>·</span>
@@ -315,7 +315,7 @@ const Dashboard: React.FC<{ user: User }> = ({ user }) => {
                             </div>
                             <div
                               className="flex items-center gap-1 text-[10px] font-satoshi tracking-widest uppercase transition-all group-hover:gap-2"
-                              style={{ color: 'rgba(248,249,250,0.3)' }}
+                              style={{ color: 'var(--vb-muted)' }}
                             >
                               View <ArrowRight size={11} />
                             </div>
@@ -381,7 +381,7 @@ const Dashboard: React.FC<{ user: User }> = ({ user }) => {
                       <p className="text-label mb-6">New Suggestion</p>
                       <form onSubmit={handleSubmitSuggestion} className="space-y-5">
                         <div>
-                          <label className="text-xs font-satoshi tracking-widest uppercase mb-1.5 block" style={{ color: 'rgba(248,249,250,0.3)' }}>
+                          <label className="text-xs font-satoshi tracking-widest uppercase mb-1.5 block" style={{ color: 'var(--vb-muted)' }}>
                             Title
                           </label>
                           <Input
@@ -392,7 +392,7 @@ const Dashboard: React.FC<{ user: User }> = ({ user }) => {
                           />
                         </div>
                         <div>
-                          <label className="text-xs font-satoshi tracking-widest uppercase mb-1.5 block" style={{ color: 'rgba(248,249,250,0.3)' }}>
+                          <label className="text-xs font-satoshi tracking-widest uppercase mb-1.5 block" style={{ color: 'var(--vb-muted)' }}>
                             Description
                           </label>
                           <Textarea
@@ -418,9 +418,9 @@ const Dashboard: React.FC<{ user: User }> = ({ user }) => {
               {suggestions.length === 0 ? (
                 <div
                   className="text-center py-20 border"
-                  style={{ borderColor: 'rgba(255,255,255,0.06)', borderStyle: 'dashed' }}
+                  style={{ borderColor: 'rgba(0,0,0,0.12)', borderStyle: 'dashed' }}
                 >
-                  <p className="font-satoshi text-xs tracking-widest uppercase" style={{ color: 'rgba(248,249,250,0.2)' }}>
+                  <p className="font-satoshi text-xs tracking-widest uppercase" style={{ color: 'var(--vb-muted)' }}>
                     No suggestions in the system yet
                   </p>
                 </div>
@@ -439,9 +439,9 @@ const Dashboard: React.FC<{ user: User }> = ({ user }) => {
                           <div
                             className="absolute top-0 right-0 px-3 py-1 text-[10px] font-satoshi font-medium uppercase tracking-widest border-b border-l"
                             style={{
-                              borderColor: s.status === 'completed' ? 'rgba(52,211,153,0.2)' : 'rgba(251,191,36,0.2)',
-                              color: s.status === 'completed' ? 'rgba(52,211,153,0.7)' : 'rgba(251,191,36,0.7)',
-                              background: s.status === 'completed' ? 'rgba(52,211,153,0.05)' : 'rgba(251,191,36,0.05)',
+                              borderColor: s.status === 'completed' ? 'rgba(16,185,129,0.2)' : 'rgba(245,158,11,0.2)',
+                              color: s.status === 'completed' ? 'rgba(16,185,129,0.8)' : 'rgba(245,158,11,0.8)',
+                              background: s.status === 'completed' ? 'rgba(16,185,129,0.05)' : 'rgba(245,158,11,0.05)',
                             }}
                           >
                             {s.status}
@@ -451,33 +451,33 @@ const Dashboard: React.FC<{ user: User }> = ({ user }) => {
                         <div className="flex-1">
                           <h3 className="font-display font-bold text-foreground mb-3 text-base">{s.title}</h3>
                           <p className="text-foreground/40 text-sm leading-relaxed line-clamp-3 mb-5">{s.description}</p>
-                          <div className="flex items-center gap-3 text-[10px] font-satoshi" style={{ color: 'rgba(248,249,250,0.25)' }}>
+                          <div className="flex items-center gap-3 text-[10px] font-satoshi" style={{ color: 'var(--vb-muted)' }}>
                             <span className="flex items-center gap-1"><UserIcon size={9} /> {s.user_name}</span>
                             <span>·</span>
                             <span>{new Date(s.created_at).toLocaleDateString()}</span>
                           </div>
                         </div>
 
-                        <div
-                          className="pt-5 mt-5 border-t flex justify-between items-center"
-                          style={{ borderColor: 'rgba(255,255,255,0.06)' }}
-                        >
-                          <div className="flex items-center gap-2">
-                            <div
-                              className="p-2 border transition-all duration-300 group-hover:border-white/20"
-                              style={{ borderColor: 'rgba(255,255,255,0.08)' }}
-                            >
+                          <div
+                            className="pt-5 mt-5 border-t flex justify-between items-center"
+                            style={{ borderColor: 'rgba(0,0,0,0.08)' }}
+                          >
+                            <div className="flex items-center gap-2">
+                              <div
+                                className="p-2 border transition-all duration-300 group-hover:border-black/20"
+                                style={{ borderColor: 'rgba(0,0,0,0.08)' }}
+                              >
                               <ThumbsUp size={13} style={{ color: 'var(--vb-accent)' }} />
                             </div>
                             <span className="font-display font-bold text-foreground">{s.votes}</span>
                           </div>
-                          <button
-                            onClick={() => handleVote(s.id)}
-                            className="text-[10px] font-satoshi tracking-widest uppercase transition-colors"
-                            style={{ color: 'rgba(248,249,250,0.35)' }}
-                            onMouseEnter={e => (e.currentTarget.style.color = '#F8F9FA')}
-                            onMouseLeave={e => (e.currentTarget.style.color = 'rgba(248,249,250,0.35)')}
-                          >
+                            <button
+                              onClick={() => handleVote(s.id)}
+                              className="text-[10px] font-satoshi tracking-widest uppercase transition-colors"
+                              style={{ color: 'var(--vb-muted)' }}
+                              onMouseEnter={e => (e.currentTarget.style.color = 'var(--vb-text)')}
+                              onMouseLeave={e => (e.currentTarget.style.color = 'var(--vb-muted)')}
+                            >
                             Endorse
                           </button>
                         </div>

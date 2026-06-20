@@ -91,9 +91,9 @@ const Offers: React.FC<{ user: User | null }> = ({ user }) => {
           <div
             className="mt-4 mb-6 p-4 border"
             style={{
-              borderColor: isExpired ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.10)',
-              background: isExpired ? 'rgba(255,255,255,0.02)' : 'rgba(255,255,255,0.04)',
-              color: isExpired ? 'rgba(248,249,250,0.2)' : '#AAB7C4',
+              borderColor: isExpired ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.08)',
+              background: isExpired ? 'rgba(0,0,0,0.02)' : 'rgba(255,255,255,0.72)',
+              color: isExpired ? 'rgba(17,20,24,0.25)' : '#7C8FA1',
             }}
           >
             <Sparkles size={28} />
@@ -101,7 +101,7 @@ const Offers: React.FC<{ user: User | null }> = ({ user }) => {
 
           {/* Title + Description */}
           <h3 className="font-display font-bold text-foreground text-xl mb-2">{offer.title}</h3>
-          <p className="text-[rgba(255,255,255,0.82)] text-sm leading-relaxed mb-5 line-clamp-2">
+          <p className="text-[#495057] text-sm leading-relaxed mb-5 line-clamp-2">
             {offer.description}
           </p>
 
@@ -109,13 +109,13 @@ const Offers: React.FC<{ user: User | null }> = ({ user }) => {
           <div
             className="w-full flex items-center justify-between px-4 py-3 border mb-3"
             style={{
-              borderColor: isExpired ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.10)',
-              background: isExpired ? 'rgba(255,255,255,0.02)' : 'rgba(255,255,255,0.04)',
+              borderColor: isExpired ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.08)',
+              background: isExpired ? 'rgba(0,0,0,0.02)' : '#EEF1F4',
             }}
           >
             <code
               className="font-mono text-base font-bold tracking-[0.15em]"
-              style={{ color: isExpired ? 'rgba(248,249,250,0.25)' : '#F8F9FA' }}
+              style={{ color: isExpired ? 'rgba(17,20,24,0.25)' : '#111418' }}
             >
               {offer.code}
             </code>
@@ -123,7 +123,7 @@ const Offers: React.FC<{ user: User | null }> = ({ user }) => {
               onClick={(e) => { e.stopPropagation(); if (!isExpired) handleCopy(offer.code, offer.id); }}
               className="transition-colors"
               disabled={isExpired}
-              style={{ color: isExpired ? 'rgba(248,249,250,0.2)' : '#B8C4D0' }}
+              style={{ color: isExpired ? 'rgba(17,20,24,0.2)' : '#7C8FA1' }}
               aria-label={`Copy code ${offer.code}`}
             >
               <AnimatePresence mode="wait">
@@ -145,9 +145,9 @@ const Offers: React.FC<{ user: User | null }> = ({ user }) => {
             <div
               className="flex items-center text-[11px] font-satoshi gap-1.5 mb-5 px-3 py-1 border"
               style={{
-                borderColor: isExpired ? 'rgba(255,255,255,0.05)' : 'rgba(251,191,36,0.2)',
-                color: isExpired ? 'rgba(248,249,250,0.25)' : 'rgba(251,191,36,0.7)',
-                background: isExpired ? 'transparent' : 'rgba(251,191,36,0.04)',
+                borderColor: isExpired ? 'rgba(0,0,0,0.04)' : 'rgba(217,119,6,0.2)',
+                color: isExpired ? 'rgba(17,20,24,0.25)' : 'rgba(217,119,6,0.8)',
+                background: isExpired ? 'transparent' : 'rgba(217,119,6,0.04)',
               }}
             >
               <Calendar size={10} />
@@ -179,7 +179,7 @@ const Offers: React.FC<{ user: User | null }> = ({ user }) => {
       {/* ── PAGE HEADER ── */}
       <div
         className="relative border-b pt-20 pb-16 overflow-hidden"
-        style={{ borderColor: 'rgba(255,255,255,0.10)' }}
+        style={{ borderColor: 'rgba(0,0,0,0.08)' }}
       >
         <div
           className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[280px] pointer-events-none"
@@ -206,7 +206,7 @@ const Offers: React.FC<{ user: User | null }> = ({ user }) => {
             Exclusive Offers
           </motion.h1>
           <motion.p
-            className="text-[rgba(255,255,255,0.82)] text-lg max-w-xl mx-auto leading-relaxed font-light"
+            className="text-[#495057] text-lg max-w-xl mx-auto leading-relaxed font-light"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
@@ -237,14 +237,14 @@ const Offers: React.FC<{ user: User | null }> = ({ user }) => {
             <div className="glass-card flex flex-col items-center justify-center text-center p-16 max-w-md mx-auto">
               <div
                 className="mb-6 p-5 border"
-                style={{ borderColor: 'rgba(255,255,255,0.07)', background: 'rgba(255,255,255,0.02)' }}
+                style={{ borderColor: 'rgba(0,0,0,0.08)', background: '#EEF1F4' }}
               >
-                <Tag size={28} style={{ color: 'rgba(248,249,250,0.2)' }} />
+                <Tag size={28} style={{ color: 'var(--vb-muted)' }} />
               </div>
               <h3 className="font-display font-bold text-foreground text-xl mb-3">
                 No Active Offers
               </h3>
-              <p className="text-foreground/35 text-sm leading-relaxed">
+              <p className="text-[#6C757D] text-sm leading-relaxed">
                 Check back later for new deals and discounts on our services.
               </p>
             </div>

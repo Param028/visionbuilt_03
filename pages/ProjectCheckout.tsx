@@ -206,7 +206,7 @@ const ProjectCheckout: React.FC<{ user: User }> = ({ user }) => {
           <div className="lg:col-span-7 space-y-8">
             <div>
               <div className="flex items-center gap-2.5 mb-4">
-                <Badge variant="default" className="border-white/5 bg-white/2">
+                <Badge variant="default" className="border-black/5 bg-black/2">
                   <UserIcon size={12} className="mr-1 inline-block text-foreground/45" />
                   <span className="text-foreground/75 font-satoshi">{item.developer_name}</span>
                 </Badge>
@@ -219,7 +219,7 @@ const ProjectCheckout: React.FC<{ user: User }> = ({ user }) => {
             </div>
 
             {/* Main Preview Image */}
-            <div className="relative rounded-xl overflow-hidden border border-white/5 bg-[#171717] aspect-video group shadow-2xl">
+            <div className="relative rounded-xl overflow-hidden border border-black/10 bg-[#EEF1F4] aspect-video group shadow-2xl">
               {selectedImage ? (
                 <img 
                   src={selectedImage} 
@@ -256,7 +256,7 @@ const ProjectCheckout: React.FC<{ user: User }> = ({ user }) => {
             {item.demo_url && (
               <button 
                 onClick={() => window.open(item.demo_url, '_blank')}
-                className="w-full flex items-center justify-center gap-2 py-4 border border-white/5 bg-white/[0.01] hover:bg-white/[0.03] text-foreground/80 hover:text-foreground font-satoshi text-sm transition-all"
+                className="w-full flex items-center justify-center gap-2 py-4 border border-black/10 bg-white/50 hover:bg-white/80 text-foreground/80 hover:text-foreground font-satoshi text-sm transition-all"
               >
                 <Eye size={16} />
                 <span>Open Live Project Demo</span>
@@ -264,9 +264,9 @@ const ProjectCheckout: React.FC<{ user: User }> = ({ user }) => {
             )}
 
             {/* Detailed Description */}
-            <div className="border-t border-white/5 pt-8 space-y-4">
+            <div className="border-t border-black/10 pt-8 space-y-4">
               <h3 className="font-display font-semibold text-foreground text-lg">Project Details</h3>
-              <p className="text-foreground/45 leading-relaxed text-sm font-satoshi">
+              <p className="text-foreground/60 leading-relaxed text-sm font-satoshi">
                 {item.full_description}
               </p>
             </div>
@@ -287,7 +287,7 @@ const ProjectCheckout: React.FC<{ user: User }> = ({ user }) => {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div 
                   className="p-5 border space-y-4"
-                  style={{ borderColor: 'rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.01)' }}
+                  style={{ borderColor: 'rgba(0,0,0,0.08)', background: '#EEF1F4' }}
                 >
                   <div className="flex justify-between items-center text-sm font-satoshi text-foreground/80">
                     <span>Standard Developer License</span>
@@ -298,7 +298,7 @@ const ProjectCheckout: React.FC<{ user: User }> = ({ user }) => {
 
                   {/* Coupon Input Area */}
                   {!isZeroCost && (
-                    <div className="border-t border-white/5 pt-4">
+                    <div className="border-t border-black/10 pt-4">
                       {appliedOffer ? (
                         <div className="flex justify-between items-center bg-emerald-500/5 border border-emerald-500/10 p-2.5 rounded-lg">
                           <div className="flex items-center gap-2">
@@ -327,7 +327,7 @@ const ProjectCheckout: React.FC<{ user: User }> = ({ user }) => {
                             type="button" 
                             onClick={handleApplyCoupon} 
                             disabled={isValidatingOffer || !couponCode}
-                            className="btn-ghost px-4 h-9 py-0 border-white/10 hover:border-white/20 text-xs flex items-center justify-center"
+                            className="btn-ghost px-4 h-9 py-0 border-black/15 hover:border-black/25 text-xs flex items-center justify-center"
                           >
                             {isValidatingOffer ? <Loader2 size={12} className="animate-spin" /> : 'Apply'}
                           </button>
@@ -351,7 +351,7 @@ const ProjectCheckout: React.FC<{ user: User }> = ({ user }) => {
                   )}
 
                   {/* Total Line */}
-                  <div className="border-t border-white/5 pt-4 flex justify-between items-center text-foreground font-display font-semibold">
+                  <div className="border-t border-black/10 pt-4 flex justify-between items-center text-foreground font-display font-semibold">
                     <span className="text-sm">Final Amount</span>
                     <div className="text-right">
                       {isZeroCost ? (

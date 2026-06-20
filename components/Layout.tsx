@@ -20,11 +20,11 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // ── Dark mode: permanently enforced ──────────────────────────
+  // ── Light mode: permanently enforced ──────────────────────────
   useEffect(() => {
-    document.documentElement.className = 'dark';
-    document.documentElement.setAttribute('data-theme', 'dark');
-    localStorage.setItem('theme', 'dark');
+    document.documentElement.className = 'light';
+    document.documentElement.setAttribute('data-theme', 'light');
+    localStorage.setItem('theme', 'light');
   }, []);
 
   // ── Scroll detection ──────────────────────────────────────────
@@ -87,7 +87,7 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
         ease={100}
         vx={0.015}
         vy={0.015}
-        color="#ffffff"
+        color="#7c8fa1"
         refresh
       />
 
@@ -106,7 +106,7 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
           <Link to="/" className="flex items-center gap-3 group z-20" aria-label="Vision Built home">
             {/* TODO: Replace this placeholder with your actual logo image.
                 Logo.tsx SVG is used here as the placeholder icon. */}
-            <div className="logo-placeholder group-hover:border-white/35 transition-colors">
+            <div className="logo-placeholder group-hover:border-black/20 transition-colors">
               <Logo className="w-4 h-4 text-foreground/60" />
             </div>
             <span className="font-display font-bold text-sm md:text-base tracking-widest text-foreground uppercase">
@@ -141,14 +141,14 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
             {user ? (
               <>
                 <Link to="/profile" title="My Profile">
-                  <button className="w-8 h-8 flex items-center justify-center border border-white/10 text-foreground/40 hover:text-foreground hover:border-white/30 transition-all duration-300">
+                  <button className="w-8 h-8 flex items-center justify-center border border-black/10 text-foreground/40 hover:text-foreground hover:border-black/20 transition-all duration-300">
                     <UserIcon size={13} />
                   </button>
                 </Link>
                 <button
                   onClick={handleLogout}
                   title="Log out"
-                  className="w-8 h-8 flex items-center justify-center border border-white/10 text-foreground/40 hover:text-red-400 hover:border-red-500/30 transition-all duration-300"
+                  className="w-8 h-8 flex items-center justify-center border border-black/10 text-foreground/40 hover:text-red-400 hover:border-red-500/30 transition-all duration-300"
                 >
                   <LogOut size={13} />
                 </button>
@@ -210,7 +210,7 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
                   </Link>
                   <button
                     onClick={handleLogout}
-                    className="flex-1 px-4 py-3 border border-white/10 text-red-400/80 text-xs font-satoshi tracking-widest uppercase hover:bg-red-500/5 transition-all"
+                    className="flex-1 px-4 py-3 border border-black/10 text-red-400/80 text-xs font-satoshi tracking-widest uppercase hover:bg-red-500/5 transition-all"
                   >
                     Log Out
                   </button>
@@ -288,7 +288,7 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
 
             {/* Platform column */}
             <div className="space-y-5">
-              <h4 className="text-label" style={{ color: 'rgba(248,249,250,0.28)' }}>Platform</h4>
+              <h4 className="text-label" style={{ color: 'var(--vb-muted)' }}>Platform</h4>
               <ul className="space-y-3.5">
                 {[
                   { name: 'Services',    path: '/services' },
@@ -309,7 +309,7 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
 
             {/* Support column */}
             <div className="space-y-5">
-              <h4 className="text-label" style={{ color: 'rgba(248,249,250,0.28)' }}>Support</h4>
+              <h4 className="text-label" style={{ color: 'var(--vb-muted)' }}>Support</h4>
               <ul className="space-y-3.5">
                 <li>
                   <Link
@@ -332,7 +332,7 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
 
             {/* Legal column */}
             <div className="space-y-5">
-              <h4 className="text-label" style={{ color: 'rgba(248,249,250,0.28)' }}>Legal</h4>
+              <h4 className="text-label" style={{ color: 'var(--vb-muted)' }}>Legal</h4>
               <ul className="space-y-3.5">
                 {[
                   { name: 'Privacy Policy',   path: '/privacy-policy' },

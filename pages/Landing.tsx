@@ -167,7 +167,7 @@ const Landing: React.FC = () => {
             className="absolute inset-0 opacity-[0.018]"
             style={{
               backgroundImage:
-                'linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)',
+                'linear-gradient(rgba(0,0,0,1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,1) 1px, transparent 1px)',
               backgroundSize: '80px 80px',
             }}
           />
@@ -196,14 +196,14 @@ const Landing: React.FC = () => {
             >
               {heroHeadingLines.main}
               <br />
-              <span className="text-[#B8C4D0]">
+              <span className="text-[#7C8FA1]">
                 {heroHeadingLines.accent}
               </span>
             </motion.h1>
 
             {/* Subheading */}
             <motion.p
-              className="text-[rgba(255,255,255,0.82)] text-lg md:text-xl max-w-lg mb-14 leading-relaxed font-light"
+              className="text-[#495057] text-lg md:text-xl max-w-lg mb-14 leading-relaxed font-light"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.25, ease: [0.4, 0, 0.2, 1] }}
@@ -244,7 +244,7 @@ const Landing: React.FC = () => {
           <div
             className="w-px h-14 mx-auto"
             style={{
-              background: 'linear-gradient(to bottom, transparent, rgba(255,255,255,0.18), transparent)',
+              background: 'linear-gradient(to bottom, transparent, rgba(0,0,0,0.08), transparent)',
             }}
           />
         </motion.div>
@@ -255,7 +255,7 @@ const Landing: React.FC = () => {
       ═══════════════════════════════════════════════ */}
       <section
         className="border-y py-10 md:py-12"
-        style={{ borderColor: 'rgba(255,255,255,0.10)', background: '#2A2F35' }}
+        style={{ borderColor: 'rgba(0,0,0,0.08)', background: '#EEF1F4' }}
       >
         <div className="container-vb">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-4">
@@ -275,7 +275,7 @@ const Landing: React.FC = () => {
                     />
                     <span className="text-2xl font-display font-bold text-foreground">{s.suffix}</span>
                     {s.after && (
-                      <span className="text-base font-satoshi ml-1" style={{ color: 'rgba(248,249,250,0.3)' }}>
+                      <span className="text-base font-satoshi ml-1" style={{ color: 'var(--vb-muted)' }}>
                         {s.after}
                       </span>
                     )}
@@ -312,7 +312,7 @@ const Landing: React.FC = () => {
                 <h3 className="text-display-sm font-display font-bold text-foreground mb-4">
                   {SERVICES[0].title}
                 </h3>
-                <p className="text-[rgba(255,255,255,0.82)] leading-relaxed max-w-md">
+                <p className="text-[#495057] leading-relaxed max-w-md">
                   {SERVICES[0].desc}
                 </p>
                 <Link
@@ -337,7 +337,7 @@ const Landing: React.FC = () => {
                 <h3 className="font-display font-bold text-foreground text-xl mb-3">
                   {SERVICES[1].title}
                 </h3>
-                <p className="text-[rgba(255,255,255,0.82)] text-sm leading-relaxed">
+                <p className="text-[#495057] text-sm leading-relaxed">
                   {SERVICES[1].desc}
                 </p>
               </div>
@@ -353,7 +353,7 @@ const Landing: React.FC = () => {
                   <h3 className="font-display font-semibold text-foreground mb-2">
                     {svc.title}
                   </h3>
-                  <p className="text-[rgba(255,255,255,0.58)] text-sm leading-relaxed">
+                  <p className="text-[#6C757D] text-sm leading-relaxed">
                     {svc.desc}
                   </p>
                 </div>
@@ -368,7 +368,7 @@ const Landing: React.FC = () => {
       ═══════════════════════════════════════════════ */}
       <section
         className="section-y-sm border-y"
-        style={{ borderColor: 'rgba(255,255,255,0.10)', background: '#2A2F35' }}
+        style={{ borderColor: 'rgba(0,0,0,0.08)', background: '#EEF1F4' }}
       >
         <div className="container-vb mb-12">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
@@ -388,11 +388,11 @@ const Landing: React.FC = () => {
                     className="text-[0.65rem] font-satoshi font-medium tracking-widest uppercase px-4 py-2 border transition-all duration-300"
                     style={{
                       borderColor:
-                        activeTab === tab ? 'rgba(248,249,250,0.6)' : 'rgba(255,255,255,0.1)',
+                        activeTab === tab ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.08)',
                       color:
-                        activeTab === tab ? '#F8F9FA' : 'rgba(248,249,250,0.4)',
+                        activeTab === tab ? '#111418' : 'rgba(17,20,24,0.48)',
                       background:
-                        activeTab === tab ? 'rgba(255,255,255,0.05)' : 'transparent',
+                        activeTab === tab ? 'rgba(0,0,0,0.04)' : 'transparent',
                     }}
                   >
                     {tab}
@@ -438,7 +438,7 @@ const Landing: React.FC = () => {
                   {i < PROCESS.length - 1 && (
                     <div
                       className="hidden lg:block absolute top-3 left-full w-full h-px"
-                      style={{ background: 'rgba(255,255,255,0.05)' }}
+                      style={{ background: 'rgba(0,0,0,0.08)' }}
                       aria-hidden="true"
                     />
                   )}
@@ -451,12 +451,12 @@ const Landing: React.FC = () => {
                   </p>
                   <div
                     className="w-6 h-px mb-4"
-                    style={{ background: 'rgba(255,255,255,0.1)' }}
+                    style={{ background: 'rgba(0,0,0,0.08)' }}
                   />
                   <h3 className="font-display font-semibold text-foreground mb-2 text-sm">
                     {step.title}
                   </h3>
-                  <p className="text-[rgba(255,255,255,0.58)] text-xs leading-relaxed">
+                  <p className="text-[#6C757D] text-xs leading-relaxed">
                     {step.desc}
                   </p>
                 </div>
@@ -471,7 +471,7 @@ const Landing: React.FC = () => {
       ═══════════════════════════════════════════════ */}
       <section
         className="section-y-sm border-y"
-        style={{ borderColor: 'rgba(255,255,255,0.10)', background: '#2A2F35' }}
+        style={{ borderColor: 'rgba(0,0,0,0.08)', background: '#EEF1F4' }}
       >
         <div className="container-vb mb-8 text-center">
           <p className="text-label">Technology Stack</p>
@@ -483,7 +483,7 @@ const Landing: React.FC = () => {
           SUBSCRIPTION PLANS (conditional)
       ═══════════════════════════════════════════════ */}
       {subscriptions.length > 0 && (
-        <section className="section-y border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+        <section className="section-y border-b" style={{ borderColor: 'rgba(0,0,0,0.08)' }}>
           <div className="container-vb">
             <FadeUp className="mb-14 md:mb-20">
               <p className="text-label mb-4">Recurring Value</p>
@@ -501,16 +501,16 @@ const Landing: React.FC = () => {
                       <span className="text-4xl font-display font-bold text-foreground">
                         ₹{sub.price}
                       </span>
-                      <span className="font-satoshi text-sm" style={{ color: 'rgba(248,249,250,0.3)' }}>
+                      <span className="font-satoshi text-sm" style={{ color: 'var(--vb-muted)' }}>
                         /{sub.interval}
                       </span>
                     </div>
-                    <p className="text-[rgba(255,255,255,0.82)] text-sm mb-7 flex-1 leading-relaxed">
+                    <p className="text-[#495057] text-sm mb-7 flex-1 leading-relaxed">
                       {sub.description}
                     </p>
                     <ul className="space-y-2.5 mb-8">
                       {sub.features.slice(0, 5).map((f: string, fi: number) => (
-                        <li key={fi} className="flex items-start gap-2.5 text-xs text-[rgba(255,255,255,0.58)]">
+                        <li key={fi} className="flex items-start gap-2.5 text-xs text-[#6C757D]">
                           <CheckCircle
                             size={12}
                             className="shrink-0 mt-0.5"
@@ -534,7 +534,7 @@ const Landing: React.FC = () => {
       {/* ═══════════════════════════════════════════════
           CTA SECTION — immersive, massive typography
       ═══════════════════════════════════════════════ */}
-      <section className="relative section-y overflow-hidden border-t" style={{ borderColor: 'rgba(255,255,255,0.10)', background: '#2A2F35' }}>
+      <section className="relative section-y overflow-hidden border-t" style={{ borderColor: 'rgba(0,0,0,0.08)', background: '#EEF1F4' }}>
         {/* Atmospheric glow */}
         <div
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
@@ -560,10 +560,10 @@ const Landing: React.FC = () => {
             >
               Let&apos;s Build Something
               <br />
-              <span className="text-[#B8C4D0]">Extraordinary.</span>
+              <span className="text-[#7C8FA1]">Extraordinary.</span>
             </h2>
             <p
-              className="text-[rgba(255,255,255,0.82)] text-lg mb-14 max-w-xl mx-auto leading-relaxed font-light"
+              className="text-[#495057] text-lg mb-14 max-w-xl mx-auto leading-relaxed font-light"
             >
               Partner with Vision Built to create digital experiences that define your category and outlast trends.
             </p>

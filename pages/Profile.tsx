@@ -11,7 +11,7 @@ import { motion } from 'framer-motion';
 // ── Field wrapper ──────────────────────────────────────────────
 const FormField: React.FC<{ label: string; children: React.ReactNode }> = ({ label, children }) => (
   <div className="space-y-1.5">
-    <label className="text-xs font-satoshi tracking-widest uppercase" style={{ color: 'rgba(248,249,250,0.3)' }}>
+    <label className="text-xs font-satoshi tracking-widest uppercase text-[#6C757D]">
       {label}
     </label>
     {children}
@@ -27,7 +27,7 @@ const Section: React.FC<{
   <div className="glass-card p-8">
     <h3
       className="flex items-center gap-2.5 font-display font-semibold text-foreground mb-7 pb-5 border-b text-base"
-      style={{ borderColor: 'rgba(255,255,255,0.07)' }}
+      style={{ borderColor: 'rgba(0,0,0,0.08)' }}
     >
       <span style={{ color: 'var(--vb-accent)' }}>{icon}</span>
       {title}
@@ -84,7 +84,7 @@ const Profile: React.FC<{ user: User; setUser: (u: User) => void }> = ({ user, s
       {/* ── Page header ── */}
       <div
         className="relative border-b pt-20 pb-16 overflow-hidden"
-        style={{ borderColor: 'rgba(255,255,255,0.06)' }}
+        style={{ borderColor: 'rgba(0,0,0,0.08)' }}
       >
         <div
           className="absolute top-0 left-1/2 -translate-x-1/2 pointer-events-none"
@@ -127,8 +127,7 @@ const Profile: React.FC<{ user: User; setUser: (u: User) => void }> = ({ user, s
             <div className="glass-card p-8 text-center space-y-5">
               {/* Avatar */}
               <div
-                className="w-20 h-20 mx-auto flex items-center justify-center font-display font-bold text-3xl text-background"
-                style={{ background: '#F8F9FA' }}
+                className="w-20 h-20 mx-auto flex items-center justify-center font-display font-bold text-3xl text-white bg-[#7C8FA1]"
               >
                 {user.name.charAt(0).toUpperCase()}
               </div>
@@ -136,7 +135,7 @@ const Profile: React.FC<{ user: User; setUser: (u: User) => void }> = ({ user, s
               {/* Name + email */}
               <div>
                 <h2 className="font-display font-bold text-foreground text-xl">{user.name}</h2>
-                <p className="text-xs font-satoshi mt-1.5" style={{ color: 'rgba(248,249,250,0.35)' }}>
+                <p className="text-xs font-satoshi mt-1.5" style={{ color: 'var(--vb-muted)' }}>
                   {user.email}
                 </p>
               </div>
@@ -159,7 +158,7 @@ const Profile: React.FC<{ user: User; setUser: (u: User) => void }> = ({ user, s
               {/* Member info */}
               <div
                 className="text-xs pt-4 border-t"
-                style={{ borderColor: 'rgba(255,255,255,0.06)', color: 'rgba(248,249,250,0.25)' }}
+                style={{ borderColor: 'rgba(0,0,0,0.08)', color: 'var(--vb-muted)' }}
               >
                 <p className="font-satoshi tracking-wide">Vision Built Member</p>
                 <p className="mt-0.5">{user.country || 'India'}</p>
@@ -191,15 +190,15 @@ const Profile: React.FC<{ user: User; setUser: (u: User) => void }> = ({ user, s
                     <div
                       className="flex items-center gap-2 px-3 h-11 border text-sm"
                       style={{
-                        borderColor: 'rgba(255,255,255,0.07)',
-                        background: 'rgba(255,255,255,0.02)',
-                        color: 'rgba(248,249,250,0.3)',
+                        borderColor: 'rgba(0,0,0,0.08)',
+                        background: '#EEF1F4',
+                        color: 'var(--vb-muted)',
                       }}
                     >
-                      <Mail size={13} style={{ color: 'rgba(248,249,250,0.25)' }} />
+                      <Mail size={13} style={{ color: 'var(--vb-muted)' }} />
                       {user.email}
                     </div>
-                    <p className="text-[10px] mt-1.5 font-satoshi" style={{ color: 'rgba(248,249,250,0.2)' }}>
+                    <p className="text-[10px] mt-1.5 font-satoshi" style={{ color: 'var(--vb-muted)' }}>
                       Email cannot be changed directly.
                     </p>
                   </FormField>
@@ -209,7 +208,7 @@ const Profile: React.FC<{ user: User; setUser: (u: User) => void }> = ({ user, s
                       <Globe
                         size={13}
                         className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
-                        style={{ color: 'rgba(248,249,250,0.3)' }}
+                        style={{ color: 'var(--vb-muted)' }}
                       />
                       <select
                         className="vb-input pl-8"
@@ -219,7 +218,7 @@ const Profile: React.FC<{ user: User; setUser: (u: User) => void }> = ({ user, s
                         required
                       >
                         {SUPPORTED_COUNTRIES.map((c) => (
-                          <option key={c} value={c} className="bg-[#2C3137] text-foreground">
+                          <option key={c} value={c}>
                             {c}
                           </option>
                         ))}

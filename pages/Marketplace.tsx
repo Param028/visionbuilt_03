@@ -21,14 +21,14 @@ const TABS: { key: ProjectCategory; icon: React.ReactNode; label: string }[] = [
 // ── Loading skeleton ──────────────────────────────────────────
 const ItemSkeleton = () => (
   <div className="glass-card overflow-hidden animate-pulse">
-    <div className="h-44 bg-white/5" />
+    <div className="h-44 bg-black/5" />
     <div className="p-6 space-y-3">
-      <div className="h-4 w-2/3 bg-white/5 rounded" />
-      <div className="h-4 w-full bg-white/4 rounded" />
-      <div className="h-4 w-5/6 bg-white/4 rounded" />
+      <div className="h-4 w-2/3 bg-black/5 rounded" />
+      <div className="h-4 w-full bg-black/5 rounded" />
+      <div className="h-4 w-5/6 bg-black/5 rounded" />
       <div className="mt-4 flex justify-between items-center">
-        <div className="h-6 w-20 bg-white/5 rounded" />
-        <div className="h-9 w-28 bg-white/5 rounded" />
+        <div className="h-6 w-20 bg-black/5 rounded" />
+        <div className="h-9 w-28 bg-black/5 rounded" />
       </div>
     </div>
   </div>
@@ -92,7 +92,7 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
       {/* ── PAGE HEADER ── */}
       <div
         className="relative border-b pt-20 pb-16 overflow-hidden"
-        style={{ borderColor: 'rgba(255,255,255,0.10)' }}
+        style={{ borderColor: 'rgba(0,0,0,0.08)' }}
       >
         <div
           className="absolute top-0 left-1/2 -translate-x-1/2 pointer-events-none"
@@ -120,7 +120,7 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
             Marketplace
           </motion.h1>
           <motion.p
-            className="text-[rgba(255,255,255,0.82)] text-lg max-w-xl mx-auto leading-relaxed font-light"
+            className="text-[#495057] text-lg max-w-xl mx-auto leading-relaxed font-light"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
@@ -137,7 +137,7 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
         <div className="flex justify-center mb-8">
           <div
             className="flex gap-1 p-1 border"
-            style={{ borderColor: 'rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)' }}
+            style={{ borderColor: 'rgba(0,0,0,0.08)', background: '#EEF1F4' }}
           >
             {(availableTabs.length > 0 ? availableTabs : TABS.slice(0, 3)).map((tab) => (
               <button
@@ -146,9 +146,9 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
                 onClick={() => setActiveTab(tab.key)}
                 className="flex items-center gap-2 px-5 py-2 text-xs font-satoshi tracking-widest uppercase transition-all duration-300"
                 style={{
-                  color:   activeTab === tab.key ? '#F8F9FA' : 'rgba(248,249,250,0.38)',
-                  background: activeTab === tab.key ? 'rgba(255,255,255,0.07)' : 'transparent',
-                  borderBottom: activeTab === tab.key ? '1px solid rgba(255,255,255,0.25)' : '1px solid transparent',
+                  color:   activeTab === tab.key ? '#111418' : 'rgba(17,20,24,0.48)',
+                  background: activeTab === tab.key ? 'rgba(255,255,255,0.72)' : 'transparent',
+                  borderBottom: activeTab === tab.key ? '1px solid rgba(0,0,0,0.15)' : '1px solid transparent',
                 }}
               >
                 {tab.icon}
@@ -161,9 +161,9 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
         {/* Controls row */}
         <div
           className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4 pb-5 border-b"
-          style={{ borderColor: 'rgba(255,255,255,0.10)' }}
+          style={{ borderColor: 'rgba(0,0,0,0.08)' }}
         >
-          <p className="text-[rgba(255,255,255,0.58)] text-sm font-satoshi">
+          <p className="text-[#6C757D] text-sm font-satoshi">
             Showing{' '}
             <span className="text-foreground font-medium">{displayedItems.length}</span>{' '}
             {activeTab.toLowerCase()}
@@ -177,20 +177,20 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
                 onChange={(e) => setSortBy(e.target.value)}
                 className="vb-input appearance-none pr-8 !h-9 !text-xs cursor-pointer"
               >
-                <option value="newest" className="bg-[#2C3137]">Newest</option>
-                <option value="popularity" className="bg-[#2C3137]">Popularity</option>
-                <option value="rating" className="bg-[#2C3137]">Top Rated</option>
+                <option value="newest">Newest</option>
+                <option value="popularity">Popularity</option>
+                <option value="rating">Top Rated</option>
                 {activeTab !== 'Free Projects' && (
                   <>
-                    <option value="price_asc" className="bg-[#2C3137]">Price ↑</option>
-                    <option value="price_desc" className="bg-[#2C3137]">Price ↓</option>
+                    <option value="price_asc">Price ↑</option>
+                    <option value="price_desc">Price ↓</option>
                   </>
                 )}
               </select>
               <ArrowUpDown
                 size={12}
                 className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"
-                style={{ color: 'rgba(248,249,250,0.3)' }}
+                style={{ color: 'var(--vb-muted)' }}
               />
             </div>
           </div>
@@ -206,10 +206,10 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
             <ShoppingBag
               className="mb-5"
               size={32}
-              style={{ color: 'rgba(248,249,250,0.18)' }}
+              style={{ color: 'var(--vb-muted)' }}
             />
             <h3 className="font-display font-bold text-foreground text-xl mb-2">No Projects Found</h3>
-            <p className="text-foreground/35 text-sm">New {activeTab} items coming soon.</p>
+            <p className="text-[#6C757D] text-sm">New {activeTab} items coming soon.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -234,9 +234,9 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
                       ) : (
                         <div
                           className="w-full h-full flex items-center justify-center"
-                          style={{ background: 'rgba(255,255,255,0.03)' }}
+                          style={{ background: 'rgba(0,0,0,0.02)' }}
                         >
-                          <ShoppingBag size={28} style={{ color: 'rgba(248,249,250,0.18)' }} />
+                          <ShoppingBag size={28} style={{ color: 'var(--vb-muted)' }} />
                         </div>
                       )}
 
@@ -256,15 +256,15 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
                       <div
                         className="absolute top-2.5 right-2.5 flex items-center gap-1 px-2 py-0.5 border text-xs"
                         style={{
-                          borderColor: 'rgba(251,191,36,0.2)',
-                          background: 'rgba(33,37,41,0.9)',
-                          color: 'rgba(251,191,36,0.9)',
+                          borderColor: 'rgba(217,119,6,0.2)',
+                          background: 'rgba(255,255,255,0.92)',
+                          color: 'rgba(217,119,6,1)',
                           backdropFilter: 'blur(8px)',
                         }}
                       >
                         <Star size={9} fill="currentColor" />
                         <span className="font-semibold">{item.rating}</span>
-                        <span style={{ color: 'rgba(248,249,250,0.35)' }}>({item.review_count})</span>
+                        <span style={{ color: 'var(--vb-muted)' }}>({item.review_count})</span>
                       </div>
                     </div>
 
@@ -277,9 +277,9 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
                             key={tag}
                             className="text-[10px] font-satoshi font-medium px-2 py-0.5 tracking-widest uppercase border"
                             style={{
-                              borderColor: 'rgba(255,255,255,0.14)',
-                              color: 'rgba(255,255,255,0.58)',
-                              background: 'rgba(255,255,255,0.07)',
+                              borderColor: 'rgba(0,0,0,0.08)',
+                              color: '#6C757D',
+                              background: '#EEF1F4',
                             }}
                           >
                             {tag}
@@ -288,18 +288,18 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
                       </div>
 
                       <h3 className="font-display font-bold text-foreground text-lg mb-1">{item.title}</h3>
-                      <div className="flex items-center gap-1 text-xs mb-2" style={{ color: 'rgba(248,249,250,0.3)' }}>
+                      <div className="flex items-center gap-1 text-xs mb-2" style={{ color: 'var(--vb-muted)' }}>
                         <UserIcon size={10} />
-                        <span>by <span style={{ color: 'rgba(248,249,250,0.55)' }}>{item.developer_name}</span></span>
+                        <span>by <span style={{ color: 'var(--vb-text-sec)' }}>{item.developer_name}</span></span>
                       </div>
-                      <p className="text-[rgba(255,255,255,0.82)] text-sm mb-4 line-clamp-2 flex-grow leading-relaxed">
+                      <p className="text-[#495057] text-sm mb-4 line-clamp-2 flex-grow leading-relaxed">
                         {item.short_description}
                       </p>
 
                       {/* Stats */}
                       <div
                         className="flex justify-between items-center text-xs pt-3 mb-4 border-t"
-                        style={{ borderColor: 'rgba(255,255,255,0.14)', color: 'rgba(255,255,255,0.58)' }}
+                        style={{ borderColor: 'rgba(0,0,0,0.08)', color: '#6C757D' }}
                       >
                         <div className="flex items-center gap-1.5">
                           <TrendingUp size={11} /> <span>{item.views} views</span>
@@ -314,7 +314,7 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
                       <div className="flex items-center justify-between gap-3 mt-auto">
                         <div className="font-display font-bold text-foreground text-xl">
                           {activeTab === 'Free Projects' ? (
-                            <span style={{ color: 'rgba(52,211,153,0.8)' }}>FREE</span>
+                            <span style={{ color: '#10B981' }}>FREE</span>
                           ) : (
                             formatPrice(item.price, user?.country)
                           )}
@@ -332,7 +332,7 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
                         ) : (
                           <div
                             className="flex-1 py-2.5 text-center text-[10px] font-satoshi tracking-widest uppercase border"
-                            style={{ borderColor: 'rgba(255,255,255,0.10)', color: 'rgba(248,249,250,0.65)' }}
+                            style={{ borderColor: 'rgba(0,0,0,0.08)', color: '#6C757D' }}
                           >
                             Admin Mode
                           </div>

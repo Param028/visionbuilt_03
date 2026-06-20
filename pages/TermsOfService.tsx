@@ -13,7 +13,7 @@ const PolicySection: React.FC<{
   <div className="glass-card p-8 md:p-10">
     <div
       className="flex items-center gap-3 mb-5 pb-5 border-b"
-      style={{ borderColor: 'rgba(255,255,255,0.06)' }}
+      style={{ borderColor: 'rgba(0,0,0,0.08)' }}
     >
       <span style={{ color: 'var(--vb-accent)' }}>{icon}</span>
       <h2 className="font-display font-bold text-foreground text-lg">{heading}</h2>
@@ -31,7 +31,7 @@ const TermsOfService: React.FC = () => {
       {/* Page header */}
       <div
         className="relative border-b pt-20 pb-14 overflow-hidden"
-        style={{ borderColor: 'rgba(255,255,255,0.06)' }}
+        style={{ borderColor: 'rgba(0,0,0,0.08)' }}
       >
         <div
           className="absolute top-0 left-1/2 -translate-x-1/2 pointer-events-none"
@@ -126,7 +126,7 @@ const TermsOfService: React.FC = () => {
           <div className="glass-card p-8 md:p-10">
             <div
               className="flex items-center gap-3 mb-5 pb-5 border-b"
-              style={{ borderColor: 'rgba(255,255,255,0.06)' }}
+              style={{ borderColor: 'rgba(0,0,0,0.08)' }}
             >
               <span style={{ color: 'var(--vb-accent)' }}><Mail size={18} /></span>
               <h2 className="font-display font-bold text-foreground text-lg">6. Contact Us</h2>
@@ -142,7 +142,7 @@ const TermsOfService: React.FC = () => {
                 <div
                   key={item.label}
                   className="p-4 border"
-                  style={{ borderColor: 'rgba(255,255,255,0.07)', background: 'rgba(255,255,255,0.02)' }}
+                  style={{ borderColor: 'rgba(0,0,0,0.08)', background: '#EEF1F4' }}
                 >
                   <p className="text-label mb-1.5">{item.label}</p>
                   <p className="text-foreground/70 font-satoshi text-sm">{item.value}</p>

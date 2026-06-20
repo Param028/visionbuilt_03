@@ -71,54 +71,104 @@ export default {
   plugins: [
     heroui({
       themes: {
-        // ── DARK THEME (only theme used) ──────────────────
-        dark: {
+        light: {
           colors: {
-            background:  '#212529',
-            foreground:  '#FFFFFF',
+            background:  '#F8F9FA',
+            foreground:  '#111418',
 
             // Elevated surfaces (cards, inputs, code blocks)
-            content1:    '#2A2F35',
-            content2:    'rgba(255, 255, 255, 0.07)',
-            content3:    'rgba(255, 255, 255, 0.09)',
-            content4:    'rgba(255, 255, 255, 0.12)',
+            content1:    '#EEF1F4',
+            content2:    'rgba(255, 255, 255, 0.72)',
+            content3:    'rgba(255, 255, 255, 0.55)',
+            content4:    'rgba(255, 255, 255, 0.65)',
 
             // Primary action color = accent
             primary: {
-              DEFAULT:    '#B8C4D0',
+              DEFAULT:    '#7C8FA1',
               foreground: '#FFFFFF',
               50:  '#F0F3F6',
               100: '#D5DDE3',
               200: '#B0BFCB',
               300: '#8AA0B2',
-              400: '#B8C4D0',
-              500: '#A4B0BE',
-              600: '#8E9BAC',
-              700: '#78869A',
-              800: '#627188',
-              900: '#4C5C76',
+              400: '#7C8FA1',
+              500: '#6E8090',
+              600: '#5A6A78',
+              700: '#465460',
+              800: '#323D47',
+              900: '#1E272F',
             },
 
             secondary: {
-              DEFAULT:    '#343A40',
-              foreground: '#CED4DA',
+              DEFAULT:    '#EEF1F4',
+              foreground: '#495057',
             },
 
             // Borders — very subtle
-            divider:    '#252B30',
+            divider:    'rgba(0, 0, 0, 0.08)',
             focus:      '#7C8FA1',
 
             // Status colors
             success: {
-              DEFAULT:    '#4caf50',
+              DEFAULT:    '#2e7d32',
               foreground: '#ffffff',
             },
             warning: {
-              DEFAULT:    '#ff9800',
+              DEFAULT:    '#ed6c02',
               foreground: '#ffffff',
             },
             danger: {
-              DEFAULT:    '#f44336',
+              DEFAULT:    '#d32f2f',
+              foreground: '#ffffff',
+            },
+          },
+        },
+        dark: {
+          colors: {
+            background:  '#F8F9FA',
+            foreground:  '#111418',
+
+            // Elevated surfaces (cards, inputs, code blocks)
+            content1:    '#EEF1F4',
+            content2:    'rgba(255, 255, 255, 0.72)',
+            content3:    'rgba(255, 255, 255, 0.55)',
+            content4:    'rgba(255, 255, 255, 0.65)',
+
+            // Primary action color = accent
+            primary: {
+              DEFAULT:    '#7C8FA1',
+              foreground: '#FFFFFF',
+              50:  '#F0F3F6',
+              100: '#D5DDE3',
+              200: '#B0BFCB',
+              300: '#8AA0B2',
+              400: '#7C8FA1',
+              500: '#6E8090',
+              600: '#5A6A78',
+              700: '#465460',
+              800: '#323D47',
+              900: '#1E272F',
+            },
+
+            secondary: {
+              DEFAULT:    '#EEF1F4',
+              foreground: '#495057',
+            },
+
+            // Borders — very subtle
+            divider:    'rgba(0, 0, 0, 0.08)',
+            focus:      '#7C8FA1',
+
+            // Status colors
+            success: {
+              DEFAULT:    '#2e7d32',
+              foreground: '#ffffff',
+            },
+            warning: {
+              DEFAULT:    '#ed6c02',
+              foreground: '#ffffff',
+            },
+            danger: {
+              DEFAULT:    '#d32f2f',
               foreground: '#ffffff',
             },
           },

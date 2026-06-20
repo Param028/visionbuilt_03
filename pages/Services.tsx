@@ -63,14 +63,14 @@ const getIcon = (iconName: string) => {
 // ── Loading skeleton ──────────────────────────────────────────
 const ServiceSkeleton = () => (
   <div className="glass-card p-8 flex flex-col gap-4 animate-pulse">
-    <div className="w-10 h-10 rounded-lg bg-white/5" />
-    <div className="h-5 w-2/3 bg-white/5 rounded" />
-    <div className="h-4 w-full bg-white/4 rounded" />
-    <div className="h-4 w-5/6 bg-white/4 rounded" />
+    <div className="w-10 h-10 rounded-lg bg-black/5" />
+    <div className="h-5 w-2/3 bg-black/5 rounded" />
+    <div className="h-4 w-full bg-black/5 rounded" />
+    <div className="h-4 w-5/6 bg-black/5 rounded" />
     <div className="mt-4 space-y-2">
-      {[1, 2, 3].map(i => <div key={i} className="h-3 w-3/4 bg-white/3 rounded" />)}
+      {[1, 2, 3].map(i => <div key={i} className="h-3 w-3/4 bg-black/3 rounded" />)}
     </div>
-    <div className="mt-auto h-10 bg-white/5 rounded" />
+    <div className="mt-auto h-10 bg-black/5 rounded" />
   </div>
 );
 
@@ -116,7 +116,7 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
       {/* ── PAGE HEADER ── */}
       <div
         className="relative border-b pt-20 pb-16 overflow-hidden"
-        style={{ borderColor: 'rgba(255,255,255,0.10)' }}
+        style={{ borderColor: 'rgba(0,0,0,0.08)' }}
       >
         {/* Atmospheric glow */}
         <div
@@ -144,7 +144,7 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
             Our Services
           </motion.h1>
           <motion.p
-            className="text-[rgba(255,255,255,0.82)] text-lg max-w-xl mx-auto leading-relaxed font-light"
+            className="text-[#495057] text-lg max-w-xl mx-auto leading-relaxed font-light"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
@@ -164,7 +164,7 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
           <div className="glass-card flex flex-col items-center justify-center text-center p-16 max-w-lg mx-auto">
             <AlertCircle className="w-10 h-10 mb-5" style={{ color: 'rgba(248,249,250,0.25)' }} />
             <h3 className="font-display font-bold text-foreground text-xl mb-3">Service Catalog Unavailable</h3>
-            <p className="text-[rgba(255,255,255,0.82)] text-sm leading-relaxed mb-8">
+            <p className="text-[#495057] text-sm leading-relaxed mb-8">
               Unable to load services at this moment. Please check your connection or contact support.
             </p>
             <button
@@ -192,9 +192,9 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
                     <div
                       className="p-2.5 border transition-all duration-300"
                       style={{
-                        borderColor: 'rgba(255,255,255,0.1)',
+                        borderColor: 'rgba(0,0,0,0.08)',
                         color: 'var(--vb-accent)',
-                        background: 'rgba(124,143,161,0.06)',
+                        background: 'rgba(124,143,161,0.10)',
                       }}
                     >
                       {getIcon(service.icon)}
@@ -207,7 +207,7 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
                   </h3>
 
                   {/* Description */}
-                  <p className="text-[rgba(255,255,255,0.82)] text-sm leading-relaxed mb-1 line-clamp-2">
+                  <p className="text-[#495057] text-sm leading-relaxed mb-1 line-clamp-2">
                     {service.description}
                   </p>
 
@@ -217,7 +217,7 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
                   {/* Feature list */}
                   <div
                     className="flex-grow space-y-2.5 mb-7 pt-6 border-t"
-                    style={{ borderColor: 'rgba(255,255,255,0.14)' }}
+                    style={{ borderColor: 'rgba(0,0,0,0.08)' }}
                   >
                     {service.features.slice(0, 6).map((feature, i) => {
                       const desc = getFeatureDescription(feature);
@@ -231,14 +231,14 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
                           {desc ? (
                             <Tooltip content={desc} className="cursor-help">
                               <span
-                                className="text-[rgba(255,255,255,0.58)] border-b border-dashed transition-colors"
-                                style={{ borderColor: 'rgba(255,255,255,0.12)' }}
+                                className="text-[#6C757D] border-b border-dashed transition-colors"
+                                style={{ borderColor: 'rgba(0,0,0,0.08)' }}
                               >
                                 {feature}
                               </span>
                             </Tooltip>
                           ) : (
-                            <span className="text-[rgba(255,255,255,0.58)]">{feature}</span>
+                            <span className="text-[#6C757D]">{feature}</span>
                           )}
                         </div>
                       );
@@ -262,8 +262,8 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
                       <div
                         className="w-full py-3 text-center text-xs font-satoshi tracking-widest uppercase border"
                         style={{
-                          borderColor: 'rgba(255,255,255,0.10)',
-                          color: 'rgba(248,249,250,0.65)',
+                          borderColor: 'rgba(0,0,0,0.08)',
+                          color: '#6C757D',
                         }}
                       >
                         Admin Mode
@@ -284,7 +284,7 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
               <h2 className="text-display font-display font-bold text-foreground">
                 Monthly Subscriptions
               </h2>
-              <p className="text-[rgba(255,255,255,0.82)] max-w-xl mt-4 leading-relaxed font-light">
+              <p className="text-[#495057] max-w-xl mt-4 leading-relaxed font-light">
                 Ongoing support and development packages to keep your business running smoothly.
               </p>
             </div>
@@ -308,12 +308,12 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
                       </span>
                       <span
                         className="text-sm font-satoshi"
-                        style={{ color: 'rgba(248,249,250,0.3)' }}
+                        style={{ color: 'var(--vb-muted)' }}
                       >
                         /{plan.interval}
                       </span>
                     </div>
-                    <p className="text-[rgba(255,255,255,0.82)] text-sm leading-relaxed mb-7 min-h-[44px]">
+                    <p className="text-[#495057] text-sm leading-relaxed mb-7 min-h-[44px]">
                       {plan.description}
                     </p>
 
@@ -325,8 +325,8 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
                     </button>
 
                     <div
-                      className="flex-1 space-y-2.5 pt-6 border-t"
-                      style={{ borderColor: 'rgba(255,255,255,0.14)' }}
+                      className="flex-grow space-y-2.5 pt-6 border-t"
+                      style={{ borderColor: 'rgba(0,0,0,0.08)' }}
                     >
                       {plan.features?.map((feature: string, i: number) => (
                         <div key={i} className="flex items-start text-xs gap-2.5">
@@ -335,7 +335,7 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
                             className="shrink-0 mt-0.5"
                             style={{ color: 'var(--vb-accent)' }}
                           />
-                          <span className="text-[rgba(255,255,255,0.58)]">{feature}</span>
+                          <span className="text-[#6C757D]">{feature}</span>
                         </div>
                       ))}
                     </div>
@@ -349,13 +349,13 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
         {/* ── CTA STRIP ── */}
         <div
           className="mt-24 glass-card p-10 md:p-14 text-center border"
-          style={{ borderColor: 'rgba(255,255,255,0.14)', background: '#2A2F35' }}
+          style={{ borderColor: 'rgba(0,0,0,0.08)', background: '#EEF1F4' }}
         >
           <p className="text-label mb-5">Need Something Custom?</p>
           <h2 className="text-display-sm font-display font-bold text-foreground mb-5">
             Let's Discuss Your Project
           </h2>
-          <p className="text-[rgba(255,255,255,0.82)] max-w-md mx-auto text-sm leading-relaxed mb-10">
+          <p className="text-[#495057] max-w-md mx-auto text-sm leading-relaxed mb-10">
             Every project is unique. Tell us what you need and we'll craft a tailored solution.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">

@@ -12,7 +12,7 @@ function cn(...inputs: ClassValue[]) {
 export const Card: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ className, children, ...props }) => {
   return (
     <div className={cn("glass-panel rounded-xl p-6", className)} {...props}>
-      {className?.includes('hover:') ? null : <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/5 to-transparent pointer-events-none opacity-20"></div>}
+      {className?.includes('hover:') ? null : <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/20 to-transparent pointer-events-none opacity-40"></div>}
       <div className="relative z-10">{children}</div>
     </div>
   );
@@ -39,10 +39,10 @@ export const Button: React.FC<ButtonProps> = ({
   const baseStyles = "relative inline-flex items-center justify-center rounded-lg font-medium transition-all focus:outline-none disabled:opacity-50 disabled:pointer-events-none overflow-hidden group border select-none";
   
   const variants = {
-    primary: "bg-white/[0.14] hover:bg-white/[0.19] text-foreground border-white/20 hover:border-white/30 backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_4px_12px_rgba(0,0,0,0.15)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.20),0_0_16px_rgba(184,196,208,0.15)] active:scale-[0.98] transition-all duration-400 ease-out",
-    secondary: "bg-transparent border-white/10 hover:border-white/20 text-foreground/82 hover:text-foreground hover:bg-white/[0.07] active:scale-[0.98] transition-all duration-400 ease-out",
-    outline: "bg-transparent border-white/15 hover:border-white/25 text-foreground hover:bg-white/[0.07] active:scale-[0.98] transition-all duration-400 ease-out",
-    ghost: "bg-transparent border-transparent text-foreground/58 hover:text-foreground hover:bg-white/[0.07] active:scale-[0.98] transition-all duration-400 ease-out"
+    primary: "bg-white/[0.68] hover:bg-white/[0.85] text-foreground border-white/80 hover:border-white/95 backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_4px_12px_rgba(0,0,0,0.04)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_6px_16px_rgba(0,0,0,0.06)] active:scale-[0.98] transition-all duration-400 ease-out",
+    secondary: "bg-transparent border-black/10 hover:border-black/20 text-foreground/80 hover:text-foreground hover:bg-white/[0.4] active:scale-[0.98] transition-all duration-400 ease-out",
+    outline: "bg-transparent border-black/10 hover:border-black/20 text-foreground hover:bg-white/[0.4] active:scale-[0.98] transition-all duration-400 ease-out",
+    ghost: "bg-transparent border-transparent text-foreground/60 hover:text-foreground hover:bg-white/[0.4] active:scale-[0.98] transition-all duration-400 ease-out"
   };
   
   const sizes = {
@@ -74,7 +74,7 @@ export const Button: React.FC<ButtonProps> = ({
       {/* Glare Effect Layer */}
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
         <div 
-            className="absolute -inset-[100%] bg-[radial-gradient(circle_at_var(--x,_50%)_var(--y,_50%),rgba(255,255,255,0.08)_0%,transparent_50%)]" 
+            className="absolute -inset-[100%] bg-[radial-gradient(circle_at_var(--x,_50%)_var(--y,_50%),rgba(0,0,0,0.03)_0%,transparent_50%)]" 
             style={{ willChange: "transform" }}
         />
       </div>
@@ -105,7 +105,7 @@ export const Input: React.FC<InputProps> = ({ label, error, className, ...props 
       {label && <label className="text-xs font-semibold text-foreground/70 uppercase tracking-wider">{label}</label>}
       <input
         className={cn(
-          "flex h-10 w-full rounded-lg border border-white/14 bg-white/[0.07] px-3 py-2 text-sm text-foreground placeholder:text-foreground/45 focus:outline-none focus:ring-2 focus:ring-white/15 focus:border-white/35 transition-all duration-300",
+          "flex h-10 w-full rounded-lg border border-black/10 bg-white/70 px-3 py-2 text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-black/20 transition-all duration-300",
           error && "border-red-500/50 focus:ring-red-500/30",
           className
         )}
@@ -128,7 +128,7 @@ export const Textarea: React.FC<TextareaProps> = ({ label, error, className, ...
       {label && <label className="text-xs font-semibold text-foreground/70 uppercase tracking-wider">{label}</label>}
       <textarea
         className={cn(
-          "flex min-h-[80px] w-full rounded-lg border border-white/14 bg-white/[0.07] px-3 py-2 text-sm text-foreground placeholder:text-foreground/45 focus:outline-none focus:ring-2 focus:ring-white/15 focus:border-white/35 transition-all duration-300",
+          "flex min-h-[80px] w-full rounded-lg border border-black/10 bg-white/70 px-3 py-2 text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-black/20 transition-all duration-300",
           error && "border-red-500/50 focus:ring-red-500/30",
           className
         )}
