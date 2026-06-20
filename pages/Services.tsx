@@ -144,7 +144,7 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
             Our Services
           </motion.h1>
           <motion.p
-            className="text-[#DDE1E6] text-lg max-w-xl mx-auto leading-relaxed font-light"
+            className="text-[rgba(255,255,255,0.82)] text-lg max-w-xl mx-auto leading-relaxed font-light"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
@@ -164,7 +164,7 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
           <div className="glass-card flex flex-col items-center justify-center text-center p-16 max-w-lg mx-auto">
             <AlertCircle className="w-10 h-10 mb-5" style={{ color: 'rgba(248,249,250,0.25)' }} />
             <h3 className="font-display font-bold text-foreground text-xl mb-3">Service Catalog Unavailable</h3>
-            <p className="text-[#DDE1E6] text-sm leading-relaxed mb-8">
+            <p className="text-[rgba(255,255,255,0.82)] text-sm leading-relaxed mb-8">
               Unable to load services at this moment. Please check your connection or contact support.
             </p>
             <button
@@ -207,7 +207,7 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
                   </h3>
 
                   {/* Description */}
-                  <p className="text-[#DDE1E6] text-sm leading-relaxed mb-1 line-clamp-2">
+                  <p className="text-[rgba(255,255,255,0.82)] text-sm leading-relaxed mb-1 line-clamp-2">
                     {service.description}
                   </p>
 
@@ -217,7 +217,7 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
                   {/* Feature list */}
                   <div
                     className="flex-grow space-y-2.5 mb-7 pt-6 border-t"
-                    style={{ borderColor: 'rgba(255,255,255,0.10)' }}
+                    style={{ borderColor: 'rgba(255,255,255,0.14)' }}
                   >
                     {service.features.slice(0, 6).map((feature, i) => {
                       const desc = getFeatureDescription(feature);
@@ -231,14 +231,14 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
                           {desc ? (
                             <Tooltip content={desc} className="cursor-help">
                               <span
-                                className="text-[#ADB5BD] border-b border-dashed transition-colors"
+                                className="text-[rgba(255,255,255,0.58)] border-b border-dashed transition-colors"
                                 style={{ borderColor: 'rgba(255,255,255,0.12)' }}
                               >
                                 {feature}
                               </span>
                             </Tooltip>
                           ) : (
-                            <span className="text-[#ADB5BD]">{feature}</span>
+                            <span className="text-[rgba(255,255,255,0.58)]">{feature}</span>
                           )}
                         </div>
                       );
@@ -284,7 +284,7 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
               <h2 className="text-display font-display font-bold text-foreground">
                 Monthly Subscriptions
               </h2>
-              <p className="text-[#DDE1E6] max-w-xl mt-4 leading-relaxed font-light">
+              <p className="text-[rgba(255,255,255,0.82)] max-w-xl mt-4 leading-relaxed font-light">
                 Ongoing support and development packages to keep your business running smoothly.
               </p>
             </div>
@@ -313,7 +313,7 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
                         /{plan.interval}
                       </span>
                     </div>
-                    <p className="text-[#DDE1E6] text-sm leading-relaxed mb-7 min-h-[44px]">
+                    <p className="text-[rgba(255,255,255,0.82)] text-sm leading-relaxed mb-7 min-h-[44px]">
                       {plan.description}
                     </p>
 
@@ -326,7 +326,7 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
 
                     <div
                       className="flex-1 space-y-2.5 pt-6 border-t"
-                      style={{ borderColor: 'rgba(255,255,255,0.10)' }}
+                      style={{ borderColor: 'rgba(255,255,255,0.14)' }}
                     >
                       {plan.features?.map((feature: string, i: number) => (
                         <div key={i} className="flex items-start text-xs gap-2.5">
@@ -335,7 +335,7 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
                             className="shrink-0 mt-0.5"
                             style={{ color: 'var(--vb-accent)' }}
                           />
-                          <span className="text-[#ADB5BD]">{feature}</span>
+                          <span className="text-[rgba(255,255,255,0.58)]">{feature}</span>
                         </div>
                       ))}
                     </div>
@@ -349,13 +349,13 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
         {/* ── CTA STRIP ── */}
         <div
           className="mt-24 glass-card p-10 md:p-14 text-center border"
-          style={{ borderColor: 'rgba(255,255,255,0.10)', background: '#2A2F35' }}
+          style={{ borderColor: 'rgba(255,255,255,0.14)', background: '#2A2F35' }}
         >
           <p className="text-label mb-5">Need Something Custom?</p>
           <h2 className="text-display-sm font-display font-bold text-foreground mb-5">
             Let's Discuss Your Project
           </h2>
-          <p className="text-[#DDE1E6] max-w-md mx-auto text-sm leading-relaxed mb-10">
+          <p className="text-[rgba(255,255,255,0.82)] max-w-md mx-auto text-sm leading-relaxed mb-10">
             Every project is unique. Tell us what you need and we'll craft a tailored solution.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">

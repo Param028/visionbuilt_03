@@ -196,14 +196,14 @@ const Landing: React.FC = () => {
             >
               {heroHeadingLines.main}
               <br />
-              <span className="text-[#AAB7C4]">
+              <span className="text-[#B8C4D0]">
                 {heroHeadingLines.accent}
               </span>
             </motion.h1>
 
             {/* Subheading */}
             <motion.p
-              className="text-[#DDE1E6] text-lg md:text-xl max-w-lg mb-14 leading-relaxed font-light"
+              className="text-[rgba(255,255,255,0.82)] text-lg md:text-xl max-w-lg mb-14 leading-relaxed font-light"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.25, ease: [0.4, 0, 0.2, 1] }}
@@ -312,7 +312,7 @@ const Landing: React.FC = () => {
                 <h3 className="text-display-sm font-display font-bold text-foreground mb-4">
                   {SERVICES[0].title}
                 </h3>
-                <p className="text-[#DDE1E6] leading-relaxed max-w-md">
+                <p className="text-[rgba(255,255,255,0.82)] leading-relaxed max-w-md">
                   {SERVICES[0].desc}
                 </p>
                 <Link
@@ -337,7 +337,7 @@ const Landing: React.FC = () => {
                 <h3 className="font-display font-bold text-foreground text-xl mb-3">
                   {SERVICES[1].title}
                 </h3>
-                <p className="text-[#DDE1E6] text-sm leading-relaxed">
+                <p className="text-[rgba(255,255,255,0.82)] text-sm leading-relaxed">
                   {SERVICES[1].desc}
                 </p>
               </div>
@@ -353,7 +353,7 @@ const Landing: React.FC = () => {
                   <h3 className="font-display font-semibold text-foreground mb-2">
                     {svc.title}
                   </h3>
-                  <p className="text-[#ADB5BD] text-sm leading-relaxed">
+                  <p className="text-[rgba(255,255,255,0.58)] text-sm leading-relaxed">
                     {svc.desc}
                   </p>
                 </div>
@@ -456,7 +456,7 @@ const Landing: React.FC = () => {
                   <h3 className="font-display font-semibold text-foreground mb-2 text-sm">
                     {step.title}
                   </h3>
-                  <p className="text-[#ADB5BD] text-xs leading-relaxed">
+                  <p className="text-[rgba(255,255,255,0.58)] text-xs leading-relaxed">
                     {step.desc}
                   </p>
                 </div>
@@ -505,12 +505,12 @@ const Landing: React.FC = () => {
                         /{sub.interval}
                       </span>
                     </div>
-                    <p className="text-[#DDE1E6] text-sm mb-7 flex-1 leading-relaxed">
+                    <p className="text-[rgba(255,255,255,0.82)] text-sm mb-7 flex-1 leading-relaxed">
                       {sub.description}
                     </p>
                     <ul className="space-y-2.5 mb-8">
                       {sub.features.slice(0, 5).map((f: string, fi: number) => (
-                        <li key={fi} className="flex items-start gap-2.5 text-xs text-[#ADB5BD]">
+                        <li key={fi} className="flex items-start gap-2.5 text-xs text-[rgba(255,255,255,0.58)]">
                           <CheckCircle
                             size={12}
                             className="shrink-0 mt-0.5"
@@ -560,10 +560,10 @@ const Landing: React.FC = () => {
             >
               Let&apos;s Build Something
               <br />
-              <span className="text-[#AAB7C4]">Extraordinary.</span>
+              <span className="text-[#B8C4D0]">Extraordinary.</span>
             </h2>
             <p
-              className="text-[#DDE1E6] text-lg mb-14 max-w-xl mx-auto leading-relaxed font-light"
+              className="text-[rgba(255,255,255,0.82)] text-lg mb-14 max-w-xl mx-auto leading-relaxed font-light"
             >
               Partner with Vision Built to create digital experiences that define your category and outlast trends.
             </p>

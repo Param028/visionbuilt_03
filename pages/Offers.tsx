@@ -101,7 +101,7 @@ const Offers: React.FC<{ user: User | null }> = ({ user }) => {
 
           {/* Title + Description */}
           <h3 className="font-display font-bold text-foreground text-xl mb-2">{offer.title}</h3>
-          <p className="text-[#ADB5BD] text-sm leading-relaxed mb-5 line-clamp-2">
+          <p className="text-[rgba(255,255,255,0.82)] text-sm leading-relaxed mb-5 line-clamp-2">
             {offer.description}
           </p>
 
@@ -123,7 +123,7 @@ const Offers: React.FC<{ user: User | null }> = ({ user }) => {
               onClick={(e) => { e.stopPropagation(); if (!isExpired) handleCopy(offer.code, offer.id); }}
               className="transition-colors"
               disabled={isExpired}
-              style={{ color: isExpired ? 'rgba(248,249,250,0.2)' : 'rgba(255,255,255,0.4)' }}
+              style={{ color: isExpired ? 'rgba(248,249,250,0.2)' : '#B8C4D0' }}
               aria-label={`Copy code ${offer.code}`}
             >
               <AnimatePresence mode="wait">
@@ -206,7 +206,7 @@ const Offers: React.FC<{ user: User | null }> = ({ user }) => {
             Exclusive Offers
           </motion.h1>
           <motion.p
-            className="text-[#DDE1E6] text-lg max-w-xl mx-auto leading-relaxed font-light"
+            className="text-[rgba(255,255,255,0.82)] text-lg max-w-xl mx-auto leading-relaxed font-light"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}

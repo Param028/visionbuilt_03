@@ -120,7 +120,7 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
             Marketplace
           </motion.h1>
           <motion.p
-            className="text-[#DDE1E6] text-lg max-w-xl mx-auto leading-relaxed font-light"
+            className="text-[rgba(255,255,255,0.82)] text-lg max-w-xl mx-auto leading-relaxed font-light"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
@@ -163,7 +163,7 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
           className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4 pb-5 border-b"
           style={{ borderColor: 'rgba(255,255,255,0.10)' }}
         >
-          <p className="text-[#ADB5BD] text-sm font-satoshi">
+          <p className="text-[rgba(255,255,255,0.58)] text-sm font-satoshi">
             Showing{' '}
             <span className="text-foreground font-medium">{displayedItems.length}</span>{' '}
             {activeTab.toLowerCase()}
@@ -277,9 +277,9 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
                             key={tag}
                             className="text-[10px] font-satoshi font-medium px-2 py-0.5 tracking-widest uppercase border"
                             style={{
-                              borderColor: 'rgba(255,255,255,0.10)',
-                              color: 'rgba(248,249,250,0.65)',
-                              background: 'rgba(255,255,255,0.04)',
+                              borderColor: 'rgba(255,255,255,0.14)',
+                              color: 'rgba(255,255,255,0.58)',
+                              background: 'rgba(255,255,255,0.07)',
                             }}
                           >
                             {tag}
@@ -292,14 +292,14 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
                         <UserIcon size={10} />
                         <span>by <span style={{ color: 'rgba(248,249,250,0.55)' }}>{item.developer_name}</span></span>
                       </div>
-                      <p className="text-[#ADB5BD] text-sm mb-4 line-clamp-2 flex-grow leading-relaxed">
+                      <p className="text-[rgba(255,255,255,0.82)] text-sm mb-4 line-clamp-2 flex-grow leading-relaxed">
                         {item.short_description}
                       </p>
 
                       {/* Stats */}
                       <div
                         className="flex justify-between items-center text-xs pt-3 mb-4 border-t"
-                        style={{ borderColor: 'rgba(255,255,255,0.10)', color: 'rgba(248,249,250,0.65)' }}
+                        style={{ borderColor: 'rgba(255,255,255,0.14)', color: 'rgba(255,255,255,0.58)' }}
                       >
                         <div className="flex items-center gap-1.5">
                           <TrendingUp size={11} /> <span>{item.views} views</span>

@@ -24,13 +24,13 @@ export default {
         'vb': {
           bg:      '#212529',
           bgalt:   '#2A2F35',
-          surface: 'rgba(255, 255, 255, 0.04)',
-          glass:   'rgba(255, 255, 255, 0.06)',
-          border:  'rgba(255, 255, 255, 0.10)',
-          text:    '#F8F9FA',
-          text2:   '#DDE1E6',
-          muted:   '#ADB5BD',
-          accent:  '#AAB7C4',
+          surface: 'rgba(255, 255, 255, 0.07)',
+          glass:   'rgba(255, 255, 255, 0.09)',
+          border:  'rgba(255, 255, 255, 0.14)',
+          text:    '#FFFFFF',
+          text2:   'rgba(255, 255, 255, 0.82)',
+          muted:   'rgba(255, 255, 255, 0.58)',
+          accent:  '#B8C4D0',
         },
       },
       animation: {
@@ -75,28 +75,28 @@ export default {
         dark: {
           colors: {
             background:  '#212529',
-            foreground:  '#F8F9FA',
+            foreground:  '#FFFFFF',
 
             // Elevated surfaces (cards, inputs, code blocks)
             content1:    '#2A2F35',
-            content2:    'rgba(255, 255, 255, 0.04)',
-            content3:    'rgba(255, 255, 255, 0.06)',
-            content4:    'rgba(255, 255, 255, 0.08)',
+            content2:    'rgba(255, 255, 255, 0.07)',
+            content3:    'rgba(255, 255, 255, 0.09)',
+            content4:    'rgba(255, 255, 255, 0.12)',
 
             // Primary action color = accent
             primary: {
-              DEFAULT:    '#AAB7C4',
-              foreground: '#F8F9FA',
+              DEFAULT:    '#B8C4D0',
+              foreground: '#FFFFFF',
               50:  '#F0F3F6',
               100: '#D5DDE3',
               200: '#B0BFCB',
               300: '#8AA0B2',
-              400: '#AAB7C4',
-              500: '#94A3B0',
-              600: '#7E8F9C',
-              700: '#687B88',
-              800: '#526774',
-              900: '#3C5360',
+              400: '#B8C4D0',
+              500: '#A4B0BE',
+              600: '#8E9BAC',
+              700: '#78869A',
+              800: '#627188',
+              900: '#4C5C76',
             },
 
             secondary: {

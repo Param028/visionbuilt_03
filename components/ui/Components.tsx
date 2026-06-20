@@ -39,10 +39,10 @@ export const Button: React.FC<ButtonProps> = ({
   const baseStyles = "relative inline-flex items-center justify-center rounded-lg font-medium transition-all focus:outline-none disabled:opacity-50 disabled:pointer-events-none overflow-hidden group border select-none";
   
   const variants = {
-    primary: "bg-white/[0.09] hover:bg-white/[0.14] text-foreground border-white/15 hover:border-white/25 backdrop-blur-md shadow-[inset_0_1px_1px_rgba(255,255,255,0.15),0_4px_12px_rgba(0,0,0,0.15)] hover:shadow-[inset_0_1px_1px_rgba(255,255,255,0.20),0_0_16px_rgba(170,183,196,0.12)] active:scale-[0.98] transition-all duration-400 ease-out",
-    secondary: "bg-transparent border-white/10 hover:border-white/20 text-foreground/80 hover:text-foreground hover:bg-white/[0.04] active:scale-[0.98] transition-all duration-400 ease-out",
-    outline: "bg-transparent border-white/15 hover:border-white/25 text-foreground hover:bg-white/[0.04] active:scale-[0.98] transition-all duration-400 ease-out",
-    ghost: "bg-transparent border-transparent text-foreground/60 hover:text-foreground hover:bg-white/[0.04] active:scale-[0.98] transition-all duration-400 ease-out"
+    primary: "bg-white/[0.14] hover:bg-white/[0.19] text-foreground border-white/20 hover:border-white/30 backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_4px_12px_rgba(0,0,0,0.15)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.20),0_0_16px_rgba(184,196,208,0.15)] active:scale-[0.98] transition-all duration-400 ease-out",
+    secondary: "bg-transparent border-white/10 hover:border-white/20 text-foreground/82 hover:text-foreground hover:bg-white/[0.07] active:scale-[0.98] transition-all duration-400 ease-out",
+    outline: "bg-transparent border-white/15 hover:border-white/25 text-foreground hover:bg-white/[0.07] active:scale-[0.98] transition-all duration-400 ease-out",
+    ghost: "bg-transparent border-transparent text-foreground/58 hover:text-foreground hover:bg-white/[0.07] active:scale-[0.98] transition-all duration-400 ease-out"
   };
   
   const sizes = {
@@ -105,7 +105,7 @@ export const Input: React.FC<InputProps> = ({ label, error, className, ...props 
       {label && <label className="text-xs font-semibold text-foreground/70 uppercase tracking-wider">{label}</label>}
       <input
         className={cn(
-          "flex h-10 w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-foreground placeholder:text-foreground/45 focus:outline-none focus:ring-2 focus:ring-white/10 focus:border-white/30 transition-all duration-300",
+          "flex h-10 w-full rounded-lg border border-white/14 bg-white/[0.07] px-3 py-2 text-sm text-foreground placeholder:text-foreground/45 focus:outline-none focus:ring-2 focus:ring-white/15 focus:border-white/35 transition-all duration-300",
           error && "border-red-500/50 focus:ring-red-500/30",
           className
         )}
@@ -128,7 +128,7 @@ export const Textarea: React.FC<TextareaProps> = ({ label, error, className, ...
       {label && <label className="text-xs font-semibold text-foreground/70 uppercase tracking-wider">{label}</label>}
       <textarea
         className={cn(
-          "flex min-h-[80px] w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-foreground placeholder:text-foreground/45 focus:outline-none focus:ring-2 focus:ring-white/10 focus:border-white/30 transition-all duration-300",
+          "flex min-h-[80px] w-full rounded-lg border border-white/14 bg-white/[0.07] px-3 py-2 text-sm text-foreground placeholder:text-foreground/45 focus:outline-none focus:ring-2 focus:ring-white/15 focus:border-white/35 transition-all duration-300",
           error && "border-red-500/50 focus:ring-red-500/30",
           className
         )}

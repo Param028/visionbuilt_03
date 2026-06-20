@@ -220,8 +220,8 @@ export const Carousel: React.FC<{ items: CarouselItem[] }> = ({ items }) => {
                   damping: 20,
                 }}
                 className={cn(
-                  "absolute w-[300px] md:w-[400px] h-[300px] bg-white/[0.06] border border-white/10 backdrop-blur-xl rounded-2xl p-6 flex flex-col items-center justify-center shadow-2xl cursor-pointer",
-                  isActive ? "border-white/20 shadow-[0_0_30px_rgba(255,255,255,0.06)]" : "hover:bg-white/[0.08]",
+                  "absolute w-[300px] md:w-[400px] h-[300px] bg-white/[0.09] border border-white/14 backdrop-blur-xl rounded-2xl p-6 flex flex-col items-center justify-center shadow-2xl cursor-pointer",
+                  isActive ? "border-white/25 shadow-[0_0_30px_rgba(255,255,255,0.08)]" : "hover:bg-white/[0.12]",
                   item.className
                 )}
                 onClick={() => {
@@ -404,7 +404,7 @@ export const GlareCard: React.FC<{ children: React.ReactNode; className?: string
   // Disable expensive tilt on mobile
   if (isMobile) {
     return (
-      <div className={cn("rounded-xl border border-white/10 bg-white/[0.06] shadow-xl backdrop-blur-md overflow-hidden", className)}>
+      <div className={cn("rounded-xl border border-white/14 bg-white/[0.09] shadow-xl backdrop-blur-xl overflow-hidden", className)}>
         {children}
       </div>
     );
@@ -443,7 +443,7 @@ export const GlareCard: React.FC<{ children: React.ReactNode; className?: string
             animate={{ rotateX: rotate.x, rotateY: rotate.y }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
         >
-            <div className="w-full h-full overflow-hidden rounded-xl border border-white/10 bg-white/[0.06] shadow-xl backdrop-blur-md">
+            <div className="w-full h-full overflow-hidden rounded-xl border border-white/14 bg-white/[0.09] shadow-xl backdrop-blur-xl">
                  {children}
             </div>
             <div 
