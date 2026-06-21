@@ -68,27 +68,9 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
           initial={{ opacity: 0, scale: 0.85 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
-          className="mb-10 relative"
+          className="mb-12 relative flex justify-center items-center"
         >
-          {/* Outer accent ring */}
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-            className="absolute -inset-6 rounded-full"
-            style={{ border: '1px solid rgba(124,143,161,0.12)' }}
-          />
-          {/* Inner ring */}
-          <motion.div
-            animate={{ rotate: -360 }}
-            transition={{ duration: 35, repeat: Infinity, ease: 'linear' }}
-            className="absolute -inset-10 rounded-full"
-            style={{ border: '1px solid rgba(255,255,255,0.04)' }}
-          />
-
-          {/* Logo icon — rendered as modern image */}
-          <div className="relative w-48 h-20 flex items-center justify-center">
-            <img src="/logo.png" alt="Vision Built Logo" className="w-40 object-contain" />
-          </div>
+          <img src="/logo.png" alt="Vision Built Logo" className="w-64 md:w-80 object-contain" />
         </motion.div>
 
         {/* Tagline */}
