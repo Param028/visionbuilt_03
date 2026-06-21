@@ -103,7 +103,7 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
 
           {/* Logo */}
           <Link to="/" className="flex items-center group z-20" aria-label="Vision Built home">
-            <img src="/logo.png" alt="Vision Built Logo" className="h-7 md:h-8 object-contain" />
+            <img src="/logo.png" alt="Vision Built Logo" className="h-9 md:h-10 object-contain" />
           </Link>
 
           {/* Desktop Nav Links */}
