@@ -99,11 +99,11 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
         }`}
         aria-label="Primary navigation"
       >
-        <div className="container-vb h-16 flex items-center justify-between">
+        <div className="container-vb h-20 md:h-24 flex items-center justify-between">
 
           {/* Logo */}
           <Link to="/" className="flex items-center group z-20" aria-label="Vision Built home">
-            <img src="/logo.png" alt="Vision Built Logo" className="h-12 md:h-13 object-contain" />
+            <img src="/logo.png" alt="Vision Built Logo" className="h-16 md:h-20 object-contain" />
           </Link>
 
           {/* Desktop Nav Links */}
@@ -233,7 +233,7 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
       </nav>
 
       {/* ── MAIN CONTENT ── */}
-      <main className="flex-grow pt-16 relative z-10 flex flex-col min-h-[calc(100vh-64px)]">
+      <main className="flex-grow pt-20 md:pt-24 relative z-10 flex flex-col min-h-[calc(100vh-80px)] md:min-h-[calc(100vh-96px)]">
         {children}
       </main>
 
