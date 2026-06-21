@@ -426,6 +426,17 @@ h1, h2, h3, h4, h5, h6, .font-display {
   background: rgba(255, 255, 255, 0.13) !important;
 }
 
+.nav-logo {
+  height: 60px !important;
+  width: auto !important;
+  display: block;
+}
+@media (min-width: 768px) {
+  .nav-logo {
+    height: 80px !important;
+  }
+}
+
 /* ────────────────────────────────────────────────────
    ATMOSPHERIC GLOW & FORM INPUTS
 ───────────────────────────────────────────────────── */
