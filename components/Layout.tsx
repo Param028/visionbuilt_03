@@ -6,7 +6,6 @@ import { User } from '../types';
 import { api } from '../services/api';
 import { Particles } from './ui/ReactBits';
 import { INITIAL_CONTACT_INFO } from '../constants';
-import { Logo } from './ui/Logo';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -103,15 +102,8 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
         <div className="container-vb h-16 flex items-center justify-between">
 
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-3 group z-20" aria-label="Vision Built home">
-            {/* TODO: Replace this placeholder with your actual logo image.
-                Logo.tsx SVG is used here as the placeholder icon. */}
-            <div className="logo-placeholder group-hover:border-black/20 transition-colors">
-              <Logo className="w-4 h-4 text-foreground/60" />
-            </div>
-            <span className="font-display font-bold text-sm md:text-base tracking-widest text-foreground uppercase">
-              Vision Built
-            </span>
+          <Link to="/" className="flex items-center group z-20" aria-label="Vision Built home">
+            <img src="/logo.png" alt="Vision Built Logo" className="h-7 md:h-8 object-contain" />
           </Link>
 
           {/* Desktop Nav Links */}
@@ -254,14 +246,10 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
 
             {/* Brand column */}
             <div className="col-span-2 space-y-6">
-              <div className="flex items-center gap-3">
-                {/* Logo placeholder in footer */}
-                <div className="logo-placeholder">
-                  <Logo className="w-4 h-4 text-foreground/50" />
-                </div>
-                <span className="font-display font-bold text-sm tracking-widest text-foreground uppercase">
-                  Vision Built
-                </span>
+              <div className="flex items-center">
+                <Link to="/" className="flex items-center">
+                  <img src="/logo.png" alt="Vision Built Logo" className="h-6 object-contain" />
+                </Link>
               </div>
               <p className="text-foreground/35 text-sm leading-relaxed max-w-xs font-light">
                 Precision digital engineering for modern enterprises. We build immersive digital experiences that endure.

@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { Lock, Shield, Terminal, ArrowRight, Fingerprint, ChevronRight } from 'lucide-react';
 import { api } from '../services/api';
 import { User } from '../types';
-import { Logo } from '../components/ui/Logo';
 import { useToast } from '../components/ui/Toast';
 import { motion } from 'framer-motion';
 
@@ -88,8 +87,8 @@ const DevLogin: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
              <div className="p-8 space-y-6">
                  <div className="flex justify-center mb-4">
                      <div className="relative group">
-                         <div className="absolute inset-0 bg-emerald-500 blur-xl opacity-10 group-hover:opacity-20 transition-opacity"></div>
-                         <Logo className="w-14 h-14 relative z-10 grayscale brightness-150 contrast-200" />
+                          <div className="absolute inset-0 bg-emerald-500 blur-xl opacity-10 group-hover:opacity-20 transition-opacity"></div>
+                          <img src="/logo.png" alt="Vision Built Logo" className="w-32 relative z-10 grayscale brightness-150 contrast-200 object-contain" />
                      </div>
                  </div>
 

@@ -1,7 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Logo } from './Logo';
 
 interface PreloaderProps {
   onComplete: () => void;
@@ -86,35 +85,17 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
             style={{ border: '1px solid rgba(255,255,255,0.04)' }}
           />
 
-          {/* Logo icon placeholder — replace with: <img src="/logo.svg" ... /> */}
-          <div
-            className="relative w-16 h-16 flex items-center justify-center"
-            style={{
-              border: '1px solid rgba(255,255,255,0.1)',
-              background: 'rgba(255,255,255,0.03)',
-            }}
-          >
-            <Logo className="w-9 h-9 text-foreground/50" />
+          {/* Logo icon — rendered as modern image */}
+          <div className="relative w-48 h-20 flex items-center justify-center">
+            <img src="/logo.png" alt="Vision Built Logo" className="w-40 object-contain" />
           </div>
         </motion.div>
-
-        {/* Wordmark */}
-        <div className="overflow-hidden mb-2">
-          <motion.h1
-            initial={{ y: 40, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.3, duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-            className="font-display font-bold text-foreground tracking-[0.35em] text-lg uppercase"
-          >
-            Vision Built
-          </motion.h1>
-        </div>
 
         {/* Tagline */}
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.6, duration: 0.6 }}
+          transition={{ delay: 0.5, duration: 0.6 }}
           className="text-label mb-12"
           style={{ color: 'rgba(124,143,161,0.6)' }}
         >
