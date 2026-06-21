@@ -169,7 +169,7 @@ const App: React.FC = () => {
           <HashRouter>
             <Layout user={user} setUser={setUser}>
                 <Routes>
-                    <Route path="/" element={<Landing />} />
+                    <Route path="/" element={<Landing user={user} />} />
                     
                     {/* Auth Logic with Recovery Handling */}
                     <Route path="/auth" element={

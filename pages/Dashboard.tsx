@@ -10,6 +10,7 @@ import { api } from '../services/api';
 import { Order, User, ProjectSuggestion } from '../types';
 import { Badge, Input, Textarea } from '../components/ui/Components';
 import { useToast } from '../components/ui/Toast';
+import { formatPrice } from '../constants';
 
 // ── Helper ─────────────────────────────────────────────────────
 const getStatusVariant = (status: Order['status']) => {
@@ -310,7 +311,7 @@ const Dashboard: React.FC<{ user: User }> = ({ user }) => {
                           <div className="flex items-center gap-6 pl-3 sm:pl-0">
                             <div className="text-right">
                               <span className="font-display font-bold text-foreground text-xl">
-                                {order.total_amount === 0 ? 'TBD' : `₹${order.total_amount}`}
+                                {order.total_amount === 0 ? 'TBD' : formatPrice(order.total_amount, user.country)}
                               </span>
                             </div>
                             <div

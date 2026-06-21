@@ -8,7 +8,8 @@ import {
 } from 'lucide-react';
 import { CountUp, LogoLoop, ProjectLoop } from '../components/ui/ReactBits';
 import { api } from '../services/api';
-import { MarketplaceItem } from '../types';
+import { MarketplaceItem, User } from '../types';
+import { formatPrice } from '../constants';
 
 // ── Inview fade-up wrapper ─────────────────────────────────────
 const FadeUp: React.FC<{
@@ -170,7 +171,7 @@ const HERO_PREVIEWS = [
 ];
 
 // ── COMPONENT ─────────────────────────────────────────────────
-const Landing: React.FC = () => {
+const Landing: React.FC<{ user: User | null }> = ({ user }) => {
   const [stats, setStats] = useState<{ totalDelivered: number; averageRating: number }>({
     totalDelivered: 0,
     averageRating: 0,
@@ -791,7 +792,7 @@ const Landing: React.FC = () => {
                     </h3>
                     <div className="flex items-baseline gap-1 mb-5">
                       <span className="text-4xl font-display font-bold text-foreground">
-                        ₹{sub.price}
+                        {formatPrice(sub.price, user?.country)}
                       </span>
                       <span className="font-satoshi text-sm" style={{ color: 'var(--vb-muted)' }}>
                         /{sub.interval}

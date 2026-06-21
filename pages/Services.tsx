@@ -9,6 +9,7 @@ import {
 import { api } from '../services/api';
 import { Service, User } from '../types';
 import { Tooltip } from '../components/ui/Components';
+import { formatPrice } from '../constants';
 
 // ── Feature tooltips ──────────────────────────────────────────
 const FEATURE_DESCRIPTIONS: Record<string, string> = {
@@ -304,7 +305,7 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
                     </h3>
                     <div className="flex items-baseline gap-1 mb-5">
                       <span className="text-4xl font-display font-bold text-foreground">
-                        ${plan.price}
+                        {formatPrice(plan.price, user?.country)}
                       </span>
                       <span
                         className="text-sm font-satoshi"
