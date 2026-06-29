@@ -2,7 +2,7 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
-import { Preloader } from './components/ui/Preloader';
+// import { Preloader } from './components/ui/Preloader'; // Preloader removed
 import { ToastProvider } from './components/ui/Toast';
 import { Card, Button } from './components/ui/Components';
 import { api } from './services/api';
@@ -42,7 +42,7 @@ const PageLoader = () => (
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [showSplash, setShowSplash] = useState(true);
+  // const [showSplash, setShowSplash] = useState(true); // Preloader state removed
   const [isRecoveryMode, setIsRecoveryMode] = useState(false);
 
   useEffect(() => {
@@ -54,7 +54,7 @@ const App: React.FC = () => {
   useEffect(() => {
     if (!isConfigured) {
         setLoading(false);
-        setShowSplash(false);
+        // setShowSplash(false); // Preloader state removed
         return;
     }
 
@@ -155,12 +155,12 @@ const App: React.FC = () => {
       );
   }
 
-  const isInitializing = loading || showSplash;
+  const isInitializing = loading; // Preloader removed
 
   return (
     <>
       <AnimatePresence>
-        {isInitializing && <Preloader onComplete={() => setShowSplash(false)} />}
+        {/* Preloader removed */}
       </AnimatePresence>
       
       {!isInitializing && (
