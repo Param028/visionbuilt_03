@@ -11,6 +11,8 @@ import SoftAurora from '../components/ui/SoftAurora';
 import { api } from '../services/api';
 import { MarketplaceItem, User } from '../types';
 import { formatPrice } from '../constants';
+import BentoGrid from '../components/ui/BentoGrid';
+import { servicesData } from '../constants/services';
 
 // ── Inview fade-up wrapper ─────────────────────────────────────
 const FadeUp: React.FC<{
@@ -472,78 +474,18 @@ const Landing: React.FC<{ user: User | null }> = ({ user }) => {
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════
-          SERVICES BENTO GRID
-      ═══════════════════════════════════════════════ */}
+      {/* ── Services Section – powered by BentoGrid ── */}
       <section className="section-y">
         <div className="container-vb">
-
-          {/* Section header */}
           <FadeUp className="mb-14 md:mb-20">
             <p className="text-label mb-4">What We Build</p>
-            <h2 className="text-display font-display font-bold text-foreground">Services</h2>
+            <h2 className="text-display font-display font-bold text-foreground">
+              Services
+            </h2>
           </FadeUp>
 
-          {/* Bento grid — 2-col top, 3-col bottom */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-
-            {/* Featured card: Website Development — spans 2 columns */}
-            <FadeUp delay={0.05} className="md:col-span-2">
-              <div className="glass-card p-10 md:p-12 h-full group">
-                <div className="mb-8" style={{ color: 'var(--vb-accent)' }}>
-                  {SERVICES[0].icon}
-                </div>
-                <h3 className="text-display-sm font-display font-bold text-foreground mb-4">
-                  {SERVICES[0].title}
-                </h3>
-                <p className="text-[#495057] leading-relaxed max-w-md">
-                  {SERVICES[0].desc}
-                </p>
-                <Link
-                  to="/services"
-                  className="inline-flex items-center gap-2 mt-10 text-xs font-satoshi tracking-widest uppercase transition-all duration-300"
-                  style={{ color: 'var(--vb-accent)' }}
-                >
-                  <span className="group-hover:tracking-[0.22em] transition-all duration-300">
-                    Explore Services
-                  </span>
-                  <ArrowRight size={12} />
-                </Link>
-              </div>
-            </FadeUp>
-
-            {/* UI/UX Design — single card */}
-            <FadeUp delay={0.12}>
-              <div className="glass-card p-8 md:p-10 h-full">
-                <div className="mb-6" style={{ color: 'var(--vb-accent)' }}>
-                  {SERVICES[1].icon}
-                </div>
-                <h3 className="font-display font-bold text-foreground text-xl mb-3">
-                  {SERVICES[1].title}
-                </h3>
-                <p className="text-[#495057] text-sm leading-relaxed">
-                  {SERVICES[1].desc}
-                </p>
-              </div>
-            </FadeUp>
-
-            {/* Bottom row — 3 equal cards */}
-            {SERVICES.slice(2).map((svc, i) => (
-              <FadeUp key={svc.title} delay={0.08 * (i + 3)}>
-                <div className="glass-card p-8 group h-full">
-                  <div className="mb-5" style={{ color: 'var(--vb-accent)' }}>
-                    {svc.icon}
-                  </div>
-                  <h3 className="font-display font-semibold text-foreground mb-2">
-                    {svc.title}
-                  </h3>
-                  <p className="text-[#6C757D] text-sm leading-relaxed">
-                    {svc.desc}
-                  </p>
-                </div>
-              </FadeUp>
-            ))}
-          </div>
+          {/* The new reusable grid */}
+          <BentoGrid cards={servicesData} className="mt-8" />
         </div>
       </section>
 
