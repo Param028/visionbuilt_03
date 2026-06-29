@@ -1,5 +1,4 @@
-
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, type ComponentType } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 import {
@@ -11,7 +10,7 @@ import SoftAurora from '../components/ui/SoftAurora';
 import { api } from '../services/api';
 import { MarketplaceItem, User } from '../types';
 import { formatPrice } from '../constants';
-import BentoGrid from '../components/ui/BentoGrid';
+import { BentoGrid } from '../components/ui/BentoGrid';
 import { servicesData } from '../constants/services';
 
 // ── Inview fade-up wrapper ─────────────────────────────────────
@@ -46,38 +45,7 @@ const techLogos = [
   { id: 'docker', name: 'Docker',      logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/docker/docker-original.svg',      url: 'https://www.docker.com' },
   { id: 'aws',    name: 'AWS',         logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/amazonwebservices/amazonwebservices-original-wordmark.svg', url: 'https://aws.amazon.com' },
   { id: 'mongo',  name: 'MongoDB',     logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/mongodb/mongodb-original.svg',    url: 'https://www.mongodb.com' },
-  { id: 'git',    name: 'Git',         logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/git/git-original.svg',            url: 'https://git-scm.com' },
-];
-
-// ── Services data ──────────────────────────────────────────────
-const SERVICES = [
-  {
-    icon: <Code2 size={26} />,
-    title: 'Website Development',
-    desc: 'Scalable, performant web applications built with precision engineering, modern architectures, and pixel-perfect delivery.',
-    featured: true,
-  },
-  {
-    icon: <Layers size={22} />,
-    title: 'UI/UX Design',
-    desc: 'Interfaces that feel premium, convert effectively, and leave a lasting impression.',
-    featured: false,
-  },
-  {
-    icon: <Palette size={22} />,
-    title: 'Branding',
-    desc: 'Identity systems designed to endure market cycles and define categories.',
-    featured: false,
-  },
-  {
-    icon: <TrendingUp size={22} />,
-    title: 'Social Media Marketing',
-    desc: 'Strategic growth and content at the scale modern brands demand.',
-    featured: false,
-  },
-  {
-    icon: <Zap size={22} />,
-    title: 'Performance Optimization',
+  { id: 'git',    name: 'Git',         logo: 'https://cdn.j// SERVICES array removed - now using servicesData from constants/services.tsPerformance Optimization',
     desc: 'Lighthouse 100. Core Web Vitals mastery. Every time.',
     featured: false,
   },
