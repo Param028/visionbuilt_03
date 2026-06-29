@@ -41,7 +41,7 @@ const PageLoader = () => (
 
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true); // Loading removed, render immediately
   // const [showSplash, setShowSplash] = useState(true); // Preloader state removed
   const [isRecoveryMode, setIsRecoveryMode] = useState(false);
 
@@ -53,7 +53,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     if (!isConfigured) {
-        setLoading(false);
+        // setLoading(false); // Loading removed
         // setShowSplash(false); // Preloader state removed
         return;
     }
@@ -65,22 +65,22 @@ const App: React.FC = () => {
       } catch (error: any) {
         console.warn("Initial session check finished with error (Non-fatal):", error);
       } finally {
-        setLoading(false);
+        // setLoading(false); // Loading removed
       }
     };
 
     // 1. Initial Fetch with Failsafe Timeout
-    const timeoutId = setTimeout(() => {
-        setLoading(prev => {
-            if (prev) {
-                console.warn("Session check timed out - forcing load");
-                return false;
-            }
-            return prev;
-        });
-    }, 15000);
+    // const timeoutId = setTimeout(() => {
+    //     setLoading(prev => {
+    //         if (prev) {
+    //             console.warn("Session check timed out - forcing load");
+    //             return false;
+    //         }
+    //         return prev;
+    //     });
+    // }, 15000);
 
-    initSession().then(() => clearTimeout(timeoutId));
+    initSession();
 
     // 2. Listen for Auth Changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event) => {
@@ -102,7 +102,6 @@ const App: React.FC = () => {
 
     return () => {
         subscription.unsubscribe();
-        clearTimeout(timeoutId);
     };
   }, []);
 
@@ -155,16 +154,13 @@ const App: React.FC = () => {
       );
   }
 
-  const isInitializing = loading; // Preloader removed
-
   return (
     <>
       <AnimatePresence>
         {/* Preloader removed */}
       </AnimatePresence>
       
-      {!isInitializing && (
-        <ToastProvider>
+      <ToastProvider>
           <NetworkDiagnostic />
           <HashRouter>
             <Layout user={user} setUser={setUser}>
@@ -198,8 +194,7 @@ const App: React.FC = () => {
                 </Routes>
             </Layout>
           </HashRouter>
-        </ToastProvider>
-      )}
+      </ToastProvider>
     </>
   );
 };
