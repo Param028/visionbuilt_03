@@ -1,10 +1,10 @@
+import React, { ComponentType } from 'react';
 import { Code2, Layers, Palette, TrendingUp, Zap, Globe } from 'lucide-react';
-import type { Icon } from 'lucide-react';
 
 /** Shape of a service item */
 export interface ServiceItem {
   /** Icon component reference (e.g. Code2) */
-  icon: Icon;
+  icon: ComponentType<{ size?: number }>;
   title: string;
   desc: string;
   featured?: boolean;
