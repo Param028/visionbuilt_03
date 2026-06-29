@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card } from '@heroui/ui'; // Assuming Hero UI Card component
+import { Card } from '@heroui/react'; // Updated import from correct package
 import { motion } from 'framer-motion';
 
 interface BentoGridProps {

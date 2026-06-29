@@ -229,6 +229,7 @@ const Landing: React.FC<{ user: User | null }> = ({ user }) => {
           HERO — fullscreen cinematic
       ═══════════════════════════════════════════════ */}
       <section className="relative min-h-screen flex items-center overflow-hidden">
+  <SoftAurora className="absolute inset-0 -z-10" />
 
         {/* Atmospheric background */}
         <div className="absolute inset-0 pointer-events-none" aria-hidden="true">

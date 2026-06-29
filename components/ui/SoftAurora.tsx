@@ -1,4 +1,5 @@
 import React, { useRef, useEffect } from 'react';
+// @ts-ignore
 import { Renderer, Camera, Transform, Geometry, Program, Mesh } from 'ogl';
 
 type SoftAuroraProps = {
@@ -134,8 +135,11 @@ const SoftAurora: React.FC<SoftAuroraProps> = ({
     window.addEventListener('mousemove', handleMouse);
     return () => {
       window.removeEventListener('mousemove', handleMouse);
+      // @ts-ignore
       program.dispose();
+      // @ts-ignore
       geometry.dispose();
+      // @ts-ignore
       mesh.dispose();
     };
   }, [
