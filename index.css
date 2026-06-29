@@ -70,7 +70,7 @@
   --font-satoshi: 'Satoshi', 'Inter', sans-serif;
 
   /* Color Palette & Surface Hierarchy (Premium Matte Black) */
-  --vb-bg:          #08080A; /* LEVEL 0 - Matte Black background */
+  --vb-bg:          #0D0E12; /* LEVEL 0 - Matte Black background */
   --vb-bg-alt:      #0F0F11; /* LEVEL 1 - Alternate sections */
   --vb-section:     #17171C; /* LEVEL 2 - Ambient surface */
   --vb-surface:     rgba(255, 255, 255, 0.09); /* LEVEL 3 - Elevated white glass */

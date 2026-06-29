@@ -20,6 +20,24 @@ export default {
         satoshi: ['Satoshi', 'Inter', 'sans-serif'],
       },
       colors: {
+        // Cyber Monolith palette
+        cyberBg: '#0D0E12',
+        cyberCard: '#161820',
+        cyberAccent: '#00FF66',
+        cyberTextPrimary: '#FFFFFF',
+        cyberTextSecondary: '#8F95A5',
+        // Preserve existing vb palette
+        'vb': {
+          bg:      '#08080A',
+          bgalt:   '#0F0F11',
+          surface: 'rgba(255, 255, 255, 0.07)',
+          glass:   'rgba(255, 255, 255, 0.09)',
+          border:  'rgba(255, 255, 255, 0.14)',
+          text:    '#FFFFFF',
+          text2:   'rgba(255, 255, 255, 0.82)',
+          muted:   'rgba(255, 255, 255, 0.58)',
+          accent:  '#B8C4D0',
+        },
         // Extended VisionBuilt palette (accessible as vb-* classes)
         'vb': {
           bg:      '#08080A',
