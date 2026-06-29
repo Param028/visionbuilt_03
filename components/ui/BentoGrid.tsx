@@ -25,7 +25,7 @@ export const BentoGrid: React.FC<BentoGridProps> = ({ cards, className = '' }) =
               className="bg-cyberCard border border-white/5 rounded-2xl backdrop-blur-[12px] transition-all duration-300"
               style={{ borderColor: 'rgba(255,255,255,0.05)' }}
             >
-              <div className="mb-8" style={{ color: 'var(--vb-accent)' }}>{svc.icon}</div>
+              <div className="mb-8" style={{ color: 'var(--vb-accent)' }}><svc.icon size={26} /></div>
               <h3 className="text-display-sm font-display font-bold text-foreground mb-4">{svc.title}</h3>
               <p className="text-[#495057] leading-relaxed max-w-md">{svc.desc}</p>
             </Card>
