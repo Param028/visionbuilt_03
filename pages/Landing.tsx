@@ -7,6 +7,7 @@ import {
   Zap, Globe, CheckCircle, ArrowLeft,
 } from 'lucide-react';
 import { CountUp, LogoLoop, ProjectLoop } from '../components/ui/ReactBits';
+import SoftAurora from '../components/ui/SoftAurora';
 import { api } from '../services/api';
 import { MarketplaceItem, User } from '../types';
 import { formatPrice } from '../constants';
