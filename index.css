@@ -102,6 +102,7 @@ html {
 }
 
 body {
+  @apply bg-[#1A1A1A] overflow-x-hidden min-h-screen text-white font-sans;
   @apply bg-background text-foreground;
   font-family: var(--font-sans);
   overflow-x: hidden;
@@ -110,7 +111,7 @@ body {
   -webkit-overflow-scrolling: touch;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
+
 
 h1, h2, h3, h4, h5, h6, .font-display {
   font-family: var(--font-heading);
@@ -149,6 +150,9 @@ h1, h2, h3, h4, h5, h6, .font-display {
 }
 
 .glass-card {
+  @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-6 overflow-hidden;
+  @apply transition-all duration-300;
+
   background: var(--vb-glass-primary) !important;
   backdrop-filter: blur(28px) !important;
   -webkit-backdrop-filter: blur(28px) !important;
@@ -179,7 +183,15 @@ h1, h2, h3, h4, h5, h6, .font-display {
   opacity: 0.8;
 }
 
+
+
 .glass-nav {
+  @apply bg-white/5 backdrop-blur-xl border border-white/10;
+  @apply transition-all duration-300;
+}
+
+
+
   background: var(--vb-glass-primary) !important;
   backdrop-filter: blur(28px) !important;
   -webkit-backdrop-filter: blur(28px) !important;
@@ -243,9 +255,7 @@ h1, h2, h3, h4, h5, h6, .font-display {
 .glass-nav .text-foreground\/40 {
   color: var(--vb-text-sec) !important;
 }
-.glass-nav .bg-white\/5 {
-  background-color: rgba(255, 255, 255, 0.05) !important;
-}
+
 .glass-nav .logo-placeholder {
   border-color: rgba(255, 255, 255, 0.14) !important;
   background: rgba(255, 255, 255, 0.09) !important;
@@ -608,4 +618,32 @@ body, html {
 .button--ghost:hover, .button--ghost[data-hovered="true"] {
   background: rgba(255, 255, 255, 0.06) !important;
   color: #FFFFFF !important;
+}
+
+
+/* One-to-one bg-black utilities mapped to frosted glass */
+.bg-black\/2 { @apply bg-white/[2%] backdrop-blur-xl border border-white/10; }
+.bg-black\/3 { @apply bg-white/[3%] backdrop-blur-xl border border-white/10; }
+.bg-black\/4 { @apply bg-white/[4%] backdrop-blur-xl border border-white/10; }
+.bg-black\/5 { @apply bg-white/5 backdrop-blur-xl border border-white/10; }
+.bg-black\/6 { @apply bg-white/[6%] backdrop-blur-xl border border-white/10; }
+.bg-black\/10 { @apply bg-white/10 backdrop-blur-xl border border-white/10; }
+.bg-black\/20 { @apply bg-white/20 backdrop-blur-xl border border-white/10; }
+.bg-black\/40 { @apply bg-white/40 backdrop-blur-xl border border-white/10; }
+.bg-black\/50 { @apply bg-white/50 backdrop-blur-xl border border-white/10; }
+.bg-black\/60 { @apply bg-white/60 backdrop-blur-xl border border-white/10; }
+.bg-black\/70 { @apply bg-white/70 backdrop-blur-xl border border-white/10; }
+.bg-black\/80 { @apply bg-white/80 backdrop-blur-xl border border-white/10; }
+.bg-black\/90 { @apply bg-white/90 backdrop-blur-xl border border-white/10; }
+.bg-black\/95 { @apply bg-white/95 backdrop-blur-xl border border-white/10; }
+.bg-black\/100 { @apply bg-white/100 backdrop-blur-xl border border-white/10; }
+
+.bg-black\/5,
+.bg-black\/3,
+.bg-black\/2,
+.bg-black\/4,
+.bg-black\/6,
+.bg-black\/10,
+.bg-black\/20 {
+  @apply bg-white/5 backdrop-blur-xl border border-white/10;
 }

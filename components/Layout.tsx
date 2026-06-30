@@ -5,7 +5,8 @@ import { Menu, X, LogOut, Instagram, Mail, ChevronRight, User as UserIcon } from
 import { User } from '../types';
 import { api } from '../services/api';
 import { Particles } from './ui/ReactBits';
-import { INITIAL_CONTACT_INFO } from '../constants';
+import BackgroundOrbs from './ui/BackgroundOrbs';
+
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -87,8 +88,9 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
         vx={0.015}
         vy={0.015}
         color="#7c8fa1"
-        refresh
-      />
+        refresh />
+      <BackgroundOrbs />
+
 
       {/* ── NAVBAR ── */}
       <nav
