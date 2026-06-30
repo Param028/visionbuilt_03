@@ -1,9 +1,8 @@
-import React, { useEffect, useRef, useState, type ComponentType } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 import {
-  ArrowRight, Code2, Layers, Palette, TrendingUp,
-  Zap, Globe, CheckCircle, ArrowLeft,
+  ArrowRight, CheckCircle, ArrowLeft,
 } from 'lucide-react';
 import { CountUp, LogoLoop, ProjectLoop } from '../components/ui/ReactBits';
 import SoftAurora from '../components/ui/SoftAurora';
@@ -45,16 +44,7 @@ const techLogos = [
   { id: 'docker', name: 'Docker',      logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/docker/docker-original.svg',      url: 'https://www.docker.com' },
   { id: 'aws',    name: 'AWS',         logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/amazonwebservices/amazonwebservices-original-wordmark.svg', url: 'https://aws.amazon.com' },
   { id: 'mongo',  name: 'MongoDB',     logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/mongodb/mongodb-original.svg',    url: 'https://www.mongodb.com' },
-  { id: 'git',    name: 'Git',         logo: 'https://cdn.j// SERVICES array removed - now using servicesData from constants/services.tsPerformance Optimization',
-    desc: 'Lighthouse 100. Core Web Vitals mastery. Every time.',
-    featured: false,
-  },
-  {
-    icon: <Globe size={22} />,
-    title: 'SEO',
-    desc: 'Organic visibility that compounds and drives qualified growth.',
-    featured: false,
-  },
+  { id: 'git',    name: 'Git',         logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/git/git-original.svg', url: 'https://git-scm.com' }
 ];
 
 // ── Process steps ──────────────────────────────────────────────

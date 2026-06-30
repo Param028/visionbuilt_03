@@ -6,7 +6,7 @@ import { User } from '../types';
 import { api } from '../services/api';
 import { Particles } from './ui/ReactBits';
 import BackgroundOrbs from './ui/BackgroundOrbs';
-
+import { INITIAL_CONTACT_INFO } from '../constants';
 
 interface LayoutProps {
   children: React.ReactNode;

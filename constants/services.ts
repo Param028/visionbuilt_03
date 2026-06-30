@@ -1,4 +1,4 @@
-import React, { ComponentType } from 'react';
+import { ComponentType } from 'react';
 import { Code2, Layers, Palette, TrendingUp, Zap, Globe } from 'lucide-react';
 
 /** Shape of a service item */
