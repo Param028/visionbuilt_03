@@ -6,6 +6,7 @@ import { User } from '../types';
 import { api } from '../services/api';
 import { Particles } from './ui/ReactBits';
 import BackgroundOrbs from './ui/BackgroundOrbs';
+import { Strands } from './ui/GlassComponents';
 import { INITIAL_CONTACT_INFO } from '../constants';
 
 interface LayoutProps {
@@ -91,6 +92,31 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
         refresh />
       <BackgroundOrbs />
 
+      {/* ── Strands WebGL Background ── */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <Strands
+          colors={["#F97316", "#7C3AED", "#06B6D4"]}
+          count={3}
+          speed={0.5}
+          amplitude={1}
+          waviness={1}
+          thickness={0.7}
+          glow={2.6}
+          taper={3}
+          spread={1}
+          hueShift={0}
+          intensity={0.6}
+          saturation={1.5}
+          opacity={1}
+          scale={1.5}
+          glass={false}
+          refraction={1}
+          dispersion={1}
+          glassSize={1}
+          className="w-full h-full"
+        />
+      </div>
+
 
       {/* ── NAVBAR ── */}
       <nav
@@ -109,7 +135,7 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
           </Link>
 
           {/* Desktop Nav Links */}
-          <div className="hidden md:flex items-center gap-7">
+          <div className="hidden md:flex items-center gap-7 flex-1 justify-center">
             {getNavItems().map((item) => (
               <Link
                 key={item.name}
