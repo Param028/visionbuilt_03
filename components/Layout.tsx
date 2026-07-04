@@ -93,7 +93,7 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
       <BackgroundOrbs />
 
       {/* ── Strands WebGL Background ── */}
-      <div className="fixed inset-0 z-0 pointer-events-none">
+      <div className="fixed inset-0 z-10 pointer-events-none">
         <Strands
           colors={["#F97316", "#7C3AED", "#06B6D4"]}
           count={3}
@@ -127,15 +127,15 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
         }`}
         aria-label="Primary navigation"
       >
-        <div className="container-vb h-24 md:h-32 flex items-center justify-between">
+        <div className="container-vb h-24 md:h-32 flex items-center justify-between relative">
 
           {/* Logo */}
           <Link to="/" className="flex items-center group z-20" aria-label="Vision Built home">
             <img src="/logo.png" alt="Vision Built Logo" className="nav-logo object-contain" />
           </Link>
 
-          {/* Desktop Nav Links */}
-          <div className="hidden md:flex items-center gap-7 flex-1 justify-center">
+          {/* Desktop Nav Links - Centered */}
+          <div className="hidden md:flex items-center gap-7 absolute left-1/2 -translate-x-1/2">
             {getNavItems().map((item) => (
               <Link
                 key={item.name}
@@ -157,7 +157,7 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
           </div>
 
           {/* Desktop Actions */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-3 z-20">
             {user ? (
               <>
                 <Link to="/profile" title="My Profile">
