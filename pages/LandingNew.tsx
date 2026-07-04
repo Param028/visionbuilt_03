@@ -9,20 +9,29 @@ const LandingNew: React.FC<{ user: User | null }> = ({ user: _user }) => {
   return (
     <main className="relative min-h-screen bg-[#1C1C1C]">
       {/* Strands Background - z-0, pointer-events-none */}
-      <Strands 
-        colors={["#FFFFFF", "#CCCCCC", "#8A8A8A", "#4A4A4A", "#1C1C1C"]}
-        count={4}
-        speed={0.2}
-        amplitude={1.2}
-        waviness={0.8}
-        thickness={0.8}
-        glow={2.0}
-        spread={1.5}
-        intensity={0.4}
-        saturation={0}
-        opacity={0.6}
-        glass={false}
-      />
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <Strands 
+          colors={["#FFFFFF", "#CCCCCC", "#8A8A8A", "#4A4A4A", "#1C1C1C"]}
+          count={4}
+          speed={0.2}
+          amplitude={1.2}
+          waviness={0.8}
+          thickness={0.8}
+          glow={2.0}
+          taper={3}
+          spread={1.5}
+          hueShift={0}
+          intensity={0.4}
+          saturation={0}
+          opacity={0.6}
+          scale={1.5}
+          glass={false}
+          refraction={1}
+          dispersion={1}
+          glassSize={1}
+          className="w-full h-full"
+        />
+      </div>
 
       {/* PillNav Header - z-50 */}
       <PillNav 
