@@ -35,7 +35,7 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
   return (
     <motion.div
       className="fixed inset-0 z-[9999] flex flex-col items-center justify-center overflow-hidden"
-      style={{ backgroundColor: '#08080A' }}
+      style={{ backgroundColor: '#1A1A1A' }}
       initial={{ opacity: 1 }}
       exit={{ opacity: 0, scale: 1.03, filter: 'blur(8px)' }}
       transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}

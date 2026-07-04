@@ -220,8 +220,8 @@ export const Carousel: React.FC<{ items: CarouselItem[] }> = ({ items }) => {
                   damping: 20,
                 }}
                 className={cn(
-                  "absolute w-[300px] md:w-[400px] h-[300px] bg-[rgba(33,37,41,0.72)] border border-[rgba(255,255,255,0.08)] backdrop-blur-xl rounded-2xl p-6 flex flex-col items-center justify-center shadow-2xl cursor-pointer text-[#F8F9FA]",
-                  isActive ? "border-[rgba(255,255,255,0.14)] shadow-[0_10px_40px_rgba(0,0,0,0.12)]" : "hover:bg-[rgba(73,80,87,0.78)]",
+                  "absolute w-[300px] md:w-[400px] h-[300px] bg-white/10 border border-white/10 backdrop-blur-2xl rounded-xl p-6 flex flex-col items-center justify-center shadow-2xl cursor-pointer text-white",
+                  isActive ? "border-white/20 shadow-[0_10px_40px_rgba(12,12,12,0.18)]" : "hover:bg-white/12",
                   item.className
                 )}
                 onClick={() => {
@@ -238,13 +238,13 @@ export const Carousel: React.FC<{ items: CarouselItem[] }> = ({ items }) => {
 
       <button 
         onClick={handlePrev} 
-        className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-md transition-all z-20 text-white hover:text-vision-primary"
+        className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-md transition-all z-20 text-white hover:text-gray-300"
       >
         <ChevronLeft size={24} />
       </button>
       <button 
         onClick={handleNext} 
-        className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-md transition-all z-20 text-white hover:text-vision-primary"
+        className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-md transition-all z-20 text-white hover:text-gray-300"
       >
         <ChevronRight size={24} />
       </button>
@@ -256,7 +256,7 @@ export const Carousel: React.FC<{ items: CarouselItem[] }> = ({ items }) => {
               onClick={() => setActive(i)}
               className={cn(
                   "w-2 h-2 rounded-full transition-all duration-300", 
-                  i === active ? "bg-primary w-6" : "bg-black/20 hover:bg-black/40"
+                  i === active ? "bg-white w-6" : "bg-white/20 hover:bg-white/40"
               )}
             />
          ))}
@@ -336,7 +336,7 @@ export const ProjectLoop: React.FC<{ items: ProjectLoopItem[] }> = ({ items }) =
              <Link key={`${item.id}-${idx}`} to={item.url || '#'} className="group">
                 <div className="w-[280px] h-[160px] md:w-[400px] md:h-[225px] overflow-hidden relative glass-panel group-hover:border-white/20 transition-all duration-300">
                     <img src={item.image} alt={item.title} loading="lazy" className="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500 filter grayscale group-hover:grayscale-0" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#1A1A1A]/85 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
                          <span className="text-white font-bold truncate w-full">{item.title}</span>
                     </div>
                  </div>
@@ -383,7 +383,7 @@ export const ProjectLoop: React.FC<{ items: ProjectLoopItem[] }> = ({ items }) =
                   loading="lazy"
                   className="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500 filter grayscale group-hover:grayscale-0" 
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                <div className="absolute inset-0 bg-gradient-to-t from-[#1A1A1A]/85 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
                      <span className="text-white font-bold truncate w-full">{item.title}</span>
                 </div>
              </div>

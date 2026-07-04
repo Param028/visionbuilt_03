@@ -5,7 +5,6 @@ import {
   ArrowRight, CheckCircle, ArrowLeft,
 } from 'lucide-react';
 import { CountUp, LogoLoop, ProjectLoop } from '../components/ui/ReactBits';
-import SoftAurora from '../components/ui/SoftAurora';
 import { api } from '../services/api';
 import { MarketplaceItem, User } from '../types';
 import { formatPrice } from '../constants';
@@ -183,45 +182,36 @@ const Landing: React.FC<{ user: User | null }> = ({ user }) => {
   })();
 
   return (
-    <div className="relative min-h-screen bg-background">
+    <div className="relative min-h-screen bg-[#1A1A1A] overflow-x-hidden">
 
       {/* ═══════════════════════════════════════════════
           HERO — fullscreen cinematic
       ═══════════════════════════════════════════════ */}
-      <section className="relative min-h-screen flex items-center overflow-hidden">
-  <SoftAurora className="absolute inset-0 -z-10" />
+      <section className="relative min-h-screen flex items-center overflow-hidden bg-[#1A1A1A]">
 
         {/* Atmospheric background */}
-        <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+        <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden" aria-hidden="true">
           {/* Primary glow — top right */}
           <div
-            className="absolute top-[20%] right-[15%] w-[640px] h-[640px] rounded-full"
-            style={{
-              background: 'radial-gradient(circle, rgba(124,143,161,0.07) 0%, transparent 65%)',
-              filter: 'blur(40px)',
-            }}
+            className="absolute top-[14%] right-[8%] w-[38rem] h-[38rem] rounded-full bg-white/10 blur-[120px]"
           />
           {/* Secondary glow — bottom left */}
           <div
-            className="absolute bottom-[20%] left-[10%] w-[400px] h-[400px] rounded-full"
-            style={{
-              background: 'radial-gradient(circle, rgba(124,143,161,0.04) 0%, transparent 65%)',
-              filter: 'blur(40px)',
-            }}
+            className="absolute bottom-[8%] left-[4%] w-[28rem] h-[28rem] rounded-full bg-[#1F327A]/20 blur-[130px]"
           />
           {/* Subtle architectural grid */}
           <div
-            className="absolute inset-0 opacity-[0.018]"
+            className="absolute inset-0 opacity-[0.025]"
             style={{
               backgroundImage:
-                'linear-gradient(rgba(0,0,0,1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,1) 1px, transparent 1px)',
+                'linear-gradient(rgba(255,255,255,0.35) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.35) 1px, transparent 1px)',
               backgroundSize: '80px 80px',
             }}
           />
         </div>
 
         {/* Content */}
-        <div className="container-vb relative z-10 pt-24 pb-20 w-full">
+        <div className="container-vb relative z-20 pt-24 pb-20 w-full">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
             
             {/* Left Column: Text & Actions */}
@@ -245,14 +235,14 @@ const Landing: React.FC<{ user: User | null }> = ({ user }) => {
               >
                 {heroHeadingLines.main}
                 <br />
-                <span className="text-[#7C8FA1]">
+                <span className="text-gray-300">
                   {heroHeadingLines.accent}
                 </span>
               </motion.h1>
 
               {/* Subheading */}
               <motion.p
-                className="text-[#495057] text-lg md:text-xl max-w-xl mb-10 leading-relaxed font-light"
+                className="text-gray-300 text-lg md:text-xl max-w-xl mb-10 leading-relaxed font-light"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.25, ease: [0.4, 0, 0.2, 1] }}
@@ -284,7 +274,7 @@ const Landing: React.FC<{ user: User | null }> = ({ user }) => {
             {/* Right Column: Luxury Mock Browser Carousel */}
             <div className="lg:col-span-5 xl:col-span-5 w-full flex flex-col items-center lg:items-end justify-center">
               <motion.div
-                className="w-full max-w-[480px] lg:max-w-full aspect-[4/3] glass-card border border-white/12 relative overflow-hidden group shadow-2xl"
+                className="w-full max-w-[480px] lg:max-w-full aspect-[4/3] glass-card border border-white/10 relative z-20 overflow-hidden group shadow-2xl"
                 initial={{ opacity: 0, scale: 0.95, y: 24 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.2, ease: [0.4, 0, 0.2, 1] }}
@@ -292,7 +282,7 @@ const Landing: React.FC<{ user: User | null }> = ({ user }) => {
                 onMouseLeave={() => setIsPaused(false)}
               >
                 {/* Browser Top Bar */}
-                <div className="h-9 border-b border-white/10 px-4 flex items-center justify-between bg-black/40 backdrop-blur-md relative z-30">
+                <div className="h-9 border-b border-white/10 px-4 flex items-center justify-between bg-white/10 backdrop-blur-md relative z-30">
                   {/* Mock Window controls */}
                   <div className="flex items-center gap-1.5">
                     <span className="w-2.5 h-2.5 rounded-full bg-[#FF5F56] opacity-80" />
@@ -310,7 +300,7 @@ const Landing: React.FC<{ user: User | null }> = ({ user }) => {
                 </div>
 
                 {/* Media Container & Transitions */}
-                <div className="absolute inset-0 pt-9 bg-black/20 z-10 flex items-center justify-center overflow-hidden">
+                <div className="absolute inset-0 pt-9 bg-[#1A1A1A]/20 z-10 flex items-center justify-center overflow-hidden">
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={activePreviewIdx}
@@ -342,7 +332,7 @@ const Landing: React.FC<{ user: User | null }> = ({ user }) => {
                 </div>
 
                 {/* Gradient Shadow Overlay */}
-                <div className="absolute inset-0 pt-9 bg-gradient-to-t from-black/80 via-black/10 to-transparent pointer-events-none z-20" />
+                <div className="absolute inset-0 pt-9 bg-gradient-to-t from-[#1A1A1A]/85 via-[#1A1A1A]/10 to-transparent pointer-events-none z-20" />
 
                 {/* Floating Project Info Label */}
                 <div className="absolute bottom-4 left-4 right-4 z-20">
@@ -398,8 +388,8 @@ const Landing: React.FC<{ user: User | null }> = ({ user }) => {
           STATS STRIP
       ═══════════════════════════════════════════════ */}
       <section
-        className="border-y py-10 md:py-12"
-        style={{ borderColor: 'rgba(255,255,255,0.08)', background: 'var(--vb-bg-alt)' }}
+        className="border-y py-10 md:py-12 bg-[#1A1A1A]"
+        style={{ borderColor: 'rgba(255,255,255,0.08)' }}
       >
         <div className="container-vb">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-4">
@@ -433,8 +423,10 @@ const Landing: React.FC<{ user: User | null }> = ({ user }) => {
       </section>
 
       {/* ── Services Section – powered by BentoGrid ── */}
-      <section className="section-y">
-        <div className="container-vb">
+      <section className="section-y relative overflow-hidden bg-[#1A1A1A]">
+        <div className="absolute left-[2%] top-[18%] z-10 h-[26rem] w-[26rem] rounded-full bg-white/10 blur-[120px]" aria-hidden="true" />
+        <div className="absolute right-[8%] bottom-[10%] z-10 h-[30rem] w-[30rem] rounded-full bg-[#1F327A]/20 blur-[130px]" aria-hidden="true" />
+        <div className="container-vb relative z-20">
           <FadeUp className="mb-14 md:mb-20">
             <p className="text-label mb-4">What We Build</p>
             <h2 className="text-display font-display font-bold text-foreground">
@@ -451,10 +443,12 @@ const Landing: React.FC<{ user: User | null }> = ({ user }) => {
           FEATURED WORK / PROJECT SHOWCASE
       ═══════════════════════════════════════════════ */}
       <section
-        className="section-y-sm border-y"
-        style={{ borderColor: 'rgba(255,255,255,0.08)', background: 'var(--vb-bg-alt)' }}
+        className="section-y-sm border-y relative overflow-hidden bg-[#1A1A1A]"
+        style={{ borderColor: 'rgba(255,255,255,0.08)' }}
       >
-        <div className="container-vb mb-12">
+        <div className="absolute right-[5%] top-[8%] z-10 h-[32rem] w-[32rem] rounded-full bg-white/10 blur-[120px]" aria-hidden="true" />
+        <div className="absolute left-[12%] bottom-[4%] z-10 h-[26rem] w-[26rem] rounded-full bg-[#1F327A]/20 blur-[130px]" aria-hidden="true" />
+        <div className="container-vb mb-12 relative z-20">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
             <FadeUp>
               <p className="text-label mb-4">Our Work</p>
@@ -469,7 +463,7 @@ const Landing: React.FC<{ user: User | null }> = ({ user }) => {
                     key={tab}
                     id={`project-tab-${tab.toLowerCase().replace(/[^a-z]/g, '-')}`}
                     onClick={() => setActiveTab(tab)}
-                    className="text-[0.65rem] font-satoshi font-medium tracking-widest uppercase px-4 py-2 border transition-all duration-300"
+                    className="text-[0.65rem] font-satoshi font-medium tracking-widest uppercase px-4 py-2 border rounded-lg backdrop-blur-xl transition-all duration-300"
                     style={{
                       borderColor:
                         activeTab === tab ? 'rgba(255,255,255,0.24)' : 'rgba(255,255,255,0.1)',
@@ -487,24 +481,26 @@ const Landing: React.FC<{ user: User | null }> = ({ user }) => {
           </div>
         </div>
 
-        <ProjectLoop
-          items={
-            getFilteredProjects().length > 0
-              ? getFilteredProjects()
-              : [
-                  {
-                    id: '1',
-                    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800',
-                    title: 'Premium Dashboard',
-                    url: '/services',
-                  },
-                ]
-          }
-        />
+        <div className="relative z-20">
+          <ProjectLoop
+            items={
+              getFilteredProjects().length > 0
+                ? getFilteredProjects()
+                : [
+                    {
+                      id: '1',
+                      image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800',
+                      title: 'Premium Dashboard',
+                      url: '/services',
+                    },
+                  ]
+            }
+          />
+        </div>
       </section>
 
       {/* ── 🎬 SOCIAL MEDIA SHOWCASE — CAROUSEL ── */}
-      <section className="section-y border-b border-white/8 relative overflow-hidden">
+      <section className="section-y border-b border-white/8 relative overflow-hidden bg-[#1A1A1A]">
         {/* Background ambient lighting */}
         <div
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
@@ -513,8 +509,8 @@ const Landing: React.FC<{ user: User | null }> = ({ user }) => {
             width: '600px',
             height: '400px',
             borderRadius: '50%',
-            background: 'radial-gradient(ellipse, rgba(184,196,208,0.04) 0%, transparent 70%)',
-            filter: 'blur(50px)',
+            background: 'radial-gradient(ellipse, rgba(255,255,255,0.10) 0%, transparent 70%)',
+            filter: 'blur(100px)',
           }}
         />
 
@@ -584,7 +580,7 @@ const Landing: React.FC<{ user: User | null }> = ({ user }) => {
                   )}
 
                   {/* Permanent Visual tag */}
-                  <div className="absolute bottom-4 left-4 right-4 z-10 p-4 bg-black/55 backdrop-blur-md border border-white/10 rounded-lg group-hover:opacity-0 group-hover:translate-y-2 transition-all duration-300">
+                  <div className="absolute bottom-4 left-4 right-4 z-10 p-4 bg-white/10 backdrop-blur-xl border border-white/10 rounded-lg group-hover:opacity-0 group-hover:translate-y-2 transition-all duration-300">
                     <span className="text-[8px] font-mono text-[var(--vb-accent)] uppercase tracking-wider block mb-0.5">
                       {item.campaign}
                     </span>
@@ -594,7 +590,7 @@ const Landing: React.FC<{ user: User | null }> = ({ user }) => {
                   </div>
 
                   {/* Hover reveal overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-400 flex flex-col justify-end p-4 md:p-6 z-20">
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#1A1A1A]/90 via-[#1A1A1A]/40 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-400 flex flex-col justify-end p-4 md:p-6 z-20">
                     <div className="glass-panel p-4 rounded-lg border border-white/14 backdrop-blur-md transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 space-y-2">
                       <span className="text-[8px] font-mono text-[var(--vb-accent)] uppercase tracking-wider block">
                         {item.campaign}
@@ -617,7 +613,7 @@ const Landing: React.FC<{ user: User | null }> = ({ user }) => {
       {/* ═══════════════════════════════════════════════
           PROCESS TIMELINE
       ═══════════════════════════════════════════════ */}
-      <section className="section-y">
+      <section className="section-y bg-[#1A1A1A]">
         <div className="container-vb">
 
           <FadeUp className="mb-16 md:mb-20">
@@ -640,7 +636,7 @@ const Landing: React.FC<{ user: User | null }> = ({ user }) => {
 
                   <p
                     className="font-satoshi text-xs mb-4 tracking-widest"
-                    style={{ color: 'rgba(124,143,161,0.5)' }}
+                    style={{ color: 'rgba(217,217,217,0.58)' }}
                   >
                     {step.num}
                   </p>
@@ -651,7 +647,7 @@ const Landing: React.FC<{ user: User | null }> = ({ user }) => {
                   <h3 className="font-display font-semibold text-foreground mb-2 text-sm">
                     {step.title}
                   </h3>
-                  <p className="text-[#6C757D] text-xs leading-relaxed">
+                  <p className="text-gray-400 text-xs leading-relaxed">
                     {step.desc}
                   </p>
                 </div>
@@ -665,8 +661,8 @@ const Landing: React.FC<{ user: User | null }> = ({ user }) => {
           TECH STACK MARQUEE
       ═══════════════════════════════════════════════ */}
       <section
-        className="section-y-sm border-y"
-        style={{ borderColor: 'rgba(255,255,255,0.08)', background: 'var(--vb-bg-alt)' }}
+        className="section-y-sm border-y bg-[#1A1A1A]"
+        style={{ borderColor: 'rgba(255,255,255,0.08)' }}
       >
         <div className="container-vb mb-8 text-center">
           <p className="text-label">Technology Stack</p>
@@ -678,7 +674,7 @@ const Landing: React.FC<{ user: User | null }> = ({ user }) => {
           SUBSCRIPTION PLANS (conditional)
       ═══════════════════════════════════════════════ */}
       {subscriptions.length > 0 && (
-        <section className="section-y border-b" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
+        <section className="section-y border-b bg-[#1A1A1A]" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
           <div className="container-vb">
             <FadeUp className="mb-14 md:mb-20">
               <p className="text-label mb-4">Recurring Value</p>
@@ -700,12 +696,12 @@ const Landing: React.FC<{ user: User | null }> = ({ user }) => {
                         /{sub.interval}
                       </span>
                     </div>
-                    <p className="text-[#495057] text-sm mb-7 flex-1 leading-relaxed">
+                    <p className="text-gray-300 text-sm mb-7 flex-1 leading-relaxed">
                       {sub.description}
                     </p>
                     <ul className="space-y-2.5 mb-8">
                       {sub.features.slice(0, 5).map((f: string, fi: number) => (
-                        <li key={fi} className="flex items-start gap-2.5 text-xs text-[#6C757D]">
+                        <li key={fi} className="flex items-start gap-2.5 text-xs text-gray-400">
                           <CheckCircle
                             size={12}
                             className="shrink-0 mt-0.5"
@@ -729,7 +725,7 @@ const Landing: React.FC<{ user: User | null }> = ({ user }) => {
       {/* ═══════════════════════════════════════════════
           CTA SECTION — immersive, massive typography
       ═══════════════════════════════════════════════ */}
-      <section className="relative section-y overflow-hidden border-t" style={{ borderColor: 'rgba(255,255,255,0.08)', background: 'var(--vb-bg-alt)' }}>
+      <section className="relative section-y overflow-hidden border-t bg-[#1A1A1A]" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
         {/* Atmospheric glow */}
         <div
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
@@ -738,8 +734,8 @@ const Landing: React.FC<{ user: User | null }> = ({ user }) => {
             width: '900px',
             height: '400px',
             borderRadius: '50%',
-            background: 'radial-gradient(ellipse, rgba(124,143,161,0.06) 0%, transparent 70%)',
-            filter: 'blur(60px)',
+            background: 'radial-gradient(ellipse, rgba(255,255,255,0.12) 0%, transparent 70%)',
+            filter: 'blur(110px)',
           }}
         />
 
@@ -750,15 +746,15 @@ const Landing: React.FC<{ user: User | null }> = ({ user }) => {
               className="font-display font-bold text-foreground mb-8 leading-[0.98]"
               style={{
                 fontSize: 'clamp(2.4rem, 6vw, 5.5rem)',
-                letterSpacing: '-0.025em',
+                letterSpacing: '0',
               }}
             >
               Let&apos;s Build Something
               <br />
-              <span className="text-[#7C8FA1]">Extraordinary.</span>
+              <span className="text-gray-300">Extraordinary.</span>
             </h2>
             <p
-              className="text-[#495057] text-lg mb-14 max-w-xl mx-auto leading-relaxed font-light"
+              className="text-gray-300 text-lg mb-14 max-w-xl mx-auto leading-relaxed font-light"
             >
               Partner with Vision Built to create digital experiences that define your category and outlast trends.
             </p>

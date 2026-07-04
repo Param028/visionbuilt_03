@@ -112,19 +112,19 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
   const handleOrder = (serviceId: string) => navigate(`/order/new?serviceId=${serviceId}`);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-[#1A1A1A] overflow-x-hidden">
 
       {/* ── PAGE HEADER ── */}
       <div
-        className="relative border-b pt-20 pb-16 overflow-hidden"
-        style={{ borderColor: 'rgba(0,0,0,0.08)' }}
+        className="relative border-b pt-20 pb-16 overflow-hidden bg-[#1A1A1A]"
+        style={{ borderColor: 'rgba(255,255,255,0.08)' }}
       >
         {/* Atmospheric glow */}
         <div
           className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] pointer-events-none"
           style={{
-            background: 'radial-gradient(ellipse, rgba(124,143,161,0.06) 0%, transparent 70%)',
-            filter: 'blur(40px)',
+            background: 'radial-gradient(ellipse, rgba(255,255,255,0.12) 0%, transparent 70%)',
+            filter: 'blur(100px)',
           }}
         />
         <div className="container-vb relative z-10 text-center">
@@ -191,11 +191,9 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
                     className="mb-7 flex items-center justify-between"
                   >
                     <div
-                      className="p-2.5 border transition-all duration-300"
+                      className="p-2.5 border rounded-lg bg-white/5 text-gray-300 transition-all duration-300"
                       style={{
-                        borderColor: 'rgba(0,0,0,0.08)',
-                        color: 'var(--vb-accent)',
-                        background: 'rgba(124,143,161,0.10)',
+                        borderColor: 'rgba(255,255,255,0.10)',
                       }}
                     >
                       {getIcon(service.icon)}
@@ -218,7 +216,7 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
                   {/* Feature list */}
                   <div
                     className="flex-grow space-y-2.5 mb-7 pt-6 border-t"
-                    style={{ borderColor: 'rgba(0,0,0,0.08)' }}
+                    style={{ borderColor: 'rgba(255,255,255,0.10)' }}
                   >
                     {service.features.slice(0, 6).map((feature, i) => {
                       const desc = getFeatureDescription(feature);
@@ -233,7 +231,7 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
                             <Tooltip content={desc} className="cursor-help">
                               <span
                                 className="text-[#6C757D] border-b border-dashed transition-colors"
-                                style={{ borderColor: 'rgba(0,0,0,0.08)' }}
+                                style={{ borderColor: 'rgba(255,255,255,0.14)' }}
                               >
                                 {feature}
                               </span>
@@ -263,8 +261,8 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
                       <div
                         className="w-full py-3 text-center text-xs font-satoshi tracking-widest uppercase border"
                         style={{
-                          borderColor: 'rgba(0,0,0,0.08)',
-                          color: '#6C757D',
+                          borderColor: 'rgba(255,255,255,0.10)',
+                          color: 'rgba(217,217,217,0.68)',
                         }}
                       >
                         Admin Mode
@@ -327,7 +325,7 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
 
                     <div
                       className="flex-grow space-y-2.5 pt-6 border-t"
-                      style={{ borderColor: 'rgba(0,0,0,0.08)' }}
+                      style={{ borderColor: 'rgba(255,255,255,0.10)' }}
                     >
                       {plan.features?.map((feature: string, i: number) => (
                         <div key={i} className="flex items-start text-xs gap-2.5">

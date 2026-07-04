@@ -14,7 +14,7 @@ import { RefreshCw, Settings, Key } from 'lucide-react';
 import { NetworkDiagnostic } from './components/NetworkDiagnostic';
 
 // --- Static Imports for Core Pages (Fixes loading spinner freeze) ---
-import Landing from './pages/Landing';
+import LandingNew from './pages/LandingNew';
 import Auth from './pages/Auth';
 import Dashboard from './pages/Dashboard';
 
@@ -35,7 +35,7 @@ const Profile = React.lazy(() => import('./pages/Profile'));
 // Simple loading spinner for page transitions
 const PageLoader = () => (
   <div className="min-h-[60vh] flex items-center justify-center">
-    <div className="w-8 h-8 border-4 border-vision-primary border-t-transparent rounded-full animate-spin"></div>
+    <div className="w-8 h-8 border-4 border-white/20 border-t-white rounded-full animate-spin"></div>
   </div>
 );
 
@@ -108,12 +108,12 @@ const App: React.FC = () => {
   // --- 1. Setup Required Screen (Missing Env Vars) ---
   if (!isConfigured) {
       return (
-          <div className="min-h-screen bg-white text-black flex items-center justify-center p-4">
-              <Card className="max-w-2xl w-full p-8 border-vision-primary/30 relative overflow-hidden">
-                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-vision-primary via-vision-secondary to-vision-primary animate-gradient-x"></div>
+          <div className="min-h-screen bg-[#1A1A1A] text-white flex items-center justify-center p-4 overflow-x-hidden">
+              <Card className="max-w-2xl w-full p-8 border-white/10 relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-full h-px bg-white/20"></div>
                   
                   <div className="text-center mb-8">
-                      <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4 text-vision-primary border border-white/10">
+                      <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-300 border border-white/10">
                           <Settings size={32} className="animate-spin-slow" />
                       </div>
                       <h1 className="text-3xl font-display font-bold text-white mb-2">Setup Required</h1>
@@ -122,7 +122,7 @@ const App: React.FC = () => {
                       </p>
                   </div>
 
-                  <div className="space-y-4 bg-black/20 p-6 rounded-xl border border-white/5 mb-8">
+                  <div className="space-y-4 bg-white/5 backdrop-blur-xl p-6 rounded-xl border border-white/10 mb-8">
                       <div className="flex items-start gap-4">
                           <div className="p-2 bg-red-500/10 rounded-lg text-red-400 mt-1">
                               <Key size={20} />
@@ -130,9 +130,9 @@ const App: React.FC = () => {
                           <div>
                               <h3 className="font-bold text-white">Missing Environment Variables</h3>
                               <p className="text-sm text-gray-400 mt-1">
-                                  Please create a <code className="text-vision-primary bg-vision-primary/10 px-1 py-0.5 rounded">.env</code> file in your project root with the following keys:
+                                  Please create a <code className="text-white bg-white/10 px-1 py-0.5 rounded">.env</code> file in your project root with the following keys:
                               </p>
-                              <div className="mt-3 bg-black/50 p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto border border-white/10">
+                              <div className="mt-3 bg-white/5 backdrop-blur-xl p-4 rounded-lg font-mono text-xs text-gray-300 overflow-x-auto border border-white/10">
                                   VITE_SUPABASE_URL=your_project_url<br/>
                                   VITE_SUPABASE_ANON_KEY=your_anon_key<br/>
                                   VITE_RAZORPAY_KEY_ID=your_razorpay_id
@@ -165,7 +165,7 @@ const App: React.FC = () => {
           <HashRouter>
             <Layout user={user} setUser={setUser}>
                 <Routes>
-                    <Route path="/" element={<Landing user={user} />} />
+                    <Route path="/" element={<LandingNew user={user} />} />
                     
                     {/* Auth Logic with Recovery Handling */}
                     <Route path="/auth" element={

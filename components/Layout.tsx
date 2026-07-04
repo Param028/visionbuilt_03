@@ -77,7 +77,7 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
     path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
 
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground font-sans relative overflow-x-hidden">
+    <div className="min-h-screen flex flex-col bg-[#1A1A1A] text-foreground font-sans relative z-0 overflow-x-hidden">
 
       {/* ── Ambient particle field ── */}
       <Particles
@@ -87,7 +87,7 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
         ease={100}
         vx={0.015}
         vy={0.015}
-        color="#7c8fa1"
+        color="#d9d9d9"
         refresh />
       <BackgroundOrbs />
 
@@ -96,7 +96,7 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
       <nav
         className={`fixed top-0 w-full z-50 transition-all duration-500 ${
           scrolled
-            ? 'glass-nav shadow-xl shadow-black/20'
+            ? 'glass-nav shadow-xl shadow-[rgba(12,12,12,0.22)]'
             : 'bg-transparent border-b border-transparent'
         }`}
         aria-label="Primary navigation"
@@ -240,7 +240,7 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
       </main>
 
       {/* ── FOOTER ── */}
-      <footer className="border-t vb-divider bg-background relative z-10">
+      <footer className="border-t vb-divider bg-[#1A1A1A] relative z-10">
         <div className="container-vb py-16 md:py-20">
 
           {/* Top grid */}

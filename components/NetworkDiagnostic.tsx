@@ -63,7 +63,7 @@ export const NetworkDiagnostic: React.FC = () => {
     if (status === 'idle') {
         return (
             <div className="fixed bottom-4 right-4 z-50">
-                <Button size="sm" variant="outline" onClick={checkConnection} className="bg-black/80 text-xs border-white/10 backdrop-blur-md">
+                <Button size="sm" variant="outline" onClick={checkConnection} className="bg-white/10 text-xs border-white/10 backdrop-blur-xl">
                     <AlertTriangle size={12} className="mr-2 text-yellow-500" />
                     Test Connection
                 </Button>
@@ -73,7 +73,7 @@ export const NetworkDiagnostic: React.FC = () => {
 
     return (
         <div className="fixed bottom-4 right-4 z-50 max-w-sm w-full animate-in slide-in-from-bottom-4">
-            <Card className="bg-black/90 border-white/10 backdrop-blur-md shadow-2xl p-4">
+            <Card className="bg-white/10 border-white/10 backdrop-blur-xl shadow-2xl p-4">
                 <div className="flex justify-between items-start mb-3">
                     <h4 className="text-sm font-bold text-white flex items-center gap-2">
                         {status === 'checking' && <RefreshCw size={14} className="animate-spin text-blue-400" />}
@@ -87,7 +87,7 @@ export const NetworkDiagnostic: React.FC = () => {
                 </div>
                 
                 <div className="space-y-2">
-                    <div className="text-xs text-gray-300 font-mono bg-black/50 p-2 rounded border border-white/5 break-all">
+                    <div className="text-xs text-gray-300 font-mono bg-white/5 p-2 rounded border border-white/10 break-all">
                         {details || 'Initializing...'}
                     </div>
                     

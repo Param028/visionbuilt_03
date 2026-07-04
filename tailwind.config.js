@@ -15,28 +15,29 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans:    ['Inter', 'system-ui', 'sans-serif'],
-        display: ['"Clash Display"', 'Inter', 'sans-serif'],
+        sans:    ['Geist', 'Manrope', 'Inter', 'system-ui', 'sans-serif'],
+        display: ['Syne', '"Clash Display"', 'Inter', 'sans-serif'],
+        mono:    ['"Geist Mono"', 'monospace'],
         satoshi: ['Satoshi', 'Inter', 'sans-serif'],
       },
       colors: {
-        // Cyber Monolith palette
-        cyberBg: '#0D0E12',
-        cyberCard: '#161820',
-        cyberAccent: '#00FF66',
+        // Charcoal and frosted glass palette
+        cyberBg: '#1A1A1A',
+        cyberCard: 'rgba(255, 255, 255, 0.08)',
+        cyberAccent: '#D9D9D9',
         cyberTextPrimary: '#FFFFFF',
-        cyberTextSecondary: '#8F95A5',
+        cyberTextSecondary: '#D9D9D9',
         // Preserve existing vb palette
         'vb': {
-          bg:      '#0D0E12', // background
-          bgalt:   '#161820', // alternate/card background
+          bg:      '#1A1A1A',
+          bgalt:   '#1A1A1A',
           surface: 'rgba(255, 255, 255, 0.07)',
-          glass:   'rgba(255, 255, 255, 0.09)',
-          border:  'rgba(255, 255, 255, 0.14)',
-          text:    '#FFFFFF', // primary text
-          text2:   '#8F95A5', // secondary text
+          glass:   'rgba(255, 255, 255, 0.08)',
+          border:  'rgba(255, 255, 255, 0.10)',
+          text:    '#FFFFFF',
+          text2:   '#D9D9D9',
           muted:   'rgba(255, 255, 255, 0.58)',
-          accent:  '#00FF66', // neon accent
+          accent:  '#D9D9D9',
         },
       },
       animation: {
@@ -79,33 +80,32 @@ export default {
       themes: {
         light: {
           colors: {
-            background:  '#08080A',
+            background:  '#1A1A1A',
             foreground:  '#FFFFFF',
 
             // Elevated surfaces (cards, inputs, code blocks)
-            content1:    'rgba(255, 255, 255, 0.09)',
+            content1:    'rgba(255, 255, 255, 0.08)',
             'content1-foreground': '#FFFFFF',
-            content2:    '#0F0F11',
-            'content2-foreground': 'rgba(255, 255, 255, 0.82)',
-            content3:    '#17171C',
-            'content3-foreground': 'rgba(255, 255, 255, 0.82)',
-            content4:    'rgba(255, 255, 255, 0.06)',
-            'content4-foreground': 'rgba(255, 255, 255, 0.58)',
+            content2:    'rgba(255, 255, 255, 0.06)',
+            'content2-foreground': '#D9D9D9',
+            content3:    'rgba(255, 255, 255, 0.05)',
+            'content3-foreground': '#D9D9D9',
+            content4:    'rgba(255, 255, 255, 0.04)',
+            'content4-foreground': 'rgba(217, 217, 217, 0.68)',
 
-            // Primary action color = accent
             primary: {
-              DEFAULT:    '#B8C4D0',
-              foreground: '#08080A',
-              50:  '#F5F7F8',
-              100: '#E5EAEF',
-              200: '#D1DAE3',
-              300: '#B8C4D0',
-              400: '#9FAFC0',
-              500: '#8295AB',
-              600: '#677A91',
-              700: '#4E5F72',
-              800: '#364352',
-              900: '#1F2833',
+              DEFAULT:    '#D9D9D9',
+              foreground: '#1A1A1A',
+              50:  '#FFFFFF',
+              100: '#F4F4F4',
+              200: '#E8E8E8',
+              300: '#D9D9D9',
+              400: '#C7C7C7',
+              500: '#AFAFAF',
+              600: '#8F8F8F',
+              700: '#6F6F6F',
+              800: '#4A4A4A',
+              900: '#2A2A2A',
             },
 
             secondary: {
@@ -114,8 +114,8 @@ export default {
             },
 
             // Borders — white glass
-            divider:    'rgba(255, 255, 255, 0.14)',
-            focus:      '#B8C4D0',
+            divider:    'rgba(255, 255, 255, 0.10)',
+            focus:      '#D9D9D9',
 
             // Status colors
             success: {
@@ -134,33 +134,32 @@ export default {
         },
         dark: {
           colors: {
-            background:  '#08080A',
+            background:  '#1A1A1A',
             foreground:  '#FFFFFF',
 
             // Elevated surfaces (cards, inputs, code blocks)
-            content1:    'rgba(255, 255, 255, 0.09)',
+            content1:    'rgba(255, 255, 255, 0.08)',
             'content1-foreground': '#FFFFFF',
-            content2:    '#0F0F11',
-            'content2-foreground': 'rgba(255, 255, 255, 0.82)',
-            content3:    '#17171C',
-            'content3-foreground': 'rgba(255, 255, 255, 0.82)',
-            content4:    'rgba(255, 255, 255, 0.06)',
-            'content4-foreground': 'rgba(255, 255, 255, 0.58)',
+            content2:    'rgba(255, 255, 255, 0.06)',
+            'content2-foreground': '#D9D9D9',
+            content3:    'rgba(255, 255, 255, 0.05)',
+            'content3-foreground': '#D9D9D9',
+            content4:    'rgba(255, 255, 255, 0.04)',
+            'content4-foreground': 'rgba(217, 217, 217, 0.68)',
 
-            // Primary action color = accent
             primary: {
-              DEFAULT:    '#B8C4D0',
-              foreground: '#08080A',
-              50:  '#F5F7F8',
-              100: '#E5EAEF',
-              200: '#D1DAE3',
-              300: '#B8C4D0',
-              400: '#9FAFC0',
-              500: '#8295AB',
-              600: '#677A91',
-              700: '#4E5F72',
-              800: '#364352',
-              900: '#1F2833',
+              DEFAULT:    '#D9D9D9',
+              foreground: '#1A1A1A',
+              50:  '#FFFFFF',
+              100: '#F4F4F4',
+              200: '#E8E8E8',
+              300: '#D9D9D9',
+              400: '#C7C7C7',
+              500: '#AFAFAF',
+              600: '#8F8F8F',
+              700: '#6F6F6F',
+              800: '#4A4A4A',
+              900: '#2A2A2A',
             },
 
             secondary: {
@@ -169,8 +168,8 @@ export default {
             },
 
             // Borders — white glass
-            divider:    'rgba(255, 255, 255, 0.14)',
-            focus:      '#B8C4D0',
+            divider:    'rgba(255, 255, 255, 0.10)',
+            focus:      '#D9D9D9',
 
             // Status colors
             success: {

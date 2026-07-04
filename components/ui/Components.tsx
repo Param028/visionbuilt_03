@@ -39,8 +39,8 @@ export const Button: React.FC<ButtonProps> = ({
   const baseStyles = "relative inline-flex items-center justify-center rounded-lg font-medium transition-all focus:outline-none disabled:opacity-50 disabled:pointer-events-none overflow-hidden group border select-none";
   
   const variants = {
-    primary: "bg-white/10 hover:bg-white/14 text-[#FFFFFF] border-white/16 backdrop-blur-[24px] shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_10px_40px_rgba(0,0,0,0.18)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_12px_44px_rgba(0,0,0,0.22)] active:scale-[0.98] transition-all duration-400 ease-out",
-    secondary: "bg-white/6 hover:bg-white/10 text-white/80 hover:text-white border-white/10 backdrop-blur-[24px] shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_8px_32px_rgba(0,0,0,0.12)] active:scale-[0.98] transition-all duration-400 ease-out",
+    primary: "bg-white/10 hover:bg-white/14 text-[#FFFFFF] border-white/16 backdrop-blur-[24px] shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_10px_40px_rgba(12,12,12,0.18)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_12px_44px_rgba(12,12,12,0.22)] active:scale-[0.98] transition-all duration-400 ease-out",
+    secondary: "bg-white/6 hover:bg-white/10 text-white/80 hover:text-white border-white/10 backdrop-blur-[24px] shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_8px_32px_rgba(12,12,12,0.12)] active:scale-[0.98] transition-all duration-400 ease-out",
     outline: "bg-transparent border-white/14 text-white/80 hover:text-white hover:bg-white/8 hover:border-white/20 active:scale-[0.98] transition-all duration-400 ease-out",
     ghost: "bg-transparent border-transparent text-white/58 hover:text-[#FFFFFF] hover:bg-white/6 active:scale-[0.98] transition-all duration-400 ease-out"
   };
@@ -216,12 +216,12 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/55 backdrop-blur-sm">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#1A1A1A]/75 backdrop-blur-sm">
       <motion.div 
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
-        className="w-full max-w-md bg-content1 border border-divider rounded-2xl p-6 shadow-xl relative"
+        className="w-full max-w-md glass-card bg-white/10 border border-white/10 rounded-xl p-6 shadow-xl relative"
       >
         <button onClick={onClose} className="absolute top-4 right-4 text-foreground/50 hover:text-foreground"><X size={20} /></button>
         <div className="flex items-start gap-4">
