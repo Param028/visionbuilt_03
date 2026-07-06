@@ -462,6 +462,38 @@ p, li {
   }
 }
 
+.vb-input,
+.vb-input-native {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
+  border-radius: 8px !important;
+  color: #FFFFFF !important;
+  padding: 0.75rem 1rem !important;
+  font-size: 0.875rem !important;
+  outline: none !important;
+  transition: all 0.3s ease !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+}
+
+.vb-input::placeholder,
+.vb-input-native::placeholder {
+  color: rgba(255, 255, 255, 0.35) !important;
+}
+
+.vb-input:focus,
+.vb-input-native:focus {
+  border-color: rgba(255, 255, 255, 0.25) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.05) !important;
+}
+
+.vb-input option {
+  background: #2C3137 !important;
+  color: #FFFFFF !important;
+}
+
 @media (max-width: 768px) {
   .glass-panel,
   .glass-card {
