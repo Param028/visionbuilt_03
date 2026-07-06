@@ -1,22 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Code, Palette, Smartphone, Globe, Zap, Layers } from 'lucide-react';
-import { PillNav, BorderGlow, RotatingText, ShinyText } from '../components/ui/GlassComponents';
+import { BorderGlow, RotatingText, ShinyText } from '../components/ui/GlassComponents';
 import { User } from '../types';
 
 // ── COMPONENT ─────────────────────────────────────────────────
 const LandingNew: React.FC<{ user: User | null }> = ({ user: _user }) => {
   return (
     <main className="relative min-h-screen bg-[#1C1C1C]">
-      {/* PillNav Header - z-50 */}
-      <PillNav
-        items={[
-          { label: 'Home', href: '/' },
-          { label: 'Services', href: '#services' },
-          { label: 'Work', href: '#work' }
-        ]}
-      />
-
       {/* Content Container - z-10 */}
       <div className="relative z-10">
         
