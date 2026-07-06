@@ -79,7 +79,7 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
     <div className="min-h-screen flex flex-col text-foreground font-sans relative z-0 overflow-x-hidden">
 
       {/* ── Strands WebGL Background ── */}
-      <div className="fixed inset-0 z-0 pointer-events-none bg-[#0A0A0A]">
+      <div className="fixed inset-0 z-0 pointer-events-none">
         <Strands
           colors={["#F97316", "#7C3AED", "#06B6D4"]}
           count={3}

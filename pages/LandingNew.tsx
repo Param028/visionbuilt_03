@@ -7,7 +7,7 @@ import { User } from '../types';
 // ── COMPONENT ─────────────────────────────────────────────────
 const LandingNew: React.FC<{ user: User | null }> = ({ user: _user }) => {
   return (
-    <main className="relative min-h-screen bg-[#1C1C1C]">
+    <main className="relative min-h-screen">
       {/* Content Container - z-10 */}
       <div className="relative z-10">
         
