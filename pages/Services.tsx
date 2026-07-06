@@ -112,11 +112,11 @@ const Services: React.FC<{ user: User | null }> = ({ user }) => {
   const handleOrder = (serviceId: string) => navigate(`/order/new?serviceId=${serviceId}`);
 
   return (
-    <div className="min-h-screen bg-[#1A1A1A] overflow-x-hidden">
+    <div className="min-h-screen overflow-x-hidden">
 
       {/* ── PAGE HEADER ── */}
       <div
-        className="relative border-b pt-20 pb-16 overflow-hidden bg-[#1A1A1A]"
+        className="relative border-b pt-20 pb-16 overflow-hidden"
         style={{ borderColor: 'rgba(255,255,255,0.08)' }}
       >
         {/* Atmospheric glow */}

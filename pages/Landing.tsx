@@ -182,12 +182,12 @@ const Landing: React.FC<{ user: User | null }> = ({ user }) => {
   })();
 
   return (
-    <div className="relative min-h-screen bg-[#1A1A1A] overflow-x-hidden">
+    <div className="relative min-h-screen overflow-x-hidden">
 
       {/* ═══════════════════════════════════════════════
           HERO — fullscreen cinematic
       ═══════════════════════════════════════════════ */}
-      <section className="relative min-h-screen flex items-center overflow-hidden bg-[#1A1A1A]">
+      <section className="relative min-h-screen flex items-center overflow-hidden">
 
         {/* Atmospheric background */}
         <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden" aria-hidden="true">
@@ -388,7 +388,7 @@ const Landing: React.FC<{ user: User | null }> = ({ user }) => {
           STATS STRIP
       ═══════════════════════════════════════════════ */}
       <section
-        className="border-y py-10 md:py-12 bg-[#1A1A1A]"
+        className="border-y py-10 md:py-12"
         style={{ borderColor: 'rgba(255,255,255,0.08)' }}
       >
         <div className="container-vb">
@@ -423,7 +423,7 @@ const Landing: React.FC<{ user: User | null }> = ({ user }) => {
       </section>
 
       {/* ── Services Section – powered by BentoGrid ── */}
-      <section className="section-y relative overflow-hidden bg-[#1A1A1A]">
+      <section className="section-y relative overflow-hidden">
         <div className="absolute left-[2%] top-[18%] z-10 h-[26rem] w-[26rem] rounded-full bg-white/10 blur-[120px]" aria-hidden="true" />
         <div className="absolute right-[8%] bottom-[10%] z-10 h-[30rem] w-[30rem] rounded-full bg-[#1F327A]/20 blur-[130px]" aria-hidden="true" />
         <div className="container-vb relative z-20">
@@ -443,7 +443,7 @@ const Landing: React.FC<{ user: User | null }> = ({ user }) => {
           FEATURED WORK / PROJECT SHOWCASE
       ═══════════════════════════════════════════════ */}
       <section
-        className="section-y-sm border-y relative overflow-hidden bg-[#1A1A1A]"
+        className="section-y-sm border-y relative overflow-hidden"
         style={{ borderColor: 'rgba(255,255,255,0.08)' }}
       >
         <div className="absolute right-[5%] top-[8%] z-10 h-[32rem] w-[32rem] rounded-full bg-white/10 blur-[120px]" aria-hidden="true" />
@@ -500,7 +500,7 @@ const Landing: React.FC<{ user: User | null }> = ({ user }) => {
       </section>
 
       {/* ── 🎬 SOCIAL MEDIA SHOWCASE — CAROUSEL ── */}
-      <section className="section-y border-b border-white/8 relative overflow-hidden bg-[#1A1A1A]">
+      <section className="section-y border-b border-white/8 relative overflow-hidden">
         {/* Background ambient lighting */}
         <div
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
@@ -613,7 +613,7 @@ const Landing: React.FC<{ user: User | null }> = ({ user }) => {
       {/* ═══════════════════════════════════════════════
           PROCESS TIMELINE
       ═══════════════════════════════════════════════ */}
-      <section className="section-y bg-[#1A1A1A]">
+      <section className="section-y">
         <div className="container-vb">
 
           <FadeUp className="mb-16 md:mb-20">
@@ -661,7 +661,7 @@ const Landing: React.FC<{ user: User | null }> = ({ user }) => {
           TECH STACK MARQUEE
       ═══════════════════════════════════════════════ */}
       <section
-        className="section-y-sm border-y bg-[#1A1A1A]"
+        className="section-y-sm border-y"
         style={{ borderColor: 'rgba(255,255,255,0.08)' }}
       >
         <div className="container-vb mb-8 text-center">
@@ -674,7 +674,7 @@ const Landing: React.FC<{ user: User | null }> = ({ user }) => {
           SUBSCRIPTION PLANS (conditional)
       ═══════════════════════════════════════════════ */}
       {subscriptions.length > 0 && (
-        <section className="section-y border-b bg-[#1A1A1A]" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
+        <section className="section-y border-b" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
           <div className="container-vb">
             <FadeUp className="mb-14 md:mb-20">
               <p className="text-label mb-4">Recurring Value</p>
@@ -725,7 +725,7 @@ const Landing: React.FC<{ user: User | null }> = ({ user }) => {
       {/* ═══════════════════════════════════════════════
           CTA SECTION — immersive, massive typography
       ═══════════════════════════════════════════════ */}
-      <section className="relative section-y overflow-hidden border-t bg-[#1A1A1A]" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
+      <section className="relative section-y overflow-hidden border-t" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
         {/* Atmospheric glow */}
         <div
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
