@@ -5,6 +5,7 @@ import { api } from '../services/api';
 import { User } from '../types';
 import { useToast } from '../components/ui/Toast';
 import { motion } from 'framer-motion';
+import BorderGlow from '../components/ui/BorderGlow';
 
 const DevLogin: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
   const [email, setEmail] = useState('');
@@ -71,6 +72,18 @@ const DevLogin: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
 
       <div className="relative z-10 w-full max-w-md p-4">
          {/* Terminal Header */}
+         <BorderGlow
+           edgeSensitivity={30}
+           glowColor="142 76 36"
+           backgroundColor="rgba(0, 0, 0, 0.4)"
+           borderRadius={12}
+           glowRadius={35}
+           glowIntensity={1.2}
+           coneSpread={25}
+           animated={true}
+           colors={['#10b981', '#059669', '#047857']}
+           fillOpacity={0.3}
+         >
          <motion.div 
            initial={{ opacity: 0, y: 15 }}
            animate={{ opacity: 1, y: 0 }}
@@ -173,6 +186,7 @@ const DevLogin: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
                  RESTRICTED AREA // PROTOCOL ACTIVE
              </div>
          </motion.div>
+         </BorderGlow>
       </div>
     </div>
   );
