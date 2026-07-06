@@ -4,8 +4,6 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, LogOut, Instagram, Mail, ChevronRight, User as UserIcon } from 'lucide-react';
 import { User } from '../types';
 import { api } from '../services/api';
-import { Particles } from './ui/ReactBits';
-import BackgroundOrbs from './ui/BackgroundOrbs';
 import { Strands } from './ui/GlassComponents';
 import { INITIAL_CONTACT_INFO } from '../constants';
 
@@ -80,20 +78,8 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
   return (
     <div className="min-h-screen flex flex-col bg-[#1A1A1A] text-foreground font-sans relative z-0 overflow-x-hidden">
 
-      {/* ── Ambient particle field ── */}
-      <Particles
-        className="fixed inset-0 z-0 pointer-events-none"
-        quantity={window.innerWidth < 768 ? 12 : 25}
-        staticity={90}
-        ease={100}
-        vx={0.015}
-        vy={0.015}
-        color="#d9d9d9"
-        refresh />
-      <BackgroundOrbs />
-
       {/* ── Strands WebGL Background ── */}
-      <div className="fixed inset-0 z-10 pointer-events-none">
+      <div className="fixed inset-0 z-0 pointer-events-none">
         <Strands
           colors={["#F97316", "#7C3AED", "#06B6D4"]}
           count={3}
@@ -127,15 +113,15 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
         }`}
         aria-label="Primary navigation"
       >
-        <div className="container-vb h-24 md:h-32 flex items-center justify-between relative">
+        <div className="container-vb h-24 md:h-32 flex items-center justify-between">
 
           {/* Logo */}
-          <Link to="/" className="flex items-center group z-20" aria-label="Vision Built home">
+          <Link to="/" className="flex items-center group" aria-label="Vision Built home">
             <img src="/logo.png" alt="Vision Built Logo" className="nav-logo object-contain" />
           </Link>
 
-          {/* Desktop Nav Links - Centered */}
-          <div className="hidden md:flex items-center gap-7 absolute left-1/2 -translate-x-1/2">
+          {/* Desktop Nav Links */}
+          <div className="hidden md:flex items-center gap-7 flex-1 justify-center">
             {getNavItems().map((item) => (
               <Link
                 key={item.name}
@@ -157,7 +143,7 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
           </div>
 
           {/* Desktop Actions */}
-          <div className="hidden md:flex items-center gap-3 z-20">
+          <div className="hidden md:flex items-center gap-3">
             {user ? (
               <>
                 <Link to="/profile" title="My Profile">
