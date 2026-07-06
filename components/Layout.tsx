@@ -76,10 +76,10 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
     path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#1A1A1A] text-foreground font-sans relative z-0 overflow-x-hidden">
+    <div className="min-h-screen flex flex-col text-foreground font-sans relative z-0 overflow-x-hidden">
 
       {/* ── Strands WebGL Background ── */}
-      <div className="fixed inset-0 z-0 pointer-events-none">
+      <div className="fixed inset-0 z-0 pointer-events-none bg-[#0A0A0A]">
         <Strands
           colors={["#F97316", "#7C3AED", "#06B6D4"]}
           count={3}
@@ -252,7 +252,7 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
       </main>
 
       {/* ── FOOTER ── */}
-      <footer className="border-t vb-divider bg-[#1A1A1A] relative z-10">
+      <footer className="border-t vb-divider bg-[#0A0A0A]/80 backdrop-blur-sm relative z-10">
         <div className="container-vb py-16 md:py-20">
 
           {/* Top grid */}
