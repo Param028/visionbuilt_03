@@ -126,9 +126,9 @@ p, li {
 .glass-panel,
 .glass-card,
 .glass-nav {
-  background: var(--vb-glass-primary) !important;
-  backdrop-filter: blur(28px) saturate(130%) !important;
-  -webkit-backdrop-filter: blur(28px) saturate(130%) !important;
+  background: rgba(26, 26, 26, 0.85) !important;
+  backdrop-filter: blur(20px) saturate(130%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(130%) !important;
   border: 1px solid var(--vb-glass-border) !important;
   box-shadow: var(--vb-glass-shadow), inset 0 1px 0 var(--vb-glass-highlight) !important;
   color: var(--vb-text-sec);
@@ -161,6 +161,14 @@ p, li {
 .glass-panel > * {
   position: relative;
   z-index: 1;
+}
+
+.text-shadow-lg {
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8), 0 0 2px rgba(0, 0, 0, 0.6);
+}
+
+.text-shadow-md {
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6), 0 0 1px rgba(0, 0, 0, 0.4);
 }
 
 .glass-nav {

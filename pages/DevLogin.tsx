@@ -50,6 +50,10 @@ const DevLogin: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
 
   return (
     <div className="min-h-screen bg-background text-emerald-400 font-mono flex items-center justify-center relative overflow-hidden selection:bg-emerald-950 selection:text-white">
+      {/* Strands Animation Background */}
+      <div className="absolute inset-0 z-0">
+        <div className="strands-container"></div>
+      </div>
       {/* Scanline & grid */}
       <div className="absolute inset-0 pointer-events-none z-50 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.15)_50%)] bg-[size:100%_4px] opacity-15" />
       <div className="absolute inset-0 pointer-events-none opacity-[0.02] bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:30px_30px]" />
@@ -70,11 +74,11 @@ const DevLogin: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
          <motion.div 
            initial={{ opacity: 0, y: 15 }}
            animate={{ opacity: 1, y: 0 }}
-           className="border border-emerald-500/20 bg-[#25292e] shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-lg overflow-hidden"
+           className="border border-emerald-500/20 glass-card shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-lg overflow-hidden"
          >
-             <div className="bg-emerald-500/[0.02] border-b border-emerald-500/10 px-4 py-3.5 flex items-center justify-between">
-                 <div className="flex items-center gap-2 text-[10px] tracking-widest text-emerald-500/60 font-semibold uppercase">
-                     <Terminal size={12} />
+             <div className="glass-panel border-b border-emerald-500/10 px-4 py-3.5 flex items-center justify-between">
+                 <div className="flex items-center gap-2 text-[10px] tracking-widest text-emerald-400/80 font-semibold uppercase text-shadow-md">
+                     <Terminal size={12} className="text-shadow-md" />
                      <span>SYS.ROOT.ACCESS</span>
                  </div>
                  <div className="flex gap-1.5 select-none">
@@ -92,7 +96,7 @@ const DevLogin: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
                      </div>
                  </div>
 
-                 <div className="space-y-1 text-[10px] text-emerald-500/40 select-none">
+                 <div className="space-y-1 text-[10px] text-emerald-400/60 select-none">
                      <p>{'>'} INITIALIZING SECURE SHELL...</p>
                      <p>{'>'} AES-256 TRAFFIC CRYPTO LINK ACTIVE.</p>
                      <p>{'>'} PROTOCOL ESTABLISHED.</p>
@@ -101,14 +105,14 @@ const DevLogin: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
                  <form onSubmit={handleLogin} className="space-y-5">
                      <div className="space-y-4">
                           <div className="space-y-1.5">
-                              <label className="text-[9px] uppercase tracking-widest text-emerald-500/50 block">Operative ID</label>
-                              <div className="flex items-center border border-emerald-500/10 bg-black/10 focus-within:border-emerald-500/30 transition-all rounded-lg px-3.5 py-2.5">
+                              <label className="text-[9px] uppercase tracking-widest text-emerald-400/70 block font-semibold">Operative ID</label>
+                              <div className="flex items-center border border-emerald-500/10 bg-black/40 focus-within:border-emerald-500/30 transition-all rounded-lg px-3.5 py-2.5">
                                   <ChevronRight size={14} className="mr-2 text-emerald-500/50 animate-pulse" />
                                   <input 
                                       type="email" 
                                       value={email}
                                       onChange={(e) => setEmail(e.target.value)}
-                                      className="bg-transparent border-none outline-none text-emerald-300 w-full placeholder-emerald-950 text-xs"
+                                      className="bg-transparent border-none outline-none text-emerald-300 w-full placeholder-emerald-950 text-xs font-semibold"
                                       placeholder="admin@visionbuilt.com"
                                       autoComplete="off"
                                   />
@@ -116,14 +120,14 @@ const DevLogin: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
                           </div>
                           
                           <div className="space-y-1.5">
-                              <label className="text-[9px] uppercase tracking-widest text-emerald-500/50 block">Security Key</label>
-                              <div className="flex items-center border border-emerald-500/10 bg-black/10 focus-within:border-emerald-500/30 transition-all rounded-lg px-3.5 py-2.5">
+                              <label className="text-[9px] uppercase tracking-widest text-emerald-400/70 block font-semibold">Security Key</label>
+                              <div className="flex items-center border border-emerald-500/10 bg-black/40 focus-within:border-emerald-500/30 transition-all rounded-lg px-3.5 py-2.5">
                                   <Lock size={14} className="mr-2 text-emerald-500/50" />
                                   <input 
                                       type="password" 
                                       value={password}
                                       onChange={(e) => setPassword(e.target.value)}
-                                      className="bg-transparent border-none outline-none text-emerald-300 w-full placeholder-emerald-950 text-xs"
+                                      className="bg-transparent border-none outline-none text-emerald-300 w-full placeholder-emerald-950 text-xs font-semibold"
                                       placeholder="••••••••••••"
                                   />
                               </div>
@@ -148,7 +152,7 @@ const DevLogin: React.FC<{ setUser: (u: User) => void }> = ({ setUser }) => {
                      <button 
                         type="submit" 
                         disabled={loading}
-                        className="w-full bg-emerald-500/5 border border-emerald-500/20 hover:bg-emerald-400 hover:text-black text-emerald-400 py-3 rounded-lg text-xs font-bold uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 group relative overflow-hidden"
+                        className="w-full glass-card border border-emerald-500/30 hover:bg-emerald-500/20 hover:border-emerald-500/50 text-emerald-400 py-3 rounded-lg text-xs font-bold uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 group relative overflow-hidden shadow-[0_0_20px_rgba(16,185,129,0.15)]"
                      >
                           {loading ? (
                               <>

@@ -42,9 +42,9 @@ const AdminNotifications: React.FC = () => {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 10 }}
-                      className="absolute right-0 mt-4 w-96 bg-[#25292e] border border-white/5 rounded-xl shadow-2xl z-50 overflow-hidden backdrop-blur-xl"
+                      className="absolute right-0 mt-4 w-96 glass-card border border-white/5 rounded-xl shadow-2xl z-50 overflow-hidden backdrop-blur-xl"
                     >
-                        <div className="p-4 border-b border-white/5 flex justify-between items-center bg-[#25292e]">
+                        <div className="p-4 border-b border-white/5 flex justify-between items-center glass-panel">
                             <span className="text-[10px] font-display font-semibold text-foreground uppercase tracking-widest flex items-center gap-2">
                                 <Shield size={12} className="text-[var(--vb-accent)]" /> System Logs
                             </span>
@@ -144,7 +144,7 @@ const AdminAnalytics: React.FC = () => {
                                  {/* Tooltip */}
                                  {hoveredIndex === i && (
                                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3.5 z-50 animate-in fade-in slide-in-from-bottom-1 pointer-events-none">
-                                         <div className="bg-[#25292e] border border-white/5 rounded-lg px-3 py-2 shadow-2xl text-center">
+                                         <div className="glass-card border border-white/5 rounded-lg px-3 py-2 shadow-2xl text-center">
                                              <p className="text-[9px] text-foreground/40 uppercase tracking-widest font-mono mb-0.5">{new Date(item.date).toLocaleDateString()}</p>
                                              <p className="text-xs font-bold text-foreground">${item.value}</p>
                                          </div>
@@ -298,7 +298,7 @@ const AdminOrders: React.FC<{ user: User }> = ({ user }) => {
                           initial={{ opacity: 0, scale: 0.95 }}
                           animate={{ opacity: 1, scale: 1 }}
                           exit={{ opacity: 0, scale: 0.95 }}
-                          className="w-full max-w-md bg-[#25292e] border border-white/5 p-8 rounded-xl shadow-2xl relative"
+                          className="w-full max-w-md glass-card border border-white/5 p-8 rounded-xl shadow-2xl relative"
                         >
                             <button onClick={() => setPaymentModal({ ...paymentModal, open: false })} className="absolute top-4 right-4 text-foreground/40 hover:text-foreground"><X size={18} /></button>
                             
@@ -435,7 +435,7 @@ const AdminOrders: React.FC<{ user: User }> = ({ user }) => {
                             <select 
                                 value={order.status}
                                 onChange={(e) => handleStatusUpdate(order.id, e.target.value as Order['status'])}
-                                className={`bg-[#25292e] border border-white/5 text-[10px] rounded-lg px-3 py-2 outline-none font-display font-semibold uppercase tracking-wider cursor-pointer ${
+                                className={`glass-card border border-white/5 text-[10px] rounded-lg px-3 py-2 outline-none font-display font-semibold uppercase tracking-wider cursor-pointer ${
                                     order.status === 'completed' ? 'text-emerald-400' : 
                                     order.status === 'pending' ? 'text-amber-400' : 'text-[var(--vb-accent)]'
                                 }`}
@@ -750,7 +750,7 @@ const AdminTasks: React.FC<{ user: User }> = ({ user }) => {
                                   <select 
                                      value={t.status}
                                      onChange={(e) => handleStatus(t.id, e.target.value as any)}
-                                     className="bg-[#25292e] border border-white/5 text-[10px] text-foreground rounded-lg px-2.5 py-1.5 outline-none cursor-pointer hover:border-white/10 transition-colors font-semibold uppercase tracking-wider"
+                                     className="glass-card border border-white/5 text-[10px] text-foreground rounded-lg px-2.5 py-1.5 outline-none cursor-pointer hover:border-white/10 transition-colors font-semibold uppercase tracking-wider"
                                   >
                                       <option value="todo" className="bg-[#212529]">To Do</option>
                                       <option value="in_progress" className="bg-[#212529]">In Progress</option>
@@ -772,7 +772,7 @@ const AdminTasks: React.FC<{ user: User }> = ({ user }) => {
                          <div className="space-y-1.5">
                              <label className="text-xs text-foreground/50 uppercase font-bold tracking-wider font-satoshi">Assignee</label>
                              <select 
-                                className="w-full bg-[#1b1e22] border border-white/5 rounded-lg px-3 py-2 text-xs text-foreground/80 outline-none font-satoshi"
+                                className="w-full glass-card border border-white/5 rounded-lg px-3 py-2 text-xs text-foreground/80 outline-none font-satoshi"
                                 value={newTask.assigned_to_id}
                                 onChange={e => setNewTask({...newTask, assigned_to_id: e.target.value})}
                              >
@@ -782,7 +782,7 @@ const AdminTasks: React.FC<{ user: User }> = ({ user }) => {
                          <div className="space-y-1.5">
                              <label className="text-xs text-foreground/50 uppercase font-bold tracking-wider font-satoshi">Priority</label>
                              <select 
-                                className="w-full bg-[#1b1e22] border border-white/5 rounded-lg px-3 py-2 text-xs text-foreground/80 outline-none font-satoshi"
+                                className="w-full glass-card border border-white/5 rounded-lg px-3 py-2 text-xs text-foreground/80 outline-none font-satoshi"
                                 value={newTask.priority}
                                 onChange={e => setNewTask({...newTask, priority: e.target.value as any})}
                              >
@@ -834,7 +834,7 @@ const AdminRequests: React.FC = () => {
                              <select 
                                 value={s.status} 
                                 onChange={(e) => handleStatus(s.id, e.target.value as any)}
-                                className="bg-[#25292e] border border-white/5 text-[10px] text-foreground rounded-lg px-2.5 py-1.5 outline-none cursor-pointer font-semibold uppercase tracking-wider"
+                                className="glass-card border border-white/5 text-[10px] text-foreground rounded-lg px-2.5 py-1.5 outline-none cursor-pointer font-semibold uppercase tracking-wider"
                              >
                                  <option value="open" className="bg-[#212529]">Open</option>
                                  <option value="planned" className="bg-[#212529]">Planned</option>
@@ -924,7 +924,7 @@ const AdminTeam: React.FC<{ user: User }> = ({ user }) => {
                         <div className="space-y-1.5">
                             <label className="text-xs text-foreground/50 uppercase font-bold tracking-wider">Access Clearance</label>
                             <select 
-                                className="w-full bg-[#1b1e22] border border-white/5 rounded-lg px-3 py-2 text-xs text-foreground/80 outline-none"
+                                className="w-full glass-card border border-white/5 rounded-lg px-3 py-2 text-xs text-foreground/80 outline-none"
                                 value={inviteData.role}
                                 onChange={e => setInviteData({...inviteData, role: e.target.value})}
                             >
@@ -1075,7 +1075,7 @@ const AdminMarketplace: React.FC<{ user: User }> = ({ user }) => {
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                               <div className="space-y-1.5">
                                   <label className="text-xs uppercase text-foreground/50 font-bold tracking-wider">Inventory Category</label>
-                                  <select value={formData.category} onChange={(e) => handleCategoryChange(e.target.value as ProjectCategory)} className="w-full h-10 bg-[#1b1e22] border border-white/5 rounded-lg px-3 text-xs text-foreground focus:border-white/20 outline-none">
+                                  <select value={formData.category} onChange={(e) => handleCategoryChange(e.target.value as ProjectCategory)} className="w-full h-10 glass-card border border-white/5 rounded-lg px-3 text-xs text-foreground focus:border-white/20 outline-none">
                                       <option value="Premium Projects" className="bg-[#212529]">Premium Projects</option>
                                       <option value="UI/UX Design" className="bg-[#212529]">UI/UX Design</option>
                                       <option value="Free Projects" className="bg-[#212529]">Free Projects</option>
@@ -1120,7 +1120,7 @@ const AdminMarketplace: React.FC<{ user: User }> = ({ user }) => {
                                     <div className="flex items-center justify-center h-full text-foreground/20"><ImageIcon size={28} /></div>
                                 )}
                                 <div className="absolute top-3 right-3 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button onClick={() => handleEdit(item)} className="p-2 border border-white/10 bg-black/60 rounded-lg text-white hover:bg-[var(--vb-accent)] transition-colors"><Edit size={12} /></button>
+                                    <button onClick={() => handleEdit(item)} className="p-2 border border-white/10 glass-card rounded-lg text-white hover:bg-[var(--vb-accent)] transition-colors"><Edit size={12} /></button>
                                     <button onClick={() => confirmDelete(item.id)} className="p-2 border border-white/10 bg-black/60 rounded-lg text-white hover:bg-red-500 transition-colors"><Trash2 size={12} /></button>
                                 </div>
                                 {item.is_featured && <div className="absolute bottom-3 left-3 bg-yellow-500 text-black text-[8px] font-display font-bold px-2 py-0.5 rounded uppercase flex items-center gap-1"><Zap size={8} fill="currentColor"/> Featured</div>}
@@ -1229,7 +1229,7 @@ const AdminSubscriptions: React.FC = () => {
                                 <div className="space-y-1.5">
                                     <label className="text-xs text-foreground/50 uppercase font-bold tracking-wider">Interval</label>
                                     <select 
-                                        className="w-full bg-[#1b1e22] border border-white/5 rounded-lg px-3 py-2 text-xs text-foreground/80 outline-none"
+                                        className="w-full glass-card border border-white/5 rounded-lg px-3 py-2 text-xs text-foreground/80 outline-none"
                                         value={formData.interval}
                                         onChange={e => setFormData({...formData, interval: e.target.value as 'month' | 'year'})}
                                     >
@@ -1398,7 +1398,7 @@ const Admin: React.FC<{ user: User }> = ({ user }) => {
     <div className="min-h-screen bg-background text-foreground font-sans selection:bg-white/10">
       <div className="flex h-screen overflow-hidden">
         {/* Sidebar */}
-        <aside className="w-64 bg-[#25292e] border-r border-white/5 hidden md:flex flex-col relative z-20">
+        <aside className="w-64 glass-panel border-r border-white/5 hidden md:flex flex-col relative z-20">
           <div className="p-8">
             <h1 className="text-sm font-display font-bold text-foreground tracking-[0.25em] flex items-center gap-2">
                 <Shield size={18} className="text-[var(--vb-accent)]" />
@@ -1447,7 +1447,7 @@ const Admin: React.FC<{ user: User }> = ({ user }) => {
         </aside>
 
         {/* Mobile Header */}
-        <div className="md:hidden fixed top-0 w-full bg-[#25292e] border-b border-white/5 z-20 flex justify-between items-center p-4">
+        <div className="md:hidden fixed top-0 w-full glass-panel border-b border-white/5 z-20 flex justify-between items-center p-4">
              <span className="font-display font-bold text-foreground text-xs uppercase tracking-widest flex items-center gap-1.5"><Shield size={12}/> Console</span>
              <div className="flex items-center gap-4">
                  <AdminNotifications />
