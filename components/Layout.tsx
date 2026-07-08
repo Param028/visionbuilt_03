@@ -82,16 +82,16 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
       <div className="fixed inset-0 z-0 pointer-events-none">
         <Strands
           colors={["#F97316", "#7C3AED", "#06B6D4"]}
-          count={3}
+          count={4}
           speed={0.5}
-          amplitude={1}
+          amplitude={1.2}
           waviness={1}
-          thickness={0.7}
-          glow={2.6}
+          thickness={0.8}
+          glow={4}
           taper={3}
           spread={1}
           hueShift={0}
-          intensity={0.6}
+          intensity={1}
           saturation={1.5}
           opacity={1}
           scale={1.5}

@@ -798,10 +798,10 @@ export class ApiService {
   async uploadImage(file: File, path: string): Promise<string> {
       const fileExt = file.name.split('.').pop();
       const fileName = `${path}/${Date.now()}.${fileExt}`;
-      const { data, error } = await supabase.storage.from('images').upload(fileName, file);
-      
+      const { error } = await supabase.storage.from('images').upload(fileName, file);
+
       if (error) throw error;
-      
+
       // Get public URL
       const { data: { publicUrl } } = supabase.storage.from('images').getPublicUrl(fileName);
       return publicUrl;

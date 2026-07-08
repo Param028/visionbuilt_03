@@ -10,29 +10,13 @@ import { api } from '../services/api';
 import { MarketplaceItem, User, ProjectCategory } from '../types';
 import { formatPrice } from '../constants';
 import { GlareCard } from '../components/ui/ReactBits';
+import { CardSkeleton } from '../components/ui/SkeletonLoader';
 
 const TABS: { key: ProjectCategory; icon: React.ReactNode; label: string }[] = [
   { key: 'Premium Projects', icon: <Layout size={14} />, label: 'Premium Projects' },
   { key: 'UI/UX Design',     icon: <Sparkles size={14} />, label: 'UI/UX Design' },
   { key: 'Free Projects',    icon: <Rocket size={14} />, label: 'Free Projects' },
 ];
-
-
-// ── Loading skeleton ──────────────────────────────────────────
-const ItemSkeleton = () => (
-  <div className="glass-card overflow-hidden animate-pulse">
-    <div className="h-44 bg-black/5" />
-    <div className="p-6 space-y-3">
-      <div className="h-4 w-2/3 bg-black/5 rounded" />
-      <div className="h-4 w-full bg-black/5 rounded" />
-      <div className="h-4 w-5/6 bg-black/5 rounded" />
-      <div className="mt-4 flex justify-between items-center">
-        <div className="h-6 w-20 bg-black/5 rounded" />
-        <div className="h-9 w-28 bg-black/5 rounded" />
-      </div>
-    </div>
-  </div>
-);
 
 // ── COMPONENT ─────────────────────────────────────────────────
 const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
@@ -198,7 +182,7 @@ const Marketplace: React.FC<{ user: User | null }> = ({ user }) => {
         {/* Items grid */}
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {[1, 2, 3, 4, 5, 6].map(i => <ItemSkeleton key={i} />)}
+            {[1, 2, 3, 4, 5, 6].map(i => <CardSkeleton key={i} />)}
           </div>
         ) : displayedItems.length === 0 ? (
           <div className="glass-card flex flex-col items-center justify-center text-center p-16 max-w-md mx-auto">

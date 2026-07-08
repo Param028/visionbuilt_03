@@ -11,6 +11,7 @@ import { formatPrice } from '../constants';
 import { BentoGrid } from '../components/ui/BentoGrid';
 import { servicesData } from '../constants/services';
 import ProductCarousel from '../components/ui/ProductCarousel';
+import { CardSkeleton, HeroSkeleton, StatsSkeleton, CarouselSkeleton } from '../components/ui/SkeletonLoader';
 
 // ── Inview fade-up wrapper ─────────────────────────────────────
 const FadeUp: React.FC<{
@@ -145,6 +146,7 @@ const Landing: React.FC<{ user: User | null }> = ({ user }) => {
   const [isPaused, setIsPaused] = useState(false);
   const [carouselCategories, setCarouselCategories] = useState<CarouselCategory[]>([]);
   const [carouselItems, setCarouselItems] = useState<Record<string, CarouselItem[]>>({});
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (isPaused) return;
@@ -155,26 +157,25 @@ const Landing: React.FC<{ user: User | null }> = ({ user }) => {
   }, [isPaused]);
 
   useEffect(() => {
-    api.getSiteSettings().then(setSiteSettings);
-    api.getPlatformStats().then(setStats);
-    api.getMarketplaceItems().then(setProjects);
-    api.getRecurringServices().then((subs) =>
-      setSubscriptions(subs.filter((s: any) => s.is_active && s.show_on_home))
-    );
-    
-    // Load carousel categories and items
-    api.getCarouselCategories().then(async (categories) => {
-      setCarouselCategories(categories);
-      // Load items for each category
-      const itemsMap: Record<string, CarouselItem[]> = {};
-      await Promise.all(
-        categories.map(async (cat) => {
-          const items = await api.getCarouselItems(cat.id);
-          itemsMap[cat.id] = items;
-        })
-      );
-      setCarouselItems(itemsMap);
-    });
+    Promise.all([
+      api.getSiteSettings().then(setSiteSettings),
+      api.getPlatformStats().then(setStats),
+      api.getMarketplaceItems().then(setProjects),
+      api.getRecurringServices().then((subs) =>
+        setSubscriptions(subs.filter((s: any) => s.is_active && s.show_on_home))
+      ),
+      api.getCarouselCategories().then(async (categories) => {
+        setCarouselCategories(categories);
+        const itemsMap: Record<string, CarouselItem[]> = {};
+        await Promise.all(
+          categories.map(async (cat) => {
+            const items = await api.getCarouselItems(cat.id);
+            itemsMap[cat.id] = items;
+          })
+        );
+        setCarouselItems(itemsMap);
+      })
+    ]).then(() => setLoading(false));
   }, []);
 
   const getFilteredProjects = () => {
@@ -233,14 +234,18 @@ const Landing: React.FC<{ user: User | null }> = ({ user }) => {
             
             {/* Left Column: Text & Actions */}
             <div className="lg:col-span-7 xl:col-span-7 flex flex-col justify-center">
-              {/* Eyebrow label */}
-              <motion.p
-                className="text-label mb-6"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 1 }}
-              >
-                Digital Agency · Premium Craftsmanship
+              {loading ? (
+                <HeroSkeleton />
+              ) : (
+                <>
+                  {/* Eyebrow label */}
+                  <motion.p
+                    className="text-label mb-6"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 1 }}
+                  >
+                    Digital Agency · Premium Craftsmanship
               </motion.p>
 
               {/* Main heading — Clash Display, cinematic scale */}
@@ -286,6 +291,8 @@ const Landing: React.FC<{ user: User | null }> = ({ user }) => {
                   View Our Work
                 </Link>
               </motion.div>
+                </>
+              )}
             </div>
 
             {/* Right Column: Luxury Mock Browser Carousel */}
@@ -742,7 +749,19 @@ const Landing: React.FC<{ user: User | null }> = ({ user }) => {
       {/* ═══════════════════════════════════════════════
           PRODUCT CAROUSELS — category-based product displays
       ═══════════════════════════════════════════════ */}
-      {carouselCategories.length > 0 && (
+      {loading ? (
+        <section className="relative section-y overflow-hidden border-t" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
+          <div className="container-vb">
+            <div className="text-center mb-12">
+              <div className="h-8 w-48 bg-white/[0.05] rounded mx-auto mb-4" />
+              <div className="h-12 w-64 bg-white/[0.05] rounded mx-auto mb-4" />
+              <div className="h-6 w-96 bg-white/[0.05] rounded mx-auto" />
+            </div>
+            <CarouselSkeleton />
+            <CarouselSkeleton />
+          </div>
+        </section>
+      ) : carouselCategories.length > 0 && (
         <section className="relative section-y overflow-hidden border-t" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
           <div className="container-vb">
             <FadeUp>
@@ -756,7 +775,7 @@ const Landing: React.FC<{ user: User | null }> = ({ user }) => {
                 </p>
               </div>
             </FadeUp>
-            
+
             {carouselCategories.map((category, index) => (
               <FadeUp key={category.id} delay={index * 0.1}>
                 <ProductCarousel
