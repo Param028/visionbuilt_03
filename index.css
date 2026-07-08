@@ -126,7 +126,7 @@ p, li {
 .glass-panel,
 .glass-card,
 .glass-nav {
-  background: rgba(26, 26, 26, 0.4) !important;
+  background: rgba(26, 26, 26, 0.15) !important;
   backdrop-filter: blur(20px) saturate(130%) !important;
   -webkit-backdrop-filter: blur(20px) saturate(130%) !important;
   border: 1px solid var(--vb-glass-border) !important;
