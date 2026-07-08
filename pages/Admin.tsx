@@ -1828,7 +1828,7 @@ const Admin: React.FC<{ user: User }> = ({ user }) => {
         </div>
 
         {/* Main Content Area */}
-        <main className="flex-1 overflow-y-auto bg-background p-4 md:p-8 pt-20 md:pt-8 relative custom-scrollbar">
+        <main className="flex-1 overflow-y-auto bg-transparent p-4 md:p-8 pt-20 md:pt-8 relative custom-scrollbar">
             {/* Grid overlay */}
             <div className="fixed inset-0 pointer-events-none opacity-[0.02] bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:40px_40px]"></div>
             
