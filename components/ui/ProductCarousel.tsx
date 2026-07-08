@@ -133,9 +133,17 @@ const ProductCarousel: React.FC<ProductCarouselProps> = ({ category, items, user
                 glowIntensity={0.8}
               >
                 <div className="h-full flex flex-col p-6">
-                  {/* Image */}
+                  {/* Image/Video */}
                   <div className="h-40 w-full rounded-lg overflow-hidden mb-4 bg-white/[0.02] border border-white/5">
-                    {item.image_url ? (
+                    {item.video_url ? (
+                      <video
+                        src={item.video_url}
+                        controls
+                        className="w-full h-full object-cover"
+                        muted
+                        loop
+                      />
+                    ) : item.image_url ? (
                       <img
                         src={item.image_url}
                         alt={item.title}

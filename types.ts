@@ -218,6 +218,7 @@ export interface CarouselItem {
   title: string;
   description?: string;
   image_url?: string;
+  video_url?: string;
   link_url?: string;
   price?: number;
   tags: string[];

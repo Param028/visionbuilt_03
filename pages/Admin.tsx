@@ -12,6 +12,7 @@ import { api } from '../services/api';
 import { User, MarketplaceItem, ProjectCategory, Order, Service, Offer, Task, ProjectSuggestion, AnalyticsData, AdminActivity, CarouselCategory, CarouselItem } from '../types';
 import { Badge, Input, Textarea, ConfirmDialog } from '../components/ui/Components';
 import ImageUpload from '../components/ui/ImageUpload';
+import VideoUpload from '../components/ui/VideoUpload';
 import { useToast } from '../components/ui/Toast';
 import { CURRENCY_CONFIG, formatPrice } from '../constants';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -1381,6 +1382,7 @@ const AdminCarousel: React.FC = () => {
         title: '',
         description: '',
         image_url: '',
+        video_url: '',
         link_url: '',
         price: 0,
         tags: [],
@@ -1618,6 +1620,12 @@ const AdminCarousel: React.FC = () => {
                                         onChange={(url) => itemFormData.image_url = url}
                                         uploadPath="carousel-items"
                                     />
+                                    <VideoUpload
+                                        label="Video"
+                                        value={itemFormData.video_url}
+                                        onChange={(url) => itemFormData.video_url = url}
+                                        uploadPath="carousel-videos"
+                                    />
                                     <Input
                                         label="Link URL"
                                         value={itemFormData.link_url || ''}
@@ -1753,7 +1761,7 @@ const Admin: React.FC<{ user: User }> = ({ user }) => {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground font-sans selection:bg-white/10">
+    <div className="min-h-screen bg-transparent text-foreground font-sans selection:bg-white/10">
       <div className="flex h-screen overflow-hidden">
         {/* Sidebar */}
         <aside className="w-64 glass-panel border-r border-white/5 hidden md:flex flex-col relative z-20">

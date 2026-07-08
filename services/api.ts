@@ -821,6 +821,33 @@ export class ApiService {
           console.error('Failed to parse image URL for deletion:', e);
       }
   }
+
+  async uploadVideo(file: File, path: string): Promise<string> {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${path}/${Date.now()}.${fileExt}`;
+      const { error } = await supabase.storage.from('videos').upload(fileName, file);
+
+      if (error) throw error;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage.from('videos').getPublicUrl(fileName);
+      return publicUrl;
+  }
+
+  async deleteVideo(videoUrl: string): Promise<void> {
+      try {
+          // Extract path from URL
+          const url = new URL(videoUrl);
+          const pathParts = url.pathname.split('/videos/');
+          if (pathParts.length > 1) {
+              const path = pathParts[1];
+              const { error } = await supabase.storage.from('videos').remove([path]);
+              if (error) console.error('Failed to delete video:', error);
+          }
+      } catch (e) {
+          console.error('Failed to parse video URL for deletion:', e);
+      }
+  }
 }
 
 export const api = new ApiService();
