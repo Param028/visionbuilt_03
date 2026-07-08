@@ -9,7 +9,7 @@ import {
   User as UserIcon, LogOut, Shield, Zap, RefreshCw, X, Calendar, Search, Wallet, Mail, Phone, Globe, Loader2
 } from 'lucide-react';
 import { api } from '../services/api';
-import { User, MarketplaceItem, ProjectCategory, Order, Service, Offer, Task, ProjectSuggestion, AnalyticsData, AdminActivity } from '../types';
+import { User, MarketplaceItem, ProjectCategory, Order, Service, Offer, Task, ProjectSuggestion, AnalyticsData, AdminActivity, CarouselCategory, CarouselItem } from '../types';
 import { Badge, Input, Textarea, ConfirmDialog } from '../components/ui/Components';
 import { useToast } from '../components/ui/Toast';
 import { CURRENCY_CONFIG, formatPrice } from '../constants';
@@ -1353,6 +1353,358 @@ const AdminSettings: React.FC = () => {
     );
 };
 
+// 9. Carousel Management
+const AdminCarousel: React.FC = () => {
+    const [categories, setCategories] = useState<CarouselCategory[]>([]);
+    const [items, setItems] = useState<CarouselItem[]>([]);
+    const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+    const [showCategoryForm, setShowCategoryForm] = useState(false);
+    const [showItemForm, setShowItemForm] = useState(false);
+    const [editingCategory, setEditingCategory] = useState<CarouselCategory | null>(null);
+    const [editingItem, setEditingItem] = useState<CarouselItem | null>(null);
+    const toast = useToast();
+
+    const categoryFormData = useState<Partial<CarouselCategory>>({
+        name: '',
+        slug: '',
+        description: '',
+        icon: 'Layers',
+        display_order: 0,
+        is_active: true
+    })[0];
+
+    const itemFormData = useState<Partial<CarouselItem>>({
+        title: '',
+        description: '',
+        image_url: '',
+        link_url: '',
+        price: 0,
+        tags: [],
+        features: [],
+        display_order: 0,
+        is_active: true
+    })[0];
+
+    useEffect(() => {
+        api.getCarouselCategories().then(setCategories);
+    }, []);
+
+    useEffect(() => {
+        if (selectedCategory) {
+            api.getCarouselItems(selectedCategory).then(setItems);
+        } else {
+            setItems([]);
+        }
+    }, [selectedCategory]);
+
+    const handleCreateCategory = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            const updated = await api.createCarouselCategory(categoryFormData as any);
+            setCategories(updated);
+            setShowCategoryForm(false);
+            toast.success("Category created");
+        } catch (e: any) {
+            toast.error(e.message || "Failed to create category");
+        }
+    };
+
+    const handleUpdateCategory = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!editingCategory) return;
+        try {
+            const updated = await api.updateCarouselCategory(editingCategory.id, categoryFormData);
+            setCategories(updated);
+            setEditingCategory(null);
+            setShowCategoryForm(false);
+            toast.success("Category updated");
+        } catch (e: any) {
+            toast.error(e.message || "Failed to update category");
+        }
+    };
+
+    const handleDeleteCategory = async (id: string) => {
+        try {
+            const updated = await api.deleteCarouselCategory(id);
+            setCategories(updated);
+            if (selectedCategory === id) setSelectedCategory(null);
+            toast.success("Category deleted");
+        } catch (e: any) {
+            toast.error(e.message || "Failed to delete category");
+        }
+    };
+
+    const handleCreateItem = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!selectedCategory) return;
+        try {
+            const updated = await api.createCarouselItem({ ...itemFormData, category_id: selectedCategory } as any);
+            setItems(updated);
+            setShowItemForm(false);
+            toast.success("Item created");
+        } catch (e: any) {
+            toast.error(e.message || "Failed to create item");
+        }
+    };
+
+    const handleUpdateItem = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!editingItem) return;
+        try {
+            const updated = await api.updateCarouselItem(editingItem.id, itemFormData);
+            setItems(updated);
+            setEditingItem(null);
+            setShowItemForm(false);
+            toast.success("Item updated");
+        } catch (e: any) {
+            toast.error(e.message || "Failed to update item");
+        }
+    };
+
+    const handleDeleteItem = async (id: string) => {
+        try {
+            const updated = await api.deleteCarouselItem(id);
+            setItems(updated);
+            toast.success("Item deleted");
+        } catch (e: any) {
+            toast.error(e.message || "Failed to delete item");
+        }
+    };
+
+    return (
+        <div className="space-y-6">
+            <div className="flex flex-col lg:flex-row gap-6">
+                {/* Categories Panel */}
+                <div className="lg:w-80 shrink-0">
+                    <div className="glass-card p-6 space-y-4">
+                        <div className="flex justify-between items-center">
+                            <h3 className="text-sm font-display font-bold text-foreground uppercase tracking-wider">Categories</h3>
+                            <button 
+                                onClick={() => { setEditingCategory(null); setShowCategoryForm(!showCategoryForm); }}
+                                className="btn-ghost p-2 rounded-lg border border-white/5 text-foreground/50 hover:text-foreground"
+                            >
+                                <Plus size={14} />
+                            </button>
+                        </div>
+
+                        {showCategoryForm && (
+                            <div className="animate-in fade-in slide-in-from-top-2 space-y-3 pb-4 border-b border-white/5">
+                                <h4 className="text-xs font-display font-semibold text-foreground/80 uppercase tracking-wider">
+                                    {editingCategory ? 'Edit Category' : 'New Category'}
+                                </h4>
+                                <form onSubmit={editingCategory ? handleUpdateCategory : handleCreateCategory} className="space-y-3">
+                                    <Input 
+                                        label="Name" 
+                                        value={categoryFormData.name || ''} 
+                                        onChange={e => categoryFormData.name = e.target.value}
+                                        required 
+                                    />
+                                    <Input 
+                                        label="Slug" 
+                                        value={categoryFormData.slug || ''} 
+                                        onChange={e => categoryFormData.slug = e.target.value.toLowerCase().replace(/\s+/g, '-')}
+                                        required 
+                                    />
+                                    <Input 
+                                        label="Icon (Lucide)" 
+                                        value={categoryFormData.icon || ''} 
+                                        onChange={e => categoryFormData.icon = e.target.value}
+                                        placeholder="Layers, Camera, Code, Palette"
+                                    />
+                                    <Textarea 
+                                        label="Description" 
+                                        value={categoryFormData.description || ''} 
+                                        onChange={e => categoryFormData.description = e.target.value}
+                                    />
+                                    <div className="flex gap-2">
+                                        <button type="submit" className="btn-primary flex-1 h-9 text-xs font-semibold">
+                                            {editingCategory ? 'Update' : 'Create'}
+                                        </button>
+                                        <button 
+                                            type="button"
+                                            onClick={() => setShowCategoryForm(false)}
+                                            className="btn-ghost flex-1 h-9 text-xs font-semibold"
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        )}
+
+                        <div className="space-y-2 max-h-[400px] overflow-y-auto custom-scrollbar">
+                            {categories.map(cat => (
+                                <div 
+                                    key={cat.id}
+                                    onClick={() => setSelectedCategory(cat.id)}
+                                    className={`p-3 rounded-lg border cursor-pointer transition-all ${
+                                        selectedCategory === cat.id 
+                                        ? 'bg-white/[0.04] border-white/10 text-foreground' 
+                                        : 'bg-white/[0.01] border-transparent hover:border-white/5 text-foreground/60'
+                                    }`}
+                                >
+                                    <div className="flex justify-between items-start">
+                                        <div>
+                                            <h4 className="text-sm font-display font-semibold">{cat.name}</h4>
+                                            <p className="text-[10px] text-foreground/40 font-mono mt-0.5">{cat.slug}</p>
+                                        </div>
+                                        <div className="flex gap-1">
+                                            <button 
+                                                onClick={(e) => { e.stopPropagation(); setEditingCategory(cat); setShowCategoryForm(true); }}
+                                                className="p-1.5 rounded hover:bg-white/5 text-foreground/40 hover:text-foreground"
+                                            >
+                                                <Edit size={12} />
+                                            </button>
+                                            <button 
+                                                onClick={(e) => { e.stopPropagation(); handleDeleteCategory(cat.id); }}
+                                                className="p-1.5 rounded hover:bg-red-500/10 text-foreground/40 hover:text-red-400"
+                                            >
+                                                <Trash2 size={12} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                            {categories.length === 0 && (
+                                <div className="text-center text-foreground/30 text-xs font-satoshi py-8">
+                                    No categories created
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Items Panel */}
+                <div className="flex-1">
+                    <div className="glass-card p-6 space-y-4">
+                        <div className="flex justify-between items-center">
+                            <h3 className="text-sm font-display font-bold text-foreground uppercase tracking-wider">
+                                {selectedCategory ? 'Category Items' : 'Select a Category'}
+                            </h3>
+                            {selectedCategory && (
+                                <button 
+                                    onClick={() => { setEditingItem(null); setShowItemForm(!showItemForm); }}
+                                    className="btn-ghost p-2 rounded-lg border border-white/5 text-foreground/50 hover:text-foreground"
+                                >
+                                    <Plus size={14} />
+                                </button>
+                            )}
+                        </div>
+
+                        {showItemForm && selectedCategory && (
+                            <div className="animate-in fade-in slide-in-from-top-2 space-y-3 pb-4 border-b border-white/5">
+                                <h4 className="text-xs font-display font-semibold text-foreground/80 uppercase tracking-wider">
+                                    {editingItem ? 'Edit Item' : 'New Item'}
+                                </h4>
+                                <form onSubmit={editingItem ? handleUpdateItem : handleCreateItem} className="space-y-3">
+                                    <Input 
+                                        label="Title" 
+                                        value={itemFormData.title || ''} 
+                                        onChange={e => itemFormData.title = e.target.value}
+                                        required 
+                                    />
+                                    <Textarea 
+                                        label="Description" 
+                                        value={itemFormData.description || ''} 
+                                        onChange={e => itemFormData.description = e.target.value}
+                                    />
+                                    <Input 
+                                        label="Image URL" 
+                                        value={itemFormData.image_url || ''} 
+                                        onChange={e => itemFormData.image_url = e.target.value}
+                                        placeholder="https://..."
+                                    />
+                                    <Input 
+                                        label="Link URL" 
+                                        value={itemFormData.link_url || ''} 
+                                        onChange={e => itemFormData.link_url = e.target.value}
+                                        placeholder="https://..."
+                                    />
+                                    <Input 
+                                        label="Price" 
+                                        type="number" 
+                                        value={itemFormData.price || 0} 
+                                        onChange={e => itemFormData.price = parseFloat(e.target.value)}
+                                    />
+                                    <Input 
+                                        label="Tags (comma separated)" 
+                                        value={itemFormData.tags?.join(', ') || ''} 
+                                        onChange={e => itemFormData.tags = e.target.value.split(',').map(t => t.trim())}
+                                        placeholder="tag1, tag2, tag3"
+                                    />
+                                    <div className="flex gap-2">
+                                        <button type="submit" className="btn-primary flex-1 h-9 text-xs font-semibold">
+                                            {editingItem ? 'Update' : 'Create'}
+                                        </button>
+                                        <button 
+                                            type="button"
+                                            onClick={() => setShowItemForm(false)}
+                                            className="btn-ghost flex-1 h-9 text-xs font-semibold"
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        )}
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {items.map(item => (
+                                <div key={item.id} className="p-4 rounded-lg border border-white/5 bg-white/[0.01] hover:bg-white/[0.02] transition-all">
+                                    <div className="flex justify-between items-start mb-3">
+                                        <div className="flex-1">
+                                            <h4 className="text-sm font-display font-semibold text-foreground">{item.title}</h4>
+                                            {item.price !== undefined && (
+                                                <p className="text-xs text-foreground/60 font-mono mt-1">{formatPrice(item.price)}</p>
+                                            )}
+                                        </div>
+                                        <div className="flex gap-1">
+                                            <button 
+                                                onClick={() => { setEditingItem(item); setShowItemForm(true); }}
+                                                className="p-1.5 rounded hover:bg-white/5 text-foreground/40 hover:text-foreground"
+                                            >
+                                                <Edit size={12} />
+                                            </button>
+                                            <button 
+                                                onClick={() => handleDeleteItem(item.id)}
+                                                className="p-1.5 rounded hover:bg-red-500/10 text-foreground/40 hover:text-red-400"
+                                            >
+                                                <Trash2 size={12} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                    {item.description && (
+                                        <p className="text-xs text-foreground/50 font-satoshi line-clamp-2">{item.description}</p>
+                                    )}
+                                    {item.tags.length > 0 && (
+                                        <div className="flex flex-wrap gap-1 mt-2">
+                                            {item.tags.slice(0, 2).map((tag, i) => (
+                                                <span key={i} className="text-[9px] font-mono px-2 py-0.5 rounded bg-white/[0.02] border border-white/5 text-foreground/60">
+                                                    {tag}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                            {selectedCategory && items.length === 0 && (
+                                <div className="col-span-full text-center text-foreground/30 text-xs font-satoshi py-8">
+                                    No items in this category
+                                </div>
+                            )}
+                            {!selectedCategory && (
+                                <div className="col-span-full text-center text-foreground/30 text-xs font-satoshi py-8">
+                                    Select a category to manage its items
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 // --- Main Admin Layout ---
 
 const Admin: React.FC<{ user: User }> = ({ user }) => {
@@ -1374,6 +1726,7 @@ const Admin: React.FC<{ user: User }> = ({ user }) => {
       { id: 'marketplace', label: 'Marketplace', icon: ShoppingBag },
       { id: 'offers', label: 'Coupons', icon: TicketPercent },
       { id: 'tasks', label: 'Directives', icon: CheckCircle },
+      { id: 'carousel', label: 'Product Carousel', icon: Layers, role: ['super_admin', 'admin'] },
       { id: 'settings', label: 'Site Content', icon: Globe, role: ['super_admin', 'admin'] },
       { id: 'team', label: 'Operatives', icon: Users, role: ['super_admin'] },
   ];
@@ -1388,6 +1741,7 @@ const Admin: React.FC<{ user: User }> = ({ user }) => {
           case 'marketplace': return <AdminMarketplace user={user} />;
           case 'offers': return <AdminOffers />;
           case 'tasks': return <AdminTasks user={user} />;
+          case 'carousel': return <AdminCarousel />;
           case 'settings': return <AdminSettings />;
           case 'team': return <AdminTeam user={user} />;
           default: return <div className="p-10 text-center text-foreground/30 text-xs font-satoshi">Select a dashboard module</div>;

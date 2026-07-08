@@ -209,3 +209,62 @@ CREATE POLICY "Admin full access" ON public.recurring_services
     )
   );
 
+-- CAROUSEL CATEGORIES
+CREATE TABLE IF NOT EXISTS public.carousel_categories (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  name TEXT NOT NULL UNIQUE,
+  slug TEXT NOT NULL UNIQUE,
+  description TEXT,
+  icon TEXT, -- Lucide icon name
+  display_order INTEGER DEFAULT 0,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now()),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now())
+);
+
+-- CAROUSEL ITEMS (Products/Services in carousels)
+CREATE TABLE IF NOT EXISTS public.carousel_items (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  category_id UUID REFERENCES public.carousel_categories(id) ON DELETE CASCADE NOT NULL,
+  title TEXT NOT NULL,
+  description TEXT,
+  image_url TEXT,
+  link_url TEXT,
+  price NUMERIC,
+  tags TEXT[] DEFAULT '{}',
+  features TEXT[] DEFAULT '{}',
+  display_order INTEGER DEFAULT 0,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now()),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now())
+);
+
+ALTER TABLE public.carousel_categories ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.carousel_items ENABLE ROW LEVEL SECURITY;
+
+-- Policies for carousel categories
+CREATE POLICY "Public read access on carousel_categories" ON public.carousel_categories
+  FOR SELECT USING (is_active = true);
+
+CREATE POLICY "Admin full access on carousel_categories" ON public.carousel_categories
+  FOR ALL USING (
+    EXISTS (
+      SELECT 1 FROM public.profiles
+      WHERE id = auth.uid() 
+      AND (role = 'admin' OR role = 'super_admin')
+    )
+  );
+
+-- Policies for carousel items
+CREATE POLICY "Public read access on carousel_items" ON public.carousel_items
+  FOR SELECT USING (is_active = true);
+
+CREATE POLICY "Admin full access on carousel_items" ON public.carousel_items
+  FOR ALL USING (
+    EXISTS (
+      SELECT 1 FROM public.profiles
+      WHERE id = auth.uid() 
+      AND (role = 'admin' OR role = 'super_admin')
+    )
+  );
+

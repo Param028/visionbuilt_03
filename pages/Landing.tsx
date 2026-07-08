@@ -6,10 +6,11 @@ import {
 } from 'lucide-react';
 import { CountUp, LogoLoop, ProjectLoop } from '../components/ui/ReactBits';
 import { api } from '../services/api';
-import { MarketplaceItem, User } from '../types';
+import { MarketplaceItem, User, CarouselCategory, CarouselItem } from '../types';
 import { formatPrice } from '../constants';
 import { BentoGrid } from '../components/ui/BentoGrid';
 import { servicesData } from '../constants/services';
+import ProductCarousel from '../components/ui/ProductCarousel';
 
 // ── Inview fade-up wrapper ─────────────────────────────────────
 const FadeUp: React.FC<{
@@ -142,6 +143,8 @@ const Landing: React.FC<{ user: User | null }> = ({ user }) => {
   const [activeTab, setActiveTab]         = useState('Websites');
   const [activePreviewIdx, setActivePreviewIdx] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [carouselCategories, setCarouselCategories] = useState<CarouselCategory[]>([]);
+  const [carouselItems, setCarouselItems] = useState<Record<string, CarouselItem[]>>({});
 
   useEffect(() => {
     if (isPaused) return;
@@ -158,6 +161,20 @@ const Landing: React.FC<{ user: User | null }> = ({ user }) => {
     api.getRecurringServices().then((subs) =>
       setSubscriptions(subs.filter((s: any) => s.is_active && s.show_on_home))
     );
+    
+    // Load carousel categories and items
+    api.getCarouselCategories().then(async (categories) => {
+      setCarouselCategories(categories);
+      // Load items for each category
+      const itemsMap: Record<string, CarouselItem[]> = {};
+      await Promise.all(
+        categories.map(async (cat) => {
+          const items = await api.getCarouselItems(cat.id);
+          itemsMap[cat.id] = items;
+        })
+      );
+      setCarouselItems(itemsMap);
+    });
   }, []);
 
   const getFilteredProjects = () => {
@@ -718,6 +735,37 @@ const Landing: React.FC<{ user: User | null }> = ({ user }) => {
                 </FadeUp>
               ))}
             </div>
+          </div>
+        </section>
+      )}
+
+      {/* ═══════════════════════════════════════════════
+          PRODUCT CAROUSELS — category-based product displays
+      ═══════════════════════════════════════════════ */}
+      {carouselCategories.length > 0 && (
+        <section className="relative section-y overflow-hidden border-t" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
+          <div className="container-vb">
+            <FadeUp>
+              <div className="text-center mb-12">
+                <p className="text-label mb-4">Our Services</p>
+                <h2 className="text-display font-display font-bold text-foreground mb-4">
+                  Explore Our Offerings
+                </h2>
+                <p className="text-gray-300 text-lg max-w-2xl mx-auto">
+                  Discover our range of services and products tailored to your needs
+                </p>
+              </div>
+            </FadeUp>
+            
+            {carouselCategories.map((category, index) => (
+              <FadeUp key={category.id} delay={index * 0.1}>
+                <ProductCarousel
+                  category={category}
+                  items={carouselItems[category.id] || []}
+                  userCountry={user?.country}
+                />
+              </FadeUp>
+            ))}
           </div>
         </section>
       )}

@@ -1,6 +1,6 @@
 
 import { supabase } from '../lib/supabase';
-import { User, Service, Order, Message, ContactInfo, Offer, MarketplaceItem, AdminActivity, Task, AnalyticsData, Role, ProjectSuggestion, Payment, RecurringService, SiteSettings } from '../types';
+import { User, Service, Order, Message, ContactInfo, Offer, MarketplaceItem, AdminActivity, Task, AnalyticsData, Role, ProjectSuggestion, Payment, RecurringService, SiteSettings, CarouselCategory, CarouselItem } from '../types';
 import { INITIAL_CONTACT_INFO, CURRENCY_CONFIG } from '../constants';
 
 // Helper to open Razorpay
@@ -729,6 +729,69 @@ export class ApiService {
       const { data, error } = await supabase.from('site_settings').update(settings).eq('id', 'global').select().single();
       if (error) throw error;
       return data;
+  }
+
+  // --- Carousel Categories ---
+  async getCarouselCategories(): Promise<CarouselCategory[]> {
+      try {
+          const { data } = await supabase.from('carousel_categories').select('*').order('display_order', { ascending: true });
+          return data as CarouselCategory[] || [];
+      } catch (e) {
+          console.error("Failed to load carousel categories", e);
+          return [];
+      }
+  }
+
+  async createCarouselCategory(category: Omit<CarouselCategory, 'id' | 'created_at' | 'updated_at'>): Promise<CarouselCategory[]> {
+      const { error } = await supabase.from('carousel_categories').insert(category);
+      if (error) throw error;
+      return this.getCarouselCategories();
+  }
+
+  async updateCarouselCategory(id: string, updates: Partial<CarouselCategory>): Promise<CarouselCategory[]> {
+      const { error } = await supabase.from('carousel_categories').update({ ...updates, updated_at: new Date().toISOString() }).eq('id', id);
+      if (error) throw error;
+      return this.getCarouselCategories();
+  }
+
+  async deleteCarouselCategory(id: string): Promise<CarouselCategory[]> {
+      const { error } = await supabase.from('carousel_categories').delete().eq('id', id);
+      if (error) throw error;
+      return this.getCarouselCategories();
+  }
+
+  // --- Carousel Items ---
+  async getCarouselItems(categoryId?: string): Promise<CarouselItem[]> {
+      try {
+          let query = supabase.from('carousel_items').select('*').order('display_order', { ascending: true });
+          if (categoryId) query = query.eq('category_id', categoryId);
+          const { data } = await query;
+          return data as CarouselItem[] || [];
+      } catch (e) {
+          console.error("Failed to load carousel items", e);
+          return [];
+      }
+  }
+
+  async createCarouselItem(item: Omit<CarouselItem, 'id' | 'created_at' | 'updated_at'>): Promise<CarouselItem[]> {
+      const { error } = await supabase.from('carousel_items').insert(item);
+      if (error) throw error;
+      return this.getCarouselItems(item.category_id);
+  }
+
+  async updateCarouselItem(id: string, updates: Partial<CarouselItem>): Promise<CarouselItem[]> {
+      const { error } = await supabase.from('carousel_items').update({ ...updates, updated_at: new Date().toISOString() }).eq('id', id);
+      if (error) throw error;
+      // Get the item to find its category_id for refreshing
+      const { data: item } = await supabase.from('carousel_items').select('category_id').eq('id', id).single();
+      return this.getCarouselItems(item?.category_id);
+  }
+
+  async deleteCarouselItem(id: string): Promise<CarouselItem[]> {
+      const { data: item } = await supabase.from('carousel_items').select('category_id').eq('id', id).single();
+      const { error } = await supabase.from('carousel_items').delete().eq('id', id);
+      if (error) throw error;
+      return this.getCarouselItems(item?.category_id);
   }
 }
 

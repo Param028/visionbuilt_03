@@ -1,4 +1,3 @@
-
 export type Role = 'client' | 'developer' | 'super_admin' | 'admin';
 
 export type OrderStatus = 'pending' | 'accepted' | 'in_progress' | 'mockup_ready' | 'completed' | 'cancelled';
@@ -12,11 +11,11 @@ export interface User {
   name: string;
   email: string;
   role: Role;
-  country?: string; 
-  currency?: string; 
+  country?: string;
+  currency?: string;
   email_verified: boolean;
   avatar_url?: string;
-  performance_score?: number; // 0-100
+  performance_score?: number;
 }
 
 export interface RecurringService {
@@ -40,7 +39,7 @@ export interface Service {
   base_price: number;
   is_enabled: boolean;
   features: string[];
-  icon: string; // Lucide icon name
+  icon: string;
   allow_domain: boolean;
   domain_price: number;
   allow_business_email: boolean;
@@ -50,16 +49,16 @@ export interface Service {
 export interface MarketplaceItem {
   id: string;
   title: string;
-  category: ProjectCategory; // New restricted category
+  category: ProjectCategory;
   short_description: string;
   full_description: string;
   price: number;
   tags: string[];
   features: string[];
   image_url?: string;
-  preview_images?: string[]; 
+  preview_images?: string[];
   demo_url?: string;
-  download_url?: string; 
+  download_url?: string;
   developer_id: string;
   developer_name: string;
   views: number;
@@ -88,7 +87,7 @@ export interface Offer {
   description: string;
   code: string;
   discountPercentage: number;
-  validUntil?: string; 
+  validUntil?: string;
 }
 
 export interface OrderRequirements {
@@ -97,40 +96,31 @@ export interface OrderRequirements {
   address_or_online: string;
   requirements_text: string;
   reference_links: string;
-  // Custom project fields
   client_name?: string;
   client_email?: string;
-  client_phone?: string; 
-  // removed client_budget
+  client_phone?: string;
 }
 
 export interface Order {
   id: string;
   user_id: string;
-  type: OrderType; 
+  type: OrderType;
   service_id?: string;
-  service_title: string; 
+  service_title: string;
   project_id?: string;
   is_custom?: boolean;
-  
   status: OrderStatus;
   domain_requested: boolean;
   business_email_requested: boolean;
-  
-  // Financials
-  total_amount: number; 
-  deposit_amount: number; 
-  amount_paid: number; 
-  currency?: string; 
-  
-  requirements: OrderRequirements; 
-  reference_project_ids?: string[]; // IDs of selected marketplace items as reference
-  
+  total_amount: number;
+  deposit_amount: number;
+  amount_paid: number;
+  currency?: string;
+  requirements: OrderRequirements;
+  reference_project_ids?: string[];
   created_at: string;
-  
-  deliverables?: string[]; 
-
-  rating?: number; 
+  deliverables?: string[];
+  rating?: number;
   review?: string;
   applied_offer_code?: string;
   discount_amount?: number;
@@ -167,8 +157,8 @@ export interface AdminActivity {
   id: string;
   admin_id: string;
   admin_name: string;
-  action: string; 
-  details?: string; 
+  action: string;
+  details?: string;
   timestamp: string;
 }
 
@@ -185,9 +175,9 @@ export interface Task {
   id: string;
   title: string;
   description: string;
-  assigned_to_id: string; 
+  assigned_to_id: string;
   assigned_to_name: string;
-  created_by_id: string; 
+  created_by_id: string;
   status: 'todo' | 'in_progress' | 'review' | 'done';
   priority: 'low' | 'medium' | 'high';
   due_date: string;
@@ -198,7 +188,7 @@ export interface AnalyticsData {
   total_views: number;
   total_orders: number;
   active_projects: number;
-  sales_trend: { label: string; value: number; date: string }[]; 
+  sales_trend: { label: string; value: number; date: string }[];
   top_developer: User | null;
 }
 
@@ -210,3 +200,30 @@ export interface SiteSettings {
   contact_phone: string;
 }
 
+export interface CarouselCategory {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  icon?: string;
+  display_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CarouselItem {
+  id: string;
+  category_id: string;
+  title: string;
+  description?: string;
+  image_url?: string;
+  link_url?: string;
+  price?: number;
+  tags: string[];
+  features: string[];
+  display_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
