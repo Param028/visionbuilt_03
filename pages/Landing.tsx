@@ -11,7 +11,7 @@ import { formatPrice } from '../constants';
 import { BentoGrid } from '../components/ui/BentoGrid';
 import { servicesData } from '../constants/services';
 import ProductCarousel from '../components/ui/ProductCarousel';
-import { CardSkeleton, HeroSkeleton, StatsSkeleton, CarouselSkeleton } from '../components/ui/SkeletonLoader';
+import { HeroSkeleton, CarouselSkeleton } from '../components/ui/SkeletonLoader';
 
 // ── Inview fade-up wrapper ─────────────────────────────────────
 const FadeUp: React.FC<{
