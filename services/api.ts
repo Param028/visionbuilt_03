@@ -793,6 +793,34 @@ export class ApiService {
       if (error) throw error;
       return this.getCarouselItems(item?.category_id);
   }
+
+  // --- Image Upload (Supabase Storage) ---
+  async uploadImage(file: File, path: string): Promise<string> {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${path}/${Date.now()}.${fileExt}`;
+      const { data, error } = await supabase.storage.from('images').upload(fileName, file);
+      
+      if (error) throw error;
+      
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage.from('images').getPublicUrl(fileName);
+      return publicUrl;
+  }
+
+  async deleteImage(imageUrl: string): Promise<void> {
+      try {
+          // Extract path from URL
+          const url = new URL(imageUrl);
+          const pathParts = url.pathname.split('/images/');
+          if (pathParts.length > 1) {
+              const path = pathParts[1];
+              const { error } = await supabase.storage.from('images').remove([path]);
+              if (error) console.error('Failed to delete image:', error);
+          }
+      } catch (e) {
+          console.error('Failed to parse image URL for deletion:', e);
+      }
+  }
 }
 
 export const api = new ApiService();

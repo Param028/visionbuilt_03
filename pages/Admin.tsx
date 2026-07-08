@@ -11,6 +11,7 @@ import {
 import { api } from '../services/api';
 import { User, MarketplaceItem, ProjectCategory, Order, Service, Offer, Task, ProjectSuggestion, AnalyticsData, AdminActivity, CarouselCategory, CarouselItem } from '../types';
 import { Badge, Input, Textarea, ConfirmDialog } from '../components/ui/Components';
+import ImageUpload from '../components/ui/ImageUpload';
 import { useToast } from '../components/ui/Toast';
 import { CURRENCY_CONFIG, formatPrice } from '../constants';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -1090,10 +1091,13 @@ const AdminMarketplace: React.FC<{ user: User }> = ({ user }) => {
                           </div>
                           <Input label="One-liner Pitch" value={formData.short_description} onChange={e => setFormData({...formData, short_description: e.target.value})} placeholder="Provide a summary pitch..." required />
                           <Textarea label="Detailed Description" value={formData.full_description} onChange={e => setFormData({...formData, full_description: e.target.value})} required />
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                              <Input label="Cover Image URL" value={formData.image_url || ''} onChange={e => setFormData({...formData, image_url: e.target.value})} placeholder="https://..." />
-                              <Input label="Download Target Link (Zip/Repo)" value={formData.download_url || ''} onChange={e => setFormData({...formData, download_url: e.target.value})} />
-                          </div>
+                          <ImageUpload
+                              label="Cover Image"
+                              value={formData.image_url}
+                              onChange={(url) => setFormData({...formData, image_url: url})}
+                              uploadPath="marketplace-items"
+                          />
+                          <Input label="Download Target Link (Zip/Repo)" value={formData.download_url || ''} onChange={e => setFormData({...formData, download_url: e.target.value})} />
                           <Input label="Project Live Demo URL" value={formData.demo_url || ''} onChange={e => setFormData({...formData, demo_url: e.target.value})} />
                           <div className="pt-2">
                               <label className="flex items-center space-x-3.5 cursor-pointer group p-4 rounded-xl border border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-all w-fit">
@@ -1603,20 +1607,20 @@ const AdminCarousel: React.FC = () => {
                                         onChange={e => itemFormData.title = e.target.value}
                                         required 
                                     />
-                                    <Textarea 
-                                        label="Description" 
-                                        value={itemFormData.description || ''} 
+                                    <Textarea
+                                        label="Description"
+                                        value={itemFormData.description || ''}
                                         onChange={e => itemFormData.description = e.target.value}
                                     />
-                                    <Input 
-                                        label="Image URL" 
-                                        value={itemFormData.image_url || ''} 
-                                        onChange={e => itemFormData.image_url = e.target.value}
-                                        placeholder="https://..."
+                                    <ImageUpload
+                                        label="Image"
+                                        value={itemFormData.image_url}
+                                        onChange={(url) => itemFormData.image_url = url}
+                                        uploadPath="carousel-items"
                                     />
-                                    <Input 
-                                        label="Link URL" 
-                                        value={itemFormData.link_url || ''} 
+                                    <Input
+                                        label="Link URL"
+                                        value={itemFormData.link_url || ''}
                                         onChange={e => itemFormData.link_url = e.target.value}
                                         placeholder="https://..."
                                     />
