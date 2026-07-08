@@ -87,13 +87,13 @@ const Layout: React.FC<LayoutProps> = ({ children, user, setUser }) => {
           amplitude={1.2}
           waviness={1}
           thickness={0.8}
-          glow={4}
+          glow={2.8}
           taper={3}
           spread={1}
           hueShift={0}
-          intensity={1}
+          intensity={0.7}
           saturation={1.5}
-          opacity={1}
+          opacity={0.7}
           scale={1.5}
           glass={false}
           refraction={1}
