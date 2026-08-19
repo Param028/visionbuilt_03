@@ -14,8 +14,8 @@ const LandingNew: React.FC<{ user: User | null }> = ({ user: _user }) => {
         {/* ═══════════════════════════════════════════════
             HERO SECTION (100vh)
         ═══════════════════════════════════════════════ */}
-        <section className="min-h-screen flex items-center justify-center px-6">
-          <div className="text-center max-w-6xl">
+        <section className="min-h-screen flex items-center px-6">
+          <div className="max-w-6xl">
             {/* Massive Headline */}
             <h1 className="font-display tracking-tighter text-6xl md:text-8xl mb-8">
               <ShinyText 
@@ -27,7 +27,7 @@ const LandingNew: React.FC<{ user: User | null }> = ({ user: _user }) => {
               />
               <RotatingText 
                 texts={['Native Software', 'Premium UI/UX', 'Cinematic Trailers', 'Digital Reality']}
-                mainClassName="px-3 md:px-4 bg-white/5 backdrop-blur-md text-white overflow-hidden py-1 md:py-2 justify-center rounded-lg border border-white/10"
+                mainClassName="px-3 md:px-4 bg-white/5 backdrop-blur-md text-white overflow-hidden py-1 md:py-2 justify-start rounded-lg border border-white/10"
                 staggerFrom="last"
                 transition={{ type: "spring", damping: 30, stiffness: 400 }}
                 rotationInterval={2500}
@@ -35,13 +35,13 @@ const LandingNew: React.FC<{ user: User | null }> = ({ user: _user }) => {
             </h1>
 
             {/* Subheading */}
-            <p className="text-[#CCCCCC] text-lg md:text-xl max-w-2xl mx-auto mb-12 leading-relaxed font-light">
+            <p className="text-[#CCCCCC] text-lg md:text-xl max-w-2xl mb-12 leading-relaxed font-light">
               Premium digital experiences for brands that demand excellence. 
               We craft cinematic websites, immersive applications, and stunning brand identities.
             </p>
 
             {/* CTAs */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col w-full gap-3 md:flex-row md:gap-4 md:w-auto">
               <Link 
                 to="/services"
                 className="px-8 py-4 bg-white text-[#1C1C1C] rounded-full font-semibold hover:bg-white/90 transition-all duration-300"
@@ -64,7 +64,7 @@ const LandingNew: React.FC<{ user: User | null }> = ({ user: _user }) => {
         </section>
 
         {/* ═══════════════════════════════════════════════
-            PROJECT SHOWCASE (Bento Grid)
+            PROJECT SHOWCASE (Staggered Grid)
         ═══════════════════════════════════════════════ */}
         <section id="work" className="py-32 px-6">
           <div className="max-w-7xl mx-auto">
@@ -81,9 +81,9 @@ const LandingNew: React.FC<{ user: User | null }> = ({ user: _user }) => {
               </h2>
             </div>
 
-            {/* Asymmetrical Bento Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[minmax(300px,auto)]">
-              {/* Large Card - Spans 2 columns */}
+            {/* Staggered 2-Column Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-8">
+              {/* Card 1 */}
               <BorderGlow 
                 glowColor="0 0 100"
                 colors={['#FFFFFF', '#CCCCCC', '#8A8A8A']}
@@ -109,7 +109,7 @@ const LandingNew: React.FC<{ user: User | null }> = ({ user: _user }) => {
                 </div>
               </BorderGlow>
 
-              {/* Small Card 1 */}
+              {/* Card 2 - Staggered */}
               <BorderGlow 
                 glowColor="0 0 100"
                 colors={['#FFFFFF', '#CCCCCC', '#8A8A8A']}
@@ -117,11 +117,11 @@ const LandingNew: React.FC<{ user: User | null }> = ({ user: _user }) => {
                 edgeSensitivity={30}
                 glowRadius={40}
               >
-                <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 h-full min-h-[300px] flex flex-col justify-end group cursor-pointer hover:bg-white/10 transition-all duration-300">
+                <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 h-full min-h-[400px] flex flex-col justify-end group cursor-pointer hover:bg-white/10 transition-all duration-300 md:mt-16">
                   <div className="absolute inset-0 bg-gradient-to-t from-[#1C1C1C] via-transparent to-transparent opacity-60" />
                   <div className="relative z-10">
                     <p className="font-mono text-xs text-[#CCCCCC] mb-2">SaaS / Enterprise</p>
-                    <h3 className="font-display text-xl font-bold text-white mb-2">
+                    <h3 className="font-display text-2xl font-bold text-white mb-2">
                       <ShinyText 
                         text="Hadid Construct"
                         color="#b5b5b5"
@@ -135,7 +135,7 @@ const LandingNew: React.FC<{ user: User | null }> = ({ user: _user }) => {
                 </div>
               </BorderGlow>
 
-              {/* Small Card 2 */}
+              {/* Card 3 - Staggered */}
               <BorderGlow 
                 glowColor="0 0 100"
                 colors={['#FFFFFF', '#CCCCCC', '#8A8A8A']}
@@ -143,11 +143,11 @@ const LandingNew: React.FC<{ user: User | null }> = ({ user: _user }) => {
                 edgeSensitivity={30}
                 glowRadius={40}
               >
-                <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 h-full min-h-[300px] flex flex-col justify-end group cursor-pointer hover:bg-white/10 transition-all duration-300">
+                <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 h-full min-h-[400px] flex flex-col justify-end group cursor-pointer hover:bg-white/10 transition-all duration-300 md:mt-16">
                   <div className="absolute inset-0 bg-gradient-to-t from-[#1C1C1C] via-transparent to-transparent opacity-60" />
                   <div className="relative z-10">
                     <p className="font-mono text-xs text-[#CCCCCC] mb-2">Creative / Portfolio</p>
-                    <h3 className="font-display text-xl font-bold text-white mb-2">
+                    <h3 className="font-display text-2xl font-bold text-white mb-2">
                       <ShinyText 
                         text="Aether Nexus"
                         color="#b5b5b5"
@@ -161,16 +161,15 @@ const LandingNew: React.FC<{ user: User | null }> = ({ user: _user }) => {
                 </div>
               </BorderGlow>
 
-              {/* Wide Card - Spans full width */}
+              {/* Card 4 */}
               <BorderGlow 
                 glowColor="0 0 100"
                 colors={['#FFFFFF', '#CCCCCC', '#8A8A8A']}
                 backgroundColor="transparent"
                 edgeSensitivity={30}
                 glowRadius={40}
-                className="md:col-span-3"
               >
-                <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 h-full min-h-[250px] flex flex-col justify-end group cursor-pointer hover:bg-white/10 transition-all duration-300">
+                <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 h-full min-h-[400px] flex flex-col justify-end group cursor-pointer hover:bg-white/10 transition-all duration-300">
                   <div className="absolute inset-0 bg-gradient-to-t from-[#1C1C1C] via-transparent to-transparent opacity-60" />
                   <div className="relative z-10">
                     <p className="font-mono text-xs text-[#CCCCCC] mb-2">Motion Graphics / WebGL</p>
@@ -192,7 +191,7 @@ const LandingNew: React.FC<{ user: User | null }> = ({ user: _user }) => {
         </section>
 
         {/* ═══════════════════════════════════════════════
-            SERVICES (Glass Tiles)
+            SERVICES (Bento Box Layout)
         ═══════════════════════════════════════════════ */}
         <section id="services" className="py-32 px-6">
           <div className="max-w-7xl mx-auto">
@@ -209,37 +208,40 @@ const LandingNew: React.FC<{ user: User | null }> = ({ user: _user }) => {
               </h2>
             </div>
 
-            {/* 3-Column Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Service 1 */}
+            {/* Bento Box Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 md:grid-rows-3 gap-6">
+              {/* Service 1 - Web Dev (spans 2 columns) */}
               <BorderGlow 
                 glowColor="0 0 100"
                 colors={['#FFFFFF', '#CCCCCC', '#8A8A8A']}
                 backgroundColor="transparent"
                 edgeSensitivity={30}
                 glowRadius={40}
+                className="md:col-span-2"
               >
-                <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 h-full hover:bg-white/10 transition-all duration-300">
-                  <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center mb-6">
-                    <Code size={28} className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]" />
+                <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 h-full hover:bg-white/10 transition-all duration-300 flex flex-col justify-between">
+                  <div>
+                    <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center mb-6">
+                      <Code size={28} className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]" />
+                    </div>
+                    <h3 className="font-display text-xl font-bold text-white mb-3">
+                      <ShinyText 
+                        text="Web Development"
+                        color="#b5b5b5"
+                        shineColor="#ffffff"
+                        speed={3}
+                        spread={120}
+                      />
+                    </h3>
+                    <p className="text-[#CCCCCC] text-sm leading-relaxed">
+                      Custom websites and web applications built with modern technologies. 
+                      From landing pages to complex platforms.
+                    </p>
                   </div>
-                  <h3 className="font-display text-xl font-bold text-white mb-3">
-                    <ShinyText 
-                      text="Web Development"
-                      color="#b5b5b5"
-                      shineColor="#ffffff"
-                      speed={3}
-                      spread={120}
-                    />
-                  </h3>
-                  <p className="text-[#CCCCCC] text-sm leading-relaxed">
-                    Custom websites and web applications built with modern technologies. 
-                    From landing pages to complex platforms.
-                  </p>
                 </div>
               </BorderGlow>
 
-              {/* Service 2 */}
+              {/* Service 2 - UI/UX Design */}
               <BorderGlow 
                 glowColor="0 0 100"
                 colors={['#FFFFFF', '#CCCCCC', '#8A8A8A']}
@@ -247,27 +249,29 @@ const LandingNew: React.FC<{ user: User | null }> = ({ user: _user }) => {
                 edgeSensitivity={30}
                 glowRadius={40}
               >
-                <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 h-full hover:bg-white/10 transition-all duration-300">
-                  <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center mb-6">
-                    <Palette size={28} className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]" />
+                <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 h-full hover:bg-white/10 transition-all duration-300 flex flex-col justify-between">
+                  <div>
+                    <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center mb-6">
+                      <Palette size={28} className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]" />
+                    </div>
+                    <h3 className="font-display text-xl font-bold text-white mb-3">
+                      <ShinyText 
+                        text="UI/UX Design"
+                        color="#b5b5b5"
+                        shineColor="#ffffff"
+                        speed={3}
+                        spread={120}
+                      />
+                    </h3>
+                    <p className="text-[#CCCCCC] text-sm leading-relaxed">
+                      User-centered design that balances aesthetics with functionality. 
+                      Wireframes, prototypes, and final designs.
+                    </p>
                   </div>
-                  <h3 className="font-display text-xl font-bold text-white mb-3">
-                    <ShinyText 
-                      text="UI/UX Design"
-                      color="#b5b5b5"
-                      shineColor="#ffffff"
-                      speed={3}
-                      spread={120}
-                    />
-                  </h3>
-                  <p className="text-[#CCCCCC] text-sm leading-relaxed">
-                    User-centered design that balances aesthetics with functionality. 
-                    Wireframes, prototypes, and final designs.
-                  </p>
                 </div>
               </BorderGlow>
 
-              {/* Service 3 */}
+              {/* Service 3 - Mobile Apps */}
               <BorderGlow 
                 glowColor="0 0 100"
                 colors={['#FFFFFF', '#CCCCCC', '#8A8A8A']}
@@ -275,27 +279,29 @@ const LandingNew: React.FC<{ user: User | null }> = ({ user: _user }) => {
                 edgeSensitivity={30}
                 glowRadius={40}
               >
-                <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 h-full hover:bg-white/10 transition-all duration-300">
-                  <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center mb-6">
-                    <Smartphone size={28} className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]" />
+                <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 h-full hover:bg-white/10 transition-all duration-300 flex flex-col justify-between">
+                  <div>
+                    <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center mb-6">
+                      <Smartphone size={28} className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]" />
+                    </div>
+                    <h3 className="font-display text-xl font-bold text-white mb-3">
+                      <ShinyText 
+                        text="Mobile Apps"
+                        color="#b5b5b5"
+                        shineColor="#ffffff"
+                        speed={3}
+                        spread={120}
+                      />
+                    </h3>
+                    <p className="text-[#CCCCCC] text-sm leading-relaxed">
+                      Native and cross-platform mobile applications. 
+                      iOS, Android, and React Native solutions.
+                    </p>
                   </div>
-                  <h3 className="font-display text-xl font-bold text-white mb-3">
-                    <ShinyText 
-                      text="Mobile Apps"
-                      color="#b5b5b5"
-                      shineColor="#ffffff"
-                      speed={3}
-                      spread={120}
-                    />
-                  </h3>
-                  <p className="text-[#CCCCCC] text-sm leading-relaxed">
-                    Native and cross-platform mobile applications. 
-                    iOS, Android, and React Native solutions.
-                  </p>
                 </div>
               </BorderGlow>
 
-              {/* Service 4 */}
+              {/* Service 4 - Brand Identity */}
               <BorderGlow 
                 glowColor="0 0 100"
                 colors={['#FFFFFF', '#CCCCCC', '#8A8A8A']}
@@ -303,27 +309,29 @@ const LandingNew: React.FC<{ user: User | null }> = ({ user: _user }) => {
                 edgeSensitivity={30}
                 glowRadius={40}
               >
-                <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 h-full hover:bg-white/10 transition-all duration-300">
-                  <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center mb-6">
-                    <Globe size={28} className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]" />
+                <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 h-full hover:bg-white/10 transition-all duration-300 flex flex-col justify-between">
+                  <div>
+                    <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center mb-6">
+                      <Globe size={28} className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]" />
+                    </div>
+                    <h3 className="font-display text-xl font-bold text-white mb-3">
+                      <ShinyText 
+                        text="Brand Identity"
+                        color="#b5b5b5"
+                        shineColor="#ffffff"
+                        speed={3}
+                        spread={120}
+                      />
+                    </h3>
+                    <p className="text-[#CCCCCC] text-sm leading-relaxed">
+                      Complete brand systems including logos, typography, 
+                      color palettes, and brand guidelines.
+                    </p>
                   </div>
-                  <h3 className="font-display text-xl font-bold text-white mb-3">
-                    <ShinyText 
-                      text="Brand Identity"
-                      color="#b5b5b5"
-                      shineColor="#ffffff"
-                      speed={3}
-                      spread={120}
-                    />
-                  </h3>
-                  <p className="text-[#CCCCCC] text-sm leading-relaxed">
-                    Complete brand systems including logos, typography, 
-                    color palettes, and brand guidelines.
-                  </p>
                 </div>
               </BorderGlow>
 
-              {/* Service 5 */}
+              {/* Service 5 - Motion Graphics */}
               <BorderGlow 
                 glowColor="0 0 100"
                 colors={['#FFFFFF', '#CCCCCC', '#8A8A8A']}
@@ -331,51 +339,56 @@ const LandingNew: React.FC<{ user: User | null }> = ({ user: _user }) => {
                 edgeSensitivity={30}
                 glowRadius={40}
               >
-                <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 h-full hover:bg-white/10 transition-all duration-300">
-                  <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center mb-6">
-                    <Zap size={28} className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]" />
+                <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 h-full hover:bg-white/10 transition-all duration-300 flex flex-col justify-between">
+                  <div>
+                    <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center mb-6">
+                      <Zap size={28} className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]" />
+                    </div>
+                    <h3 className="font-display text-xl font-bold text-white mb-3">
+                      <ShinyText 
+                        text="Motion Graphics"
+                        color="#b5b5b5"
+                        shineColor="#ffffff"
+                        speed={3}
+                        spread={120}
+                      />
+                    </h3>
+                    <p className="text-[#CCCCCC] text-sm leading-relaxed">
+                      Cinematic animations, video editing, and motion design. 
+                      From social media to full-scale productions.
+                    </p>
                   </div>
-                  <h3 className="font-display text-xl font-bold text-white mb-3">
-                    <ShinyText 
-                      text="Motion Graphics"
-                      color="#b5b5b5"
-                      shineColor="#ffffff"
-                      speed={3}
-                      spread={120}
-                    />
-                  </h3>
-                  <p className="text-[#CCCCCC] text-sm leading-relaxed">
-                    Cinematic animations, video editing, and motion design. 
-                    From social media to full-scale productions.
-                  </p>
                 </div>
               </BorderGlow>
 
-              {/* Service 6 */}
+              {/* Service 6 - 3D & WebGL (spans 2 rows) */}
               <BorderGlow 
                 glowColor="0 0 100"
                 colors={['#FFFFFF', '#CCCCCC', '#8A8A8A']}
                 backgroundColor="transparent"
                 edgeSensitivity={30}
                 glowRadius={40}
+                className="md:row-span-2"
               >
-                <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 h-full hover:bg-white/10 transition-all duration-300">
-                  <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center mb-6">
-                    <Layers size={28} className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]" />
+              <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 h-full hover:bg-white/10 transition-all duration-300 flex flex-col justify-between">
+                  <div>
+                    <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center mb-6">
+                      <Layers size={28} className="text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]" />
+                    </div>
+                    <h3 className="font-display text-xl font-bold text-white mb-3">
+                      <ShinyText 
+                        text="3D & WebGL"
+                        color="#b5b5b5"
+                        shineColor="#ffffff"
+                        speed={3}
+                        spread={120}
+                      />
+                    </h3>
+                    <p className="text-[#CCCCCC] text-sm leading-relaxed">
+                      Interactive 3D experiences and WebGL visualizations. 
+                      Three.js, OGL, and custom shader development.
+                    </p>
                   </div>
-                  <h3 className="font-display text-xl font-bold text-white mb-3">
-                    <ShinyText 
-                      text="3D & WebGL"
-                      color="#b5b5b5"
-                      shineColor="#ffffff"
-                      speed={3}
-                      spread={120}
-                    />
-                  </h3>
-                  <p className="text-[#CCCCCC] text-sm leading-relaxed">
-                    Interactive 3D experiences and WebGL visualizations. 
-                    Three.js, OGL, and custom shader development.
-                  </p>
                 </div>
               </BorderGlow>
             </div>
