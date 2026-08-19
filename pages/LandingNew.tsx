@@ -89,7 +89,7 @@ const LandingNew: React.FC<{ user: User | null }> = ({ user: _user }) => {
                 colors={['#FFFFFF', '#CCCCCC', '#8A8A8A']}
                 backgroundColor="transparent"
                 edgeSensitivity={30}
-                glowRadius={40}
+                glowRadius={20}
               >
                 <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 h-full min-h-[400px] flex flex-col justify-end group cursor-pointer hover:bg-white/10 transition-all duration-300">
                   <div className="absolute inset-0 bg-gradient-to-t from-[#1C1C1C] via-transparent to-transparent opacity-60" />
@@ -115,7 +115,7 @@ const LandingNew: React.FC<{ user: User | null }> = ({ user: _user }) => {
                 colors={['#FFFFFF', '#CCCCCC', '#8A8A8A']}
                 backgroundColor="transparent"
                 edgeSensitivity={30}
-                glowRadius={40}
+                glowRadius={20}
               >
                 <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 h-full min-h-[400px] flex flex-col justify-end group cursor-pointer hover:bg-white/10 transition-all duration-300 md:mt-16">
                   <div className="absolute inset-0 bg-gradient-to-t from-[#1C1C1C] via-transparent to-transparent opacity-60" />
@@ -141,7 +141,7 @@ const LandingNew: React.FC<{ user: User | null }> = ({ user: _user }) => {
                 colors={['#FFFFFF', '#CCCCCC', '#8A8A8A']}
                 backgroundColor="transparent"
                 edgeSensitivity={30}
-                glowRadius={40}
+                glowRadius={20}
               >
                 <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 h-full min-h-[400px] flex flex-col justify-end group cursor-pointer hover:bg-white/10 transition-all duration-300 md:mt-16">
                   <div className="absolute inset-0 bg-gradient-to-t from-[#1C1C1C] via-transparent to-transparent opacity-60" />
@@ -167,7 +167,7 @@ const LandingNew: React.FC<{ user: User | null }> = ({ user: _user }) => {
                 colors={['#FFFFFF', '#CCCCCC', '#8A8A8A']}
                 backgroundColor="transparent"
                 edgeSensitivity={30}
-                glowRadius={40}
+                glowRadius={20}
               >
                 <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 h-full min-h-[400px] flex flex-col justify-end group cursor-pointer hover:bg-white/10 transition-all duration-300">
                   <div className="absolute inset-0 bg-gradient-to-t from-[#1C1C1C] via-transparent to-transparent opacity-60" />
