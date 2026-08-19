@@ -82,7 +82,7 @@ const LandingNew: React.FC<{ user: User | null }> = ({ user: _user }) => {
             </div>
 
             {/* Staggered 2-Column Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20">
               {/* Card 1 */}
               <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 h-full min-h-[400px] flex flex-col justify-end group cursor-pointer hover:bg-white/10 transition-all duration-300 relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-t from-[#1C1C1C] via-transparent to-transparent opacity-60" />
