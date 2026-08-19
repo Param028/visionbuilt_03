@@ -82,7 +82,7 @@ const LandingNew: React.FC<{ user: User | null }> = ({ user: _user }) => {
             </div>
 
             {/* Staggered 2-Column Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-12">
               {/* Card 1 */}
               <BorderGlow 
                 glowColor="0 0 100"
