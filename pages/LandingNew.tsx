@@ -84,112 +84,76 @@ const LandingNew: React.FC<{ user: User | null }> = ({ user: _user }) => {
             {/* Staggered 2-Column Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16">
               {/* Card 1 */}
-              <BorderGlow 
-                glowColor="0 0 100"
-                colors={['#FFFFFF', '#CCCCCC', '#8A8A8A']}
-                backgroundColor="transparent"
-                edgeSensitivity={30}
-                glowRadius={20}
-                className="overflow-hidden"
-              >
-                <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 h-full min-h-[400px] flex flex-col justify-end group cursor-pointer hover:bg-white/10 transition-all duration-300">
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#1C1C1C] via-transparent to-transparent opacity-60" />
-                  <div className="relative z-10">
-                    <p className="font-mono text-xs text-[#CCCCCC] mb-2">Web3 / DeFi</p>
-                    <h3 className="font-display text-2xl font-bold text-white mb-2">
-                      <ShinyText 
-                        text="Cyberware Dashboard"
-                        color="#b5b5b5"
-                        shineColor="#ffffff"
-                        speed={3}
-                        spread={120}
-                      />
-                    </h3>
-                    <p className="text-[#CCCCCC] text-sm">Real-time trading interface with WebGL visualizations</p>
-                  </div>
+              <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 h-full min-h-[400px] flex flex-col justify-end group cursor-pointer hover:bg-white/10 transition-all duration-300 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-t from-[#1C1C1C] via-transparent to-transparent opacity-60" />
+                <div className="relative z-10">
+                  <p className="font-mono text-xs text-[#CCCCCC] mb-2">Web3 / DeFi</p>
+                  <h3 className="font-display text-2xl font-bold text-white mb-2">
+                    <ShinyText 
+                      text="Cyberware Dashboard"
+                      color="#b5b5b5"
+                      shineColor="#ffffff"
+                      speed={3}
+                      spread={120}
+                    />
+                  </h3>
+                  <p className="text-[#CCCCCC] text-sm">Real-time trading interface with WebGL visualizations</p>
                 </div>
-              </BorderGlow>
+              </div>
 
               {/* Card 2 - Staggered */}
-              <BorderGlow 
-                glowColor="0 0 100"
-                colors={['#FFFFFF', '#CCCCCC', '#8A8A8A']}
-                backgroundColor="transparent"
-                edgeSensitivity={30}
-                glowRadius={20}
-                className="overflow-hidden"
-              >
-                <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 h-full min-h-[400px] flex flex-col justify-end group cursor-pointer hover:bg-white/10 transition-all duration-300 md:mt-16">
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#1C1C1C] via-transparent to-transparent opacity-60" />
-                  <div className="relative z-10">
-                    <p className="font-mono text-xs text-[#CCCCCC] mb-2">SaaS / Enterprise</p>
-                    <h3 className="font-display text-2xl font-bold text-white mb-2">
-                      <ShinyText 
-                        text="Hadid Construct"
-                        color="#b5b5b5"
-                        shineColor="#ffffff"
-                        speed={3}
-                        spread={120}
-                      />
-                    </h3>
-                    <p className="text-[#CCCCCC] text-sm">Architecture management platform</p>
-                  </div>
+              <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 h-full min-h-[400px] flex flex-col justify-end group cursor-pointer hover:bg-white/10 transition-all duration-300 md:mt-16 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-t from-[#1C1C1C] via-transparent to-transparent opacity-60" />
+                <div className="relative z-10">
+                  <p className="font-mono text-xs text-[#CCCCCC] mb-2">SaaS / Enterprise</p>
+                  <h3 className="font-display text-2xl font-bold text-white mb-2">
+                    <ShinyText 
+                      text="Hadid Construct"
+                      color="#b5b5b5"
+                      shineColor="#ffffff"
+                      speed={3}
+                      spread={120}
+                    />
+                  </h3>
+                  <p className="text-[#CCCCCC] text-sm">Architecture management platform</p>
                 </div>
-              </BorderGlow>
+              </div>
 
               {/* Card 3 - Staggered */}
-              <BorderGlow 
-                glowColor="0 0 100"
-                colors={['#FFFFFF', '#CCCCCC', '#8A8A8A']}
-                backgroundColor="transparent"
-                edgeSensitivity={30}
-                glowRadius={20}
-                className="overflow-hidden"
-              >
-                <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 h-full min-h-[400px] flex flex-col justify-end group cursor-pointer hover:bg-white/10 transition-all duration-300 md:mt-16">
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#1C1C1C] via-transparent to-transparent opacity-60" />
-                  <div className="relative z-10">
-                    <p className="font-mono text-xs text-[#CCCCCC] mb-2">Creative / Portfolio</p>
-                    <h3 className="font-display text-2xl font-bold text-white mb-2">
-                      <ShinyText 
-                        text="Aether Nexus"
-                        color="#b5b5b5"
-                        shineColor="#ffffff"
-                        speed={3}
-                        spread={120}
-                      />
-                    </h3>
-                    <p className="text-[#CCCCCC] text-sm">Immersive 3D portfolio experience</p>
-                  </div>
+              <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 h-full min-h-[400px] flex flex-col justify-end group cursor-pointer hover:bg-white/10 transition-all duration-300 md:mt-16 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-t from-[#1C1C1C] via-transparent to-transparent opacity-60" />
+                <div className="relative z-10">
+                  <p className="font-mono text-xs text-[#CCCCCC] mb-2">Creative / Portfolio</p>
+                  <h3 className="font-display text-2xl font-bold text-white mb-2">
+                    <ShinyText 
+                      text="Aether Nexus"
+                      color="#b5b5b5"
+                      shineColor="#ffffff"
+                      speed={3}
+                      spread={120}
+                    />
+                  </h3>
+                  <p className="text-[#CCCCCC] text-sm">Immersive 3D portfolio experience</p>
                 </div>
-              </BorderGlow>
+              </div>
 
               {/* Card 4 */}
-              <BorderGlow 
-                glowColor="0 0 100"
-                colors={['#FFFFFF', '#CCCCCC', '#8A8A8A']}
-                backgroundColor="transparent"
-                edgeSensitivity={30}
-                glowRadius={20}
-                className="overflow-hidden"
-              >
-                <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 h-full min-h-[400px] flex flex-col justify-end group cursor-pointer hover:bg-white/10 transition-all duration-300">
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#1C1C1C] via-transparent to-transparent opacity-60" />
-                  <div className="relative z-10">
-                    <p className="font-mono text-xs text-[#CCCCCC] mb-2">Motion Graphics / WebGL</p>
-                    <h3 className="font-display text-2xl font-bold text-white mb-2">
-                      <ShinyText 
-                        text="Driftwood Rebranding"
-                        color="#b5b5b5"
-                        shineColor="#ffffff"
-                        speed={3}
-                        spread={120}
-                      />
-                    </h3>
-                    <p className="text-[#CCCCCC] text-sm">Complete brand overhaul with cinematic motion graphics</p>
-                  </div>
+              <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 h-full min-h-[400px] flex flex-col justify-end group cursor-pointer hover:bg-white/10 transition-all duration-300 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-t from-[#1C1C1C] via-transparent to-transparent opacity-60" />
+                <div className="relative z-10">
+                  <p className="font-mono text-xs text-[#CCCCCC] mb-2">Motion Graphics / WebGL</p>
+                  <h3 className="font-display text-2xl font-bold text-white mb-2">
+                    <ShinyText 
+                      text="Driftwood Rebranding"
+                      color="#b5b5b5"
+                      shineColor="#ffffff"
+                      speed={3}
+                      spread={120}
+                    />
+                  </h3>
+                  <p className="text-[#CCCCCC] text-sm">Complete brand overhaul with cinematic motion graphics</p>
                 </div>
-              </BorderGlow>
+              </div>
             </div>
           </div>
         </section>
