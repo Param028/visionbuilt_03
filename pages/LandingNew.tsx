@@ -366,12 +366,12 @@ const LandingNew: React.FC<{ user: User | null }> = ({ user: _user }) => {
         {/* ═══════════════════════════════════════════════
             FOOTER
         ═══════════════════════════════════════════════ */}
-        <footer className="mt-32 p-16 md:p-32">
+        <footer className="mt-32 px-6 py-16 md:p-32">
           <div className="max-w-7xl mx-auto">
-            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-12 md:p-20 text-center">
+            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 md:p-20 text-center">
               {/* Giant CTA */}
-              <h2 className="font-display text-5xl md:text-9xl font-bold text-white mb-12">
-                <ShinyText 
+              <h2 className="font-display text-4xl md:text-9xl font-bold text-white mb-8 md:mb-12">
+                <ShinyText
                   text="Ready to Begin?"
                   color="#b5b5b5"
                   shineColor="#ffffff"
@@ -381,24 +381,24 @@ const LandingNew: React.FC<{ user: User | null }> = ({ user: _user }) => {
               </h2>
 
               {/* Contact Email */}
-              <a 
+              <a
                 href="mailto:vbuilt20@gmail.com"
-                className="text-2xl md:text-4xl text-white font-display font-bold hover:text-[#CCCCCC] transition-colors duration-300 mb-16 block"
+                className="text-xl md:text-4xl text-white font-display font-bold hover:text-[#CCCCCC] transition-colors duration-300 mb-8 md:mb-16 block break-all"
               >
                 vbuilt20@gmail.com
               </a>
 
               {/* CTA Button */}
-              <Link 
+              <Link
                 to="/services"
-                className="inline-block px-10 py-4 bg-white text-[#1C1C1C] rounded-full font-semibold text-lg hover:bg-white/90 transition-all duration-300"
+                className="inline-block px-8 py-3 md:px-10 md:py-4 bg-white text-[#1C1C1C] rounded-full font-semibold text-base md:text-lg hover:bg-white/90 transition-all duration-300"
               >
                 Get in Touch
               </Link>
 
               {/* Bottom Meta */}
-              <div className="mt-16 pt-8 border-t border-white/10">
-                <p className="text-[#CCCCCC] text-sm font-mono">
+              <div className="mt-12 md:mt-16 pt-6 md:pt-8 border-t border-white/10">
+                <p className="text-[#CCCCCC] text-xs md:text-sm font-mono">
                   © 2026 Vision Built
                 </p>
               </div>
