@@ -101,8 +101,8 @@ const LandingNew: React.FC<{ user: User | null }> = ({ user: _user }) => {
                 </div>
               </div>
 
-              {/* Card 2 - Staggered */}
-              <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 h-full min-h-[400px] flex flex-col justify-end group cursor-pointer hover:bg-white/10 transition-all duration-300 md:mt-12 relative overflow-hidden">
+              {/* Card 2 */}
+              <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 h-full min-h-[400px] flex flex-col justify-end group cursor-pointer hover:bg-white/10 transition-all duration-300 relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-t from-[#1C1C1C] via-transparent to-transparent opacity-60" />
                 <div className="relative z-10">
                   <p className="font-mono text-xs text-[#CCCCCC] mb-2">SaaS / Enterprise</p>
@@ -119,8 +119,8 @@ const LandingNew: React.FC<{ user: User | null }> = ({ user: _user }) => {
                 </div>
               </div>
 
-              {/* Card 3 - Staggered */}
-              <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 h-full min-h-[400px] flex flex-col justify-end group cursor-pointer hover:bg-white/10 transition-all duration-300 md:mt-12 relative overflow-hidden">
+              {/* Card 3 */}
+              <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 h-full min-h-[400px] flex flex-col justify-end group cursor-pointer hover:bg-white/10 transition-all duration-300 relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-t from-[#1C1C1C] via-transparent to-transparent opacity-60" />
                 <div className="relative z-10">
                   <p className="font-mono text-xs text-[#CCCCCC] mb-2">Creative / Portfolio</p>
