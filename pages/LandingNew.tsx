@@ -66,7 +66,7 @@ const LandingNew: React.FC<{ user: User | null }> = ({ user: _user }) => {
         {/* ═══════════════════════════════════════════════
             PROJECT SHOWCASE (Staggered Grid)
         ═══════════════════════════════════════════════ */}
-        <section id="work" className="py-32 px-6">
+        <section id="work" className="py-48 px-6">
           <div className="max-w-7xl mx-auto">
             <div className="mb-16">
               <p className="font-mono text-xs text-[#CCCCCC] mb-4 tracking-widest uppercase">Selected Work</p>
