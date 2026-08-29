@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Code, Palette, Smartphone, Globe, Zap, Layers } from 'lucide-react';
 import { BorderGlow, RotatingText, ShinyText } from '../components/ui/GlassComponents';
+import MagicBento from '../components/ui/MagicBento';
 import { User } from '../types';
 
 // ── COMPONENT ─────────────────────────────────────────────────
@@ -166,7 +167,7 @@ const LandingNew: React.FC<{ user: User | null }> = ({ user: _user }) => {
             <div className="mb-16">
               <p className="font-mono text-xs text-[#CCCCCC] mb-4 tracking-widest uppercase">What We Do</p>
               <h2 className="font-display text-4xl md:text-6xl font-bold text-white mb-4">
-                <ShinyText 
+                <ShinyText
                   text="Our Services"
                   color="#b5b5b5"
                   shineColor="#ffffff"
@@ -176,8 +177,60 @@ const LandingNew: React.FC<{ user: User | null }> = ({ user: _user }) => {
               </h2>
             </div>
 
-            {/* Bento Box Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 md:grid-rows-3 gap-6">
+            {/* MagicBento Component */}
+            <MagicBento
+              textAutoHide={true}
+              enableStars={false}
+              enableSpotlight={true}
+              enableBorderGlow={true}
+              enableTilt={true}
+              enableMagnetism={true}
+              clickEffect={false}
+              spotlightRadius={300}
+              particleCount={12}
+              glowColor="217, 217, 217"
+              data={[
+                {
+                  label: "01",
+                  title: "Web Development",
+                  description: "Custom websites and web applications built with modern technologies. From landing pages to complex platforms.",
+                  color: "rgba(255, 255, 255, 0.05)",
+                },
+                {
+                  label: "02",
+                  title: "UI/UX Design",
+                  description: "User-centered design that balances aesthetics with functionality. Wireframes, prototypes, and final designs.",
+                  color: "rgba(255, 255, 255, 0.05)",
+                },
+                {
+                  label: "03",
+                  title: "Mobile Apps",
+                  description: "Native and cross-platform mobile applications. iOS, Android, and React Native solutions.",
+                  color: "rgba(255, 255, 255, 0.05)",
+                },
+                {
+                  label: "04",
+                  title: "Brand Identity",
+                  description: "Complete brand systems including logos, typography, color palettes, and brand guidelines.",
+                  color: "rgba(255, 255, 255, 0.05)",
+                },
+                {
+                  label: "05",
+                  title: "Motion Graphics",
+                  description: "Cinematic animations, video editing, and motion design. From social media to full-scale productions.",
+                  color: "rgba(255, 255, 255, 0.05)",
+                },
+                {
+                  label: "06",
+                  title: "3D & WebGL",
+                  description: "Interactive 3D experiences and WebGL visualizations. Three.js, OGL, and custom shader development.",
+                  color: "rgba(255, 255, 255, 0.05)",
+                },
+              ]}
+            />
+
+            {/* Original Bento Box Grid (preserved for fallback) */}
+            <div className="grid grid-cols-1 md:grid-cols-3 md:grid-rows-3 gap-6 hidden">
               {/* Service 1 - Web Dev (spans 2 columns) */}
               <BorderGlow 
                 glowColor="0 0 100"
