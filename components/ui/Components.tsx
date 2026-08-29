@@ -99,11 +99,13 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   error?: string;
 }
 
-export const Input: React.FC<InputProps> = ({ label, error, className, ...props }) => {
+export const Input: React.FC<InputProps> = ({ label, error, className, value, onChange, ...props }) => {
   return (
     <div className="space-y-1.5 w-full">
       {label && <label className="text-xs font-semibold text-white/82 uppercase tracking-wider">{label}</label>}
       <input
+        value={value}
+        onChange={onChange}
         className={cn(
           "flex h-10 w-full rounded-lg border border-white/10 bg-white/4 px-3 py-2 text-sm text-[#FFFFFF] placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-[#B8C4D0]/10 focus:border-[#B8C4D0] transition-all duration-300",
           error && "border-red-500/50 focus:ring-red-500/30",
@@ -122,11 +124,13 @@ interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement
   error?: string;
 }
 
-export const Textarea: React.FC<TextareaProps> = ({ label, error, className, ...props }) => {
+export const Textarea: React.FC<TextareaProps> = ({ label, error, className, value, onChange, ...props }) => {
   return (
     <div className="space-y-1.5 w-full">
       {label && <label className="text-xs font-semibold text-white/82 uppercase tracking-wider">{label}</label>}
       <textarea
+        value={value}
+        onChange={onChange}
         className={cn(
           "flex min-h-[80px] w-full rounded-lg border border-white/10 bg-white/4 px-3 py-2 text-sm text-[#FFFFFF] placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-[#B8C4D0]/10 focus:border-[#B8C4D0] transition-all duration-300",
           error && "border-red-500/50 focus:ring-red-500/30",
