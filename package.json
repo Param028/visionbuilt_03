@@ -8,23 +8,14 @@
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "admin": "node scripts/admin-cli.js"
+    "verify:routes": "node scripts/check-public-routes.mjs"
   },
   "dependencies": {
-    "@heroui/react": "^3.2.1",
-    "@heroui/theme": "^2.4.26",
     "@supabase/supabase-js": "^2.39.7",
-    "clsx": "^2.1.1",
-    "dotenv": "^16.4.5",
-    "framer-motion": "^12.26.2",
-    "gsap": "^3.15.0",
-    "inquirer": "^9.2.15",
     "lucide-react": "^0.562.0",
-    "ogl": "^1.0.11",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
-    "react-router-dom": "^7.12.0",
-    "tailwind-merge": "^3.4.0"
+    "react-router-dom": "^7.12.0"
   },
   "devDependencies": {
     "@types/node": "^20.11.24",
@@ -32,9 +23,9 @@
     "@types/react-dom": "^19.0.1",
     "@vitejs/plugin-react": "^5.1.2",
     "autoprefixer": "^10.4.18",
-    "postcss": "^8.4.35",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.2.2",
-    "vite": "^7.3.1"
+    "vite": "^7.3.1",
+    "wait-on": "^8.0.3"
   }
 }

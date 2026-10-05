@@ -1,0 +1,31 @@
+name: Verify Vercel deployment
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-and-routes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Start preview server
+        run: npm run preview -- --host 0.0.0.0 --port 4173 > /tmp/visionbuilt-preview.log 2>&1 &
+      - name: Check local public routes
+        run: npx wait-on http://127.0.0.1:4173 && npm run verify:routes -- --base-url=http://127.0.0.1:4173
+      - name: Wait for Vercel deployment
+        if: ${{ vars.VERCEL_DEPLOYMENT_URL != '' }}
+        env:
+          DEPLOYMENT_URL: ${{ vars.VERCEL_DEPLOYMENT_URL }}
+        run: npx wait-on --timeout 120000 "$DEPLOYMENT_URL"
+      - name: Check deployed public routes
+        if: ${{ vars.VERCEL_DEPLOYMENT_URL != '' }}
+        env:
+          DEPLOYMENT_URL: ${{ vars.VERCEL_DEPLOYMENT_URL }}
+        run: npm run verify:routes -- --base-url="$DEPLOYMENT_URL"
