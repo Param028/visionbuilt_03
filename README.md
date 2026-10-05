@@ -1,20 +1,22 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Vision Built portfolio
 
-# Run and deploy your AI Studio app
+A Vite + React + TypeScript + Tailwind portfolio site backed by Supabase.
 
-This contains everything you need to run your app locally.
+## Included
 
-View your app in AI Studio: https://ai.studio/apps/aa8e2c16-bd08-4e0e-9065-8cfe354e1829
+- BrowserRouter public site: Home, Work, category filtering, project detail, Services, About, Contact, Privacy and Terms.
+- Published-only project queries with category/subcategory support and project media.
+- Supabase Auth admin login at `/admin/login` with database-backed `admin`/`super_admin` access checks.
+- CMS dashboard shell with project/enquiry counts and enquiry inbox.
+- Validated contact enquiries with honeypot and client cooldown protection.
+- Vercel rewrite, `robots.txt`, sitemap, responsive layout, accessible focus states and reduced-motion support.
+- Versioned schema and RLS migration at `supabase/migrations/portfolio_cms_migration.sql`.
 
-## Run Locally
+## Local development
 
-**Prerequisites:**  Node.js
+1. Copy `.env.example` to `.env.local` and add the public Supabase URL and anon/publishable key.
+2. Run `npm install`.
+3. Run `npm run dev`.
+4. Apply the migration in `supabase/migrations/portfolio_cms_migration.sql` to a Supabase project.
 
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+The browser bundle contains no service-role keys or payment credentials. Admin writes are protected by Supabase RLS and the `public.is_admin()` function.
