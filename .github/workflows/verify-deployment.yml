@@ -20,12 +20,10 @@ jobs:
       - name: Check local public routes
         run: npx wait-on http://127.0.0.1:4173 && npm run verify:routes -- --base-url=http://127.0.0.1:4173
       - name: Wait for Vercel deployment
-        if: ${{ vars.VERCEL_DEPLOYMENT_URL != '' }}
         env:
-          DEPLOYMENT_URL: ${{ vars.VERCEL_DEPLOYMENT_URL }}
+          DEPLOYMENT_URL: ${{ vars.VERCEL_DEPLOYMENT_URL || 'https://www.visionbuilt.in' }}
         run: npx wait-on --timeout 120000 "$DEPLOYMENT_URL"
       - name: Check deployed public routes
-        if: ${{ vars.VERCEL_DEPLOYMENT_URL != '' }}
         env:
-          DEPLOYMENT_URL: ${{ vars.VERCEL_DEPLOYMENT_URL }}
+          DEPLOYMENT_URL: ${{ vars.VERCEL_DEPLOYMENT_URL || 'https://www.visionbuilt.in' }}
         run: npm run verify:routes -- --base-url="$DEPLOYMENT_URL"
