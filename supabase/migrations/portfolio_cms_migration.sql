@@ -25,3 +25,8 @@ insert into storage.buckets(id,name,public,file_size_limit,allowed_mime_types) v
 create policy portfolio_media_read on storage.objects for select using(bucket_id='portfolio-media'); create policy portfolio_media_write on storage.objects for insert with check(bucket_id='portfolio-media' and public.is_admin()); create policy portfolio_media_update on storage.objects for update using(bucket_id='portfolio-media' and public.is_admin()); create policy portfolio_media_delete on storage.objects for delete using(bucket_id='portfolio-media' and public.is_admin());
 -- Preserve legacy commerce tables for rollback/audit; the new application does not query them.
 alter table if exists public.orders rename to archived_orders; alter table if exists public.payments rename to archived_payments; alter table if exists public.messages rename to archived_messages; alter table if exists public.marketplace_items rename to archived_marketplace_items; alter table if exists public.offers rename to archived_offers; alter table if exists public.tasks rename to archived_tasks; alter table if exists public.project_suggestions rename to archived_project_suggestions; alter table if exists public.recurring_services rename to archived_recurring_services;
+
+-- Security hardening: the helper is only used inside RLS policies, not as a public RPC.
+alter function public.is_admin() set search_path = public;
+alter function public.enforce_two_category_levels() set search_path = public;
+revoke execute on function public.is_admin() from anon, authenticated;
