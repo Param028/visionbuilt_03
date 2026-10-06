@@ -20,3 +20,8 @@
 @media(prefers-reduced-motion:reduce){.showcase-card,.scroll-cue span,.skeleton-card div{animation:none!important;transition:none!important}.showcase-card{transform:none!important}}
 
 .not-found-code{font:500 18px var(--mono);letter-spacing:.08em;color:var(--accent)}.not-found-links{display:flex;gap:10px;flex-wrap:wrap;margin:28px 0}.not-found-search{display:flex;align-items:center;gap:8px;width:min(420px,100%);border:1px solid var(--line);padding:12px;color:var(--muted)}.not-found-search input{border:0;outline:0;width:100%;background:transparent;color:var(--muted)}a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--primary);outline-offset:3px}
+
+
+/* Footer wordmark alignment fix */
+.footer-wordmark{display:block;width:100%;text-align:center;margin:54px auto -4px;transform:none;overflow:visible;font-size:clamp(64px,15vw,220px);letter-spacing:-.075em}
+@media(max-width:800px){.footer-wordmark{font-size:18vw;margin-top:42px;letter-spacing:-.06em}}
